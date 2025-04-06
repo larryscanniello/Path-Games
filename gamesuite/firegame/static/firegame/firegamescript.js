@@ -65,26 +65,50 @@ document.addEventListener('keydown', (event) => {
 
 async function makeMove(move) {
     let currentposition = document.querySelector('.player')
-    currentposition.classList.remove('player')
-    currentposition.style.backgroundColor = 'gray'
     const matrix = Array.from(document.querySelectorAll('.item'));
     let playerIndex = matrix.indexOf(currentposition);
     switch(move){
         case 0:
-            matrix[playerIndex+25].style.backgroundColor = 'dodgerblue'
-            matrix[playerIndex+25].classList.add('player')
+            if(playerIndex<600){
+                if(!matrix[playerIndex+25].classList.contains('closed')){
+                    matrix[playerIndex+25].style.backgroundColor = 'dodgerblue'
+                    matrix[playerIndex+25].classList.add('player')
+                    currentposition.classList.remove('player')
+                    currentposition.style.backgroundColor = 'lightgray'
+                }
+            }
             break;
         case 1:
-            matrix[playerIndex-1].style.backgroundColor = 'dodgerblue'
-            matrix[playerIndex-1].classList.add('player')
+            if(!playerIndex%25==0){
+                if(!matrix[playerIndex-1].classList.contains('closed')){
+                    matrix[playerIndex-1].style.backgroundColor = 'dodgerblue'
+                    matrix[playerIndex-1].classList.add('player')
+                    currentposition.classList.remove('player')
+                    currentposition.style.backgroundColor = 'lightgray'
+                }
+            } 
             break;
         case 2:
-            matrix[playerIndex-25].style.backgroundColor = 'dodgerblue'
-            matrix[playerIndex-25].classList.add('player')
+            if(playerIndex>24){
+                if(!matrix[playerIndex-25].classList.contains('closed')){
+                    matrix[playerIndex-25].style.backgroundColor = 'dodgerblue'
+                    matrix[playerIndex-25].classList.add('player')
+                    currentposition.classList.remove('player')
+                    currentposition.style.backgroundColor = 'lightgray'        
+                }
+            }
             break;
         case 3:
-            matrix[playerIndex+1].style.backgroundColor = 'dodgerblue'
-            matrix[playerIndex+1].classList.add('player')
+            if(!((playerIndex%25)==24)){
+                console.log('Check2')
+                if(!matrix[playerIndex+1].classList.contains('closed')){
+                    console.log('Check1')
+                    matrix[playerIndex+1].style.backgroundColor = 'dodgerblue'
+                    matrix[playerIndex+1].classList.add('player')
+                    currentposition.classList.remove('player')
+                    currentposition.style.backgroundColor = 'lightgray'    
+                }
+            }
             break;
         
     }
