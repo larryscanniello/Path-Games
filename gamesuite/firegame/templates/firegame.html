@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'firegame/firegamestyles.css' %}">
+<script>
+    const csrfToken = "{{ csrf_token }}";
+</script>
+<script src="{% static 'firegame/firegamescript.js' %}" defer></script>
+<div class="container"></div>
+{% endblock %}
