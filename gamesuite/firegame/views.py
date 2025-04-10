@@ -23,3 +23,7 @@ def make_move(request):
     grid = json.loads(request.body)
     grid = fire_step.fire_step(grid)
     return JsonResponse({'grid': grid})
+
+def create_more_games(request):
+    
+    return HttpResponse('Yo')

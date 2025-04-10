@@ -71,20 +71,22 @@ def place_initial_positions(grid,printyn):
                     opencelllist.append((i,j))
         #Randomly pick an open cell to place bots
         botindex = opencelllist[math.floor(random.random()*len(opencelllist))]
+        while not ((botindex[0]<9 or botindex[0]>17) and (botindex[1]<9 or botindex[1]>17)):
+            botindex = opencelllist[math.floor(random.random()*len(opencelllist))]
+            print('check1')
         grid[botindex] = 11110
         opencelllist.remove(botindex)
         #Randomly pick an open cell to place extinguisher
         extindex = opencelllist[math.floor(random.random()*len(opencelllist))]
+        if(manhattandistance(extindex,botindex)<25):
+            extindex = opencelllist[math.floor(random.random()*len(opencelllist))]
         grid[extindex] = 5
         opencelllist.remove(extindex)
         #Randomly pick an open cell to start fire
         fireindex = opencelllist[math.floor(random.random()*len(opencelllist))]
         grid[fireindex] = 2
         opencelllist.remove(fireindex)
-        if printyn == 1:
-            file = open('shipresults.txt','a')
-            file.write('t= 0 \n')
-            file.write(np.array2string(grid, max_line_width=1000))
-            file.write('\n')
-            file.close()
         return grid,botindex,extindex,fireindex
+
+def manhattandistance(coords1,coords2):
+    return abs(coords1[0]-coords2[0])+abs(coords1[1]-coords2[1])
