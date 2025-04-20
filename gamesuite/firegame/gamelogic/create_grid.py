@@ -5,7 +5,7 @@ import numpy as np
 
 def create_grid(D):
         #create array
-        newgrid = np.ones((D,D))
+        newgrid = np.ones((D,D),dtype=int)
         #select random block to open
         row = math.floor((random.random())*D)
         col = math.floor((random.random())*D)
@@ -49,18 +49,16 @@ def create_grid(D):
                 if newgrid[item2] == 1:
                     closednbrsofdeadends.append(item2)
         #Open approximately half of these closed neighbors of deadend cells
-        #Well, a bit more than half, it seemed like this gave greater variance in success rates and thus made things a little bit more interesting
-        #i.e. more corridors to choose from, more significant choices for the bots to make
         openeddeadends = []
         for item in closednbrsofdeadends:
-            if random.random() > .62:
+            if random.random() > .55:
                 newgrid[item] = 0
                 openeddeadends.append(item)
         #print(newgrid)
         #print('Before: ',len(closednbrsofdeadends),' After: ', len(closednbrsofdeadends)-len(openeddeadends))
         return newgrid
 
-def place_initial_positions(grid,printyn):
+def place_initial_positions(grid):
         D=len(grid)
         #Goal: Place bots, extinguisher, and initial fire cell
         #First step: Create list of all open cells
@@ -73,8 +71,7 @@ def place_initial_positions(grid,printyn):
         botindex = opencelllist[math.floor(random.random()*len(opencelllist))]
         while not ((botindex[0]<9 or botindex[0]>17) and (botindex[1]<9 or botindex[1]>17)):
             botindex = opencelllist[math.floor(random.random()*len(opencelllist))]
-            print('check1')
-        grid[botindex] = 11110
+        grid[botindex] = 10
         opencelllist.remove(botindex)
         #Randomly pick an open cell to place extinguisher
         extindex = opencelllist[math.floor(random.random()*len(opencelllist))]

@@ -3,7 +3,7 @@ from .get_adj_indices import get_adj_indices
 import numpy as np
 
 def fire_step(grid):
-        q = .5
+        q = .4
         newgrid = np.array(grid)
         firelist = []
         for i in range(len(grid)):
@@ -18,4 +18,4 @@ def fire_step(grid):
                         firelist.append((i,j))
         for index in firelist:
              newgrid[index]+=2
-        return newgrid.tolist()
+        return newgrid, firelist

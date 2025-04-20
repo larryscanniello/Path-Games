@@ -18,9 +18,49 @@
 
   .item {
     background-color: lightgray;
+    justify-content: center;
+    align-items: center;
+    display: flex;
   }
 
   * {
     margin: 0;
     padding: 0;
   }
+
+  .layer1 {
+    width: 85%;
+    height: 85%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .layer2 {
+    width: 75%;
+    height: 75%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .layer3 {
+    width: 68%;
+    height: 68%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .layer4{
+    width: 55%;
+    height: 55%;
+  }
+
+.extinguisher{
+  background-color: green !important;
+}
+
+.fire{
+  background-color: red !important;
+}

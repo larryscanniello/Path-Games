@@ -1,7 +1,8 @@
 
 let container = document.querySelector('.container')
-
 let sqmatrix = []
+let turncount = 0
+let gameid = 0
 
 for(let i=0;i<25;i++){
     let row = []
@@ -21,21 +22,32 @@ startGame();
 
 async function startGame() {
     try {
-      const response = await fetch('new_game/');
+      const response = await fetch('load_game/',{
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+            },
+        body: JSON.stringify(difficulty)
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
       let data = await response.json();
-      
-      sqmatrix[data.extindex[0]][data.extindex[1]].style.backgroundColor = 'green'
-      sqmatrix[data.extindex[0]][data.extindex[1]].classList.add('extinguisher')
-      sqmatrix[data.fireindex[0]][data.fireindex[1]].style.backgroundColor = 'red'
-      sqmatrix[data.fireindex[0]][data.fireindex[1]].classList.add('fire')
-      sqmatrix[data.botindex[0]][data.botindex[1]].style.backgroundColor = 'dodgerblue'
-      sqmatrix[data.botindex[0]][data.botindex[1]].classList.add('player')
+      extindex = JSON.parse(data.extindex)
+      fireindex = JSON.parse(data.fireindex)
+      botindex = JSON.parse(data.botindex)
+      layout = JSON.parse(data.layout)
+      gameid = JSON.parse(data.gameid)
+      sqmatrix[extindex[0]][extindex[1]].style.backgroundColor = 'green'
+      sqmatrix[extindex[0]][extindex[1]].classList.add('extinguisher')
+      sqmatrix[fireindex[0]][fireindex[1]].style.backgroundColor = 'red'
+      sqmatrix[fireindex[0]][fireindex[1]].classList.add('fire')
+      sqmatrix[botindex[0]][botindex[1]].style.backgroundColor = 'dodgerblue'
+      sqmatrix[botindex[0]][botindex[1]].classList.add('player')
       for(let i=0;i<25;i++){
         for(let j=0;j<25;j++){
-            if(data.layout[i][j]==1){
+            if(layout[i][j]==1){
                 sqmatrix[i][j].style.backgroundColor = 'black'
                 sqmatrix[i][j].classList.add('closed')
             }
@@ -100,9 +112,7 @@ async function makeMove(move) {
             break;
         case 3:
             if(!((playerIndex%25)==24)){
-                console.log('Check2')
                 if(!matrix[playerIndex+1].classList.contains('closed')){
-                    console.log('Check1')
                     matrix[playerIndex+1].style.backgroundColor = 'dodgerblue'
                     matrix[playerIndex+1].classList.add('player')
                     currentposition.classList.remove('player')
@@ -120,9 +130,11 @@ async function makeMove(move) {
           'Content-Type': 'application/json',
           'X-CSRFToken': csrfToken,
         },
-        body: JSON.stringify(arr)
-        
-      });
+        body: JSON.stringify({
+            'grid': arr,
+            'turncount': turncount,
+            'gameid': gameid
+        })});
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       } 
@@ -139,7 +151,7 @@ async function makeMove(move) {
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-    
+    turncount += 1
   }
 
 function convertArrToNumbers(){

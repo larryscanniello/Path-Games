@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<form action="{% url 'play_game' 'easy' %}" method="get">
+    <button type="submit">Easy</button>
+</form>
+<form action="{% url 'play_game' 'medium' %}" method="get">
+    <button type="submit">Medium</button>
+</form>
+<form action="{% url 'play_game' 'hard' %}" method="get">
+    <button type="submit">Hard</button>
+</form>
+
+{% endblock %}
