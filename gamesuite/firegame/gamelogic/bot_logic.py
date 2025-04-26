@@ -55,14 +55,15 @@ def move_bot_3(grid,bot3index):
         for j in range(len(altgrid)):
             if grid[(i,j)]%10==0:
                 adjlist = get_adj_indices.get_adj_indices(i,j,len(altgrid))
-                checkfireneighbor = False
                 for item in adjlist:
                     if grid[item]%10==2:
-                        checkfireneighbor = True
                         altgrid[(i,j)]=3
                         break
     #do bfs on alt grid, if that doesn't work, do bfs on normal grid                
     bfslist = bfs(altgrid,bot3index)
+    file = open('results.txt','a')
+    file.write(str(altgrid))
+    file.close()
     if not bfslist == []:
         """grid[bot3index] -= 100
         grid[bfslist[1]] += 100"""

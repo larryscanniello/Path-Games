@@ -23,4 +23,5 @@ urlpatterns = [
     path('',views.index,name='index'),
     path('accounts/',include('accounts.urls')),
     path('firegame/',include('firegame.urls'),name='firegame'),
+    path('api/',include('api.urls'),name='api'),
 ]
