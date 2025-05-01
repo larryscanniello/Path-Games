@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'accounts',
     'api',
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    'mousegame',
 ]
 
 MIDDLEWARE = [

@@ -1,15 +1,15 @@
-import logo from './logo.svg';
-import './App.css';
-import NavBar from './Components/NavBar.jsx'
-import RenderGrid from './Components/RenderGrid.jsx'
-import { useState, useEffect } from 'react';
+import NavBar from '../NavBar.jsx'
+import RenderGridSeeBots from './RenderGridSeeFireBots.jsx'
+import { useState, useEffect, useRef } from 'react';
 
-function App() {
-  const [currentTurn,setCurrentTurn] = useState(0)
+function SeeFireBots() {
+  const [currentTurn,setCurrentTurn] = useState(0);
   const [data,setData] = useState(null)
   const [currentGrid,setCurrentGrid] = useState(null);
   const [error, setError] = useState(null);
   const [firelist, setFirelist] = useState(null);
+  const [play, setPlay] = useState(false);
+  const intervalRef = useRef(null);
 
 
   useEffect(() => {
@@ -33,7 +33,7 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if(data){
-      if(e.code === 'Space' || e.code === 'ArrowRight'){
+      if(e.code === 'ArrowRight'){
         setCurrentTurn((prev)=>{
           const newTurn = Math.min(firelist.length-1, prev + 1);
           return newTurn
@@ -43,7 +43,15 @@ function App() {
           const newTurn = Math.max(0,prev-1)
           return newTurn
         })
+      } else if (e.code === 'Space'){
+        if(!play){
+        setCurrentTurn((prev)=>{
+          const newTurn = Math.min(firelist.length-1, prev + 1);
+          return newTurn
+        });
         }
+        setPlay((prev)=> !prev)
+      }
         };
     };
     if(data){
@@ -54,36 +62,25 @@ function App() {
     }
   }, [data]);
 
-  /*
-  const moveForwards = (turn) => {
-    const thisTurnList = firelist[turn-1]
-    setCurrentGrid(prev => {
-      const newGrid = prev.map(row=>[...row])
-      thisTurnList.forEach(element => {
-        newGrid[element[0]][element[1]] +=2;
-      });
-      return newGrid;
-    });
-  };
-
-  const moveBackwards = (turn) => {
-    const thisTurnList = firelist[turn+1]
-    setCurrentGrid(prev => {
-      const newGrid = prev.map(row=>[...row])
-      thisTurnList.forEach(element => {
-        newGrid[element[0]][element[1]] -=2;
-      });
-      return newGrid;
-    });
-  };
-  */
+  useEffect(()=>{
+    if(play){
+      intervalRef.current = setInterval(()=>{
+      setCurrentTurn(prev => {
+        const newTurn = Math.min(firelist.length-1, prev + 1);
+        return newTurn
+      })
+      },500)
+      return () => clearInterval(intervalRef.current)
+    }
+  },[play])
+  
   return (
     <>
     <NavBar/>
-    <RenderGrid data={data} currentGrid={currentGrid} currentTurn={currentTurn}/>
+    <RenderGridSeeBots data={data} currentGrid={currentGrid} currentTurn={currentTurn}/>
     <div>Current turn: {currentTurn}</div>
     </>
   )
 }
 
-export default App;
+export default SeeFireBots;

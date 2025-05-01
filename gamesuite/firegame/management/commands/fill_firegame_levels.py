@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from firegame.models import FiregameMap
-from firegame.gamelogic import create_grid,fire_step,bot_logic,get_adj_indices
+from firegame.gamelogic.Firegame import create_grid,fire_step,bot_logic,get_adj_indices
 import random
 import numpy as np
 import json

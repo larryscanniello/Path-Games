@@ -1,6 +1,6 @@
-import '../Styles/FiregameStyles.css'
+import '../../Styles/FiregameStyles.css'
 
-export default function RenderGrid(props){
+export default function RenderGridSeeBots(props){
     if(!props.data) return <p>Loading...</p>
 
     const grid = JSON.parse(props.data.initial_board)
@@ -16,8 +16,7 @@ export default function RenderGrid(props){
     return(
     <div className='container'>
         {grid.map((row,i)=>(
-            <div key={i}>
-                {row.map((cell,j) => {
+                row.map((cell,j) => {
                     let bgColor = '';
                     const mod = cell%10;
                     if(mod===2){
@@ -36,8 +35,7 @@ export default function RenderGrid(props){
                     >
                     <BotSlot data={props.data} currentTurn={props.currentTurn} i={i} j={j}/></div>
                     </>
-                )})}
-            </div>
+                )})
         ))}
     </div>)
 }
