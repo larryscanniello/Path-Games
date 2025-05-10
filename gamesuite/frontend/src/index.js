@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import SeeFireBots from './Components/Firegame/SeeFireBots'
 import SeeMiceBots from './Components/Mousegame/SeeMiceBots'
+import Mousegame from './Components/Mousegame/Mousegame';
 import Home from './Components/Home'
 import Firegame from './Components/Firegame/Firegame'
 import reportWebVitals from './reportWebVitals';
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
   {
     path: "/seemicebots",
     element: <SeeMiceBots/>
+  },
+  {
+    path: "/mousegame",
+    element: <Mousegame/>
   }
 
 ])

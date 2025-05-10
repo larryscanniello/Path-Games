@@ -8,16 +8,18 @@ export default function SeeMiceBots(){
     const [turn, setTurn] = useState(0);
     const [error, setError] = useState(null);
     const [play, setPlay] = useState(false);
+    const [showBot3Probabilities,setShowBot3Probabilities] = useState(false);
     const intervalRef = useRef(null);
 
     useEffect(() => {
         async function fetchGame(){
           try{
-            const res = await fetch('http://localhost:8000/api/mousegame/4/');
+            const res = await fetch('http://localhost:8000/api/mousegame/26/');
             if(!res.ok){
               throw new Error('Game not found')
             }
             const responsedata = await res.json();
+            console.log(responsedata)
             const parseddata = {
                 game: {
                     grid: JSON.parse(responsedata.game.grid),
@@ -37,8 +39,15 @@ export default function SeeMiceBots(){
                 bot3: {
                     evidence: JSON.parse(responsedata.bots[2].evidence).slice(1),
                     states: JSON.parse(responsedata.bots[2].states)
+                },
+                bot4: {
+                    evidence: JSON.parse(responsedata.bots[3].evidence).slice(1),
+                    states: JSON.parse(responsedata.bots[3].states),
+                    plans: responsedata.bots[3].plans,
+                    modechange: responsedata.bots[3].modechange
                 }
             }
+            console.log(parseddata)
             setSimData(parseddata);
           } catch(err){
           setError(err.message)
@@ -50,7 +59,7 @@ export default function SeeMiceBots(){
     useEffect(() => {
         const handleKeyDown = (e) => {
           if(simData){
-            const simlength = Math.max(simData.bot1.evidence.length,simData.bot2.evidence.length,simData.bot3.evidence.length)
+            const simlength = Math.max(simData.bot1.evidence.length,simData.bot2.evidence.length,simData.bot3.evidence.length,simData.bot4.evidence.length)
             if(e.code === 'ArrowRight'){
                 setTurn((prev)=>{
                 const newTurn = Math.min(simlength-1, prev + 1);
@@ -84,7 +93,7 @@ export default function SeeMiceBots(){
         if(play){
         intervalRef.current = setInterval(()=>{
         setTurn(prev => {
-            const simlength = Math.max(simData.bot1.evidence.length,simData.bot2.evidence.length,simData.bot3.evidence.length)
+            const simlength = Math.max(simData.bot1.evidence.length,simData.bot2.evidence.length,simData.bot3.evidence.length,simData.bot4.evidence.length)
             const newTurn = Math.min(simlength-1, prev + 1);
             return newTurn
         })
@@ -94,11 +103,20 @@ export default function SeeMiceBots(){
     },[play])
 
 
-
   return (
     <>
     <NavBar/>
-    <RenderGridSeeMouseBots data={simData} turn={turn}/>
+    <button onClick= {() => setShowBot3Probabilities(prev => !prev)}>
+      {showBot3Probabilities ? 'Hide Probabilities' : 'Show Probabilities'}
+    </button>
+    <div>
+      Turn: {turn}
+    </div>
+    <RenderGridSeeMouseBots 
+    data={simData} 
+    turn={turn} 
+    showBot3Probabilities={showBot3Probabilities}
+    />
     <div>Current turn: {turn}</div>
     </>
   )

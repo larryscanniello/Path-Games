@@ -7,12 +7,15 @@ class MousegameMap(models.Model):
     mouse_starting_index = models.JSONField() 
     mouse_path = models.JSONField()
     num_turns = models.IntegerField()
+    sensor_sensitivity = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return f"Game {self.id} - {self.num_turns} turns"
     
 class BotData(models.Model):
     mousegame_map = models.ForeignKey(MousegameMap,on_delete=models.CASCADE)
+    plans = models.JSONField(null=True)
     evidence = models.JSONField()
     states = models.JSONField()
+    modechange = models.IntegerField(null=True)
     bot = models.SmallIntegerField()

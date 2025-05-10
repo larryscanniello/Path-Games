@@ -37,25 +37,21 @@ def filtering(filterstate,stoch,filterevidence,t,grid,a):
     #which will be different for all 3 evidence types
     probevidence = np.zeros((len(grid),len(grid)))
     #Next line is if new evidence is stepping into an empty square, thereby that empty square does not contain the mouse:
+    open_mask = np.logical_or(grid % 10 == 0, grid % 10 == 2)
+    exclude = filterevidence[t][2]
+    open_mask[exclude[0], exclude[1]] = False
     if filterevidence[t][1]==2:
-        for i in range(len(grid)):
-            for j in range(len(grid)):
-                if (grid[(i,j)]%10==0 or grid[i,j]%10==2) and not (i,j)==filterevidence[t][2]:
-                    probevidence[(i,j)] += 1
+        probevidence[open_mask] = 1
     #If new evidence is a positive sense:
     if filterevidence[t][1]==1:
-        for i in range(len(grid)):
-            for j in range(len(grid)):
-                if (grid[(i,j)]%10==0 or grid[i,j]%10==2) and not (i,j)==filterevidence[t][2]:
-                    d = calc_manhattan_dist((i,j),filterevidence[t][2])
-                    probevidence[(i,j)]=math.exp(-a*(d-1))
+        rows, cols = np.indices(grid.shape)
+        dists = np.abs(rows - exclude[0]) + np.abs(cols - exclude[1])
+        probevidence[open_mask] = np.exp(-a * (dists[open_mask] - 1))
     #If new evidence is a negative sense:
     if filterevidence[t][1]==0:
-        for i in range(len(grid)):
-            for j in range(len(grid)):
-                if (grid[(i,j)]%10==0 or grid[i,j]%10==2) and not (i,j)==filterevidence[t][2]:
-                    d = calc_manhattan_dist((i,j),filterevidence[t][2])
-                    probevidence[(i,j)]=1-math.exp(-a*(d-1))
+        rows, cols = np.indices(grid.shape)
+        dists = np.abs(rows - exclude[0]) + np.abs(cols - exclude[1])
+        probevidence[open_mask] = 1-np.exp(-a * (dists[open_mask] - 1))
     stateunnormalized = pred * probevidence
     #Now we normalize probabilities
     newstate = stateunnormalized*(1/np.sum(stateunnormalized))
@@ -102,3 +98,48 @@ def predicting(initialstate,stoch,evidence,grid):
 
 def calc_manhattan_dist(tup1,tup2):
     return int(math.fabs(tup1[0]-tup2[0])+math.fabs(tup1[1]-tup2[1]))
+
+def calculate_KL_divergence(state,stoch,grid,a):
+    divergencearr = np.zeros((len(state),len(state)))
+    for i in range(len(state)):
+        for j in range(len(state)):
+            if state[(i,j)]>1e-5:
+                newstate = filtering(state,stoch,[(0,0,(i,j))],0,grid,a)
+                eps = 1e-10
+                try:
+                    divergence = np.sum(state[newstate>0]*np.log(state[newstate>0]/newstate[newstate>0]))
+                    divergencearr[i][j] = divergence
+                except:
+                    divergencearr[i][j]=0
+    return divergencearr
+
+def calculate_expected_entropy_reduction(state,stoch,grid,a,botindex):
+    H = calc_entropy(state)
+
+    open_mask = np.logical_or(grid % 10 == 0, grid % 10 == 2)
+    rows, cols = np.indices(grid.shape)
+
+    entropy_array = np.zeros((len(state),len(state)))
+    for i in range(len(state)):
+        for j in range(len(state)):
+            dists = np.abs(rows - i) + np.abs(cols - j)
+            probevidencebeep,probevidencenobeep = np.zeros((len(state),len(state))),np.zeros((len(state),len(state)))
+            probevidencebeep[open_mask] = np.exp(-a * (dists[open_mask] - 1))
+            Pbeep = np.sum(state*probevidencebeep)
+            probevidencenobeep[open_mask] = 1-np.exp(-a * (dists[open_mask] - 1))
+            Pnobeep = np.sum(state*probevidencenobeep)
+            """Hbeepx = filtering(state,stoch,[(0,1,(i,j))],0,grid,a)
+            Hnobeepx = filtering(state,stoch,[(0,0,(i,j))],0,grid,a)"""
+            #entropy_array[i][j] = H-Pbeep*calc_entropy(probevidencebeep*state/Pbeep)-Pnobeep*calc_entropy(probevidencenobeep*state/Pnobeep)
+            entropy_array[i][j] = H-Pnobeep*calc_entropy(probevidencenobeep*state/Pnobeep)
+
+    return entropy_array
+
+
+
+
+def calc_entropy(state):
+    state = state.flatten()
+    state = state[state > 0]
+    stateentropy = -np.sum(state*np.log(state))
+    return stateentropy

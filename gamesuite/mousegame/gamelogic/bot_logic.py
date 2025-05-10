@@ -4,6 +4,7 @@ from . import bot_logic, state_logic,get_adj_indices
 import numpy as np
 import heapq
 from collections import deque
+from scipy.signal import convolve2d
 
 def bot_1(grid,bot1index,t,plan,bot1evidence,mouseindex,a,bot1state,stoch):
     if plan == []:
@@ -108,15 +109,128 @@ def bot_3(grid,bot3index,t,plan,bot3evidence,mouseindex,a,bot3state,stoch):
         plan.pop(0)
         return grid,bot3index,bot3evidence,plan,bot3state
     else:
-        """grid[bot3index]-=1000
-        grid[plan[0]]+=1000"""
         bot3index = plan[0]
         plan.pop(0)
         newevidence = (t,2,bot3index)
         bot3evidence.append(newevidence)
         bot3state = state_logic.filtering(bot3state.copy(),stoch,bot3evidence.copy(),t,grid,a)
         return grid,bot3index,bot3evidence,plan,bot3state
+
+def bot_3_alt(grid,bot3index,turn,plan,bot3evidence,mouseindex,a,bot3state,stoch,mode):
+    if not plan==[]:
+        if plan[0]==None:
+            d = calc_manhattan_dist(bot3index,mouseindex)
+            if random.random()<math.exp(-a*(d-1)):
+                newevidence = (turn,1,bot3index)
+                bot3evidence.append(newevidence)
+            else:
+                newevidence = (turn,0,bot3index)
+                bot3evidence.append(newevidence)
+            bot3state= state_logic.filtering(bot3state.copy(),stoch,bot3evidence.copy(),turn,grid,a)
+            plan.pop(0)
+            return grid,bot3index,bot3evidence,plan,bot3state,mode
+        else:
+            bot3index = plan[0]
+            plan.pop(0)
+            newevidence = (turn,2,bot3index)
+            bot3evidence.append(newevidence)
+            bot3state = state_logic.filtering(bot3state.copy(),stoch,bot3evidence.copy(),turn,grid,a)
+            return grid,bot3index,bot3evidence,plan,bot3state,mode
+    d = calc_manhattan_dist(bot3index,mouseindex)
+    if random.random()<math.exp(-a*(d-1)):
+        newevidence = (turn,1,bot3index)
+        bot3evidence.append(newevidence)
+    else:
+        newevidence = (turn,0,bot3index)
+        bot3evidence.append(newevidence)
+    bot3state = state_logic.filtering(bot3state.copy(),stoch,bot3evidence,turn,grid,a)
+    if mode==0:
+        kernel = np.ones((7, 7))
+        block_sums = convolve2d(bot3state, kernel, mode='valid')
+        if not np.any(block_sums > 0.5):
+            bot3state = state_logic.filtering(bot3state.copy(),stoch,bot3evidence.copy(),turn,grid.copy(),a)
+            destinationindex = np.unravel_index(bot3state.argmax(), bot3state.shape)
+            if bot3index == destinationindex:
+                statecopy = bot3state.copy()
+                statecopy[bot3index]-=1
+                destinationindex = np.unravel_index(statecopy.argmax(), bot3state.shape)
+            plan = bot_3_dynamic_UFCS(grid,bot3index,destinationindex,bot3state.copy(),3,stoch,bot3evidence.copy(),turn)
+            return grid,bot3index,bot3evidence,plan,bot3state,mode
+        else:
+            mode=1
+            return grid,bot3index,bot3evidence,plan,bot3state,mode
+    #at this point mode=1
+    bot3state = state_logic.filtering(bot3state.copy(),stoch,bot3evidence.copy(),turn,grid.copy(),a)
+    destinationindex = np.unravel_index(bot3state.argmax(), bot3state.shape)
+    plan = bot_3_dynamic_UFCS(grid,bot3index,destinationindex,bot3state,1,stoch,bot3evidence,turn)
+    return grid,bot3index,bot3evidence,plan,bot3state,mode    
     
+def bot_4(grid,bot4index,turn,plan,bot4evidence,mouseindex,a,bot4state,stoch,mode):
+    if not plan==[]:
+        if plan[0]==None:
+            d = calc_manhattan_dist(bot4index,mouseindex)
+            if random.random()<math.exp(-a*(d-1)):
+                newevidence = (turn,1,bot4index)
+                bot4evidence.append(newevidence)
+            else:
+                newevidence = (turn,0,bot4index)
+                bot4evidence.append(newevidence)
+            bot4state= state_logic.filtering(bot4state.copy(),stoch,bot4evidence.copy(),turn,grid,a)
+            plan.pop(0)
+            return grid,bot4index,bot4evidence,plan,bot4state,mode
+        else:
+            bot4index = plan[0]
+            plan.pop(0)
+            newevidence = (turn,2,bot4index)
+            bot4evidence.append(newevidence)
+            bot4state = state_logic.filtering(bot4state.copy(),stoch,bot4evidence.copy(),turn,grid,a)
+            return grid,bot4index,bot4evidence,plan,bot4state,mode
+
+    #at this point, plan is empty, we need to sense and get new plan
+    d = calc_manhattan_dist(bot4index,mouseindex)
+    if random.random()<math.exp(-a*(d-1)):
+        newevidence = (turn,1,bot4index)
+        bot4evidence.append(newevidence)
+    else:
+        newevidence = (turn,0,bot4index)
+        bot4evidence.append(newevidence)
+    bot4state = state_logic.filtering(bot4state.copy(),stoch,bot4evidence,turn,grid,a)
+    if mode==0:
+        kernel = np.ones((7, 7))
+        block_sums = convolve2d(bot4state, kernel, mode='valid')
+        if not np.any(block_sums > 0.5):
+            information_gain_array = state_logic.calculate_expected_entropy_reduction(bot4state,stoch,grid,a,bot4index)
+            destinationindex = np.unravel_index(information_gain_array.argmax(), information_gain_array.shape)
+            if bot4index == destinationindex:
+                information_gain_array[bot4index]-=10000
+                destinationindex = np.unravel_index(information_gain_array.argmax(), bot4state.shape)
+            plan = bot_3_dynamic_UFCS(grid,bot4index,destinationindex,bot4state,4,stoch,bot4evidence,turn)
+            return grid,bot4index,bot4evidence,plan,bot4state,mode
+        else:
+            mode=1
+            return grid,bot4index,bot4evidence,plan,bot4state,mode
+    #at this point mode=1
+    bot4state = state_logic.filtering(bot4state.copy(),stoch,bot4evidence.copy(),turn,grid.copy(),a)
+    destinationindex = np.unravel_index(bot4state.argmax(), bot4state.shape)
+    plan = bot_3_dynamic_UFCS(grid,bot4index,destinationindex,bot4state,1,stoch,bot4evidence,turn)
+    return grid,bot4index,bot4evidence,plan,bot4state,mode
+    
+    
+    """kernel = np.ones((7, 7))
+    block_sums = convolve2d(bot4state, kernel, mode='valid')
+    destinationpreindex = np.unravel_index(block_sums.argmax(), block_sums.shape)
+    i,j = destinationpreindex[0],destinationpreindex[1]
+    if (i <= bot4index[0] < i+7) and (j <= bot4index[1] < j+7):
+        subarray = bot4state[i:i+7, j:j+7]
+        local_max_idx = np.unravel_index(np.argmax(subarray), subarray.shape)
+        destinationindex = (local_max_idx[0] + i, local_max_idx[1] + j)        
+        plan = bot_3_dynamic_UFCS(grid,bot4index,destinationindex,bot4state,3,stoch,bot4evidence,turn)
+    else:
+        destinationindex = (destinationpreindex[0]+3,destinationpreindex[1]+3)
+        plan = bot_3_dynamic_UFCS(grid,bot4index,destinationindex,bot4state,1,stoch,bot4evidence,turn)
+    return grid,bot4index,bot4evidence,plan,bot4state,mode"""
+
+
 def bfs(grid,start,end,bot):
     prev = {}
     marked = []
@@ -138,6 +252,13 @@ def bfs(grid,start,end,bot):
     
 def make_bfs_path_list(prev,currentstate,bot):
     #An extension of the bfs function, just makes the actual list of indices/tuples to return
+    if bot==4:
+        bfslist = [None,None,None,None]
+        while not prev[currentstate]==None:
+            bfslist.append(currentstate)
+            currentstate = prev[currentstate]
+        bfslist.reverse()
+        return bfslist
     bfslist = []
     while not prev[currentstate]==None:
         #print('Current state: ',currentstate)

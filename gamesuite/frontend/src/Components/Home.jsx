@@ -5,5 +5,6 @@ export default function Home(){
     <a href="/firegame">This is the link to the firegame</a>
     <p></p><a href="/seefirebots">This is the link to see fire bots</a>
     <p></p><a href="/seemicebots">This is the link to see the mice bots </a>
+    <p></p><a href="/mousegame">This is the link to play the mousegame</a>
     </>
 }
