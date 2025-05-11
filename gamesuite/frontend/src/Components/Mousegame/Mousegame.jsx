@@ -1,5 +1,6 @@
 import {useState, useEffect, useRef} from 'react'
 import RenderGridMousegame from './RenderGridMousegame';
+import SensorInfoBox from './SensorInfoBox';
 
 const GRID_SIZE = 25;
 
@@ -13,12 +14,16 @@ export default function Mousegame(){
         mouseIndex: null,
         gameStatus: 'in_progress',
         playerPath: null,
+        sensorLog: [],
     })
+    const boxRef = useRef(null);
+    const [showSenses,setShowSenses] = useState(false);
+    const [hoverIndex,setHoverIndex] = useState(null);
 
     useEffect(() => {
         async function fetchGame(){
             try{
-            const res = await fetch('http://localhost:8000/api/mousegame/3');
+            const res = await fetch('http://localhost:8000/api/mousegame/10');
             if(!res.ok){
                 throw new Error('Game not found')
             }
@@ -45,12 +50,15 @@ export default function Mousegame(){
                 }
             }
             setGameData(parseddata);
+            const playerIndex = parseddata.game.botStartingIndex;
+            const mouseIndex = parseddata.game.mouseStartingIndex;
             setGameState({
                 turn: 0,
-                playerIndex: parseddata.game.botStartingIndex,
-                mouseIndex: parseddata.game.mouseStartingIndex,
+                playerIndex,
+                mouseIndex,
                 gameStatus: 'in_progress',
                 playerPath: [parseddata.game.botStartingIndex],
+                sensorLog: []
             })
             } catch(err){
                 setError(err.message);
@@ -59,12 +67,19 @@ export default function Mousegame(){
         fetchGame();
         }, [])
 
+        useEffect(()=>{
+            if(boxRef){
+                boxRef.current.scrollTop = boxRef.current.scrollHeight;
+            }
+        },[gameState])
+
       useEffect(() => {
         const handleKeyDown = (e) => {
             setGameState(prev => {
             if(!prev||prev.gameStatus!=='in_progress') return prev;
             const newTurn = Math.min(gameData.bot3.evidence.length-1, prev.turn + 1);
             const newPlayerIndex = prev.playerIndex ? [...prev.playerIndex] : [...gameData.game.botStartingIndex]
+            const sensorLog = prev.sensorLog.map(obj=>({...obj}));
             switch(e.code){
                 case('ArrowRight'):
                     if(newPlayerIndex[1]!==GRID_SIZE-1){
@@ -76,6 +91,7 @@ export default function Mousegame(){
                     }
                     break;
                 case('ArrowDown'):
+                    e.preventDefault();
                     if(newPlayerIndex[0]!==GRID_SIZE-1){
                         const i = newPlayerIndex[0]+1
                         const j = newPlayerIndex[1]
@@ -94,6 +110,7 @@ export default function Mousegame(){
                     }
                     break;
                 case('ArrowUp'):
+                    e.preventDefault();
                     if(newPlayerIndex[0]!==0){
                         const i = newPlayerIndex[0]-1
                         const j = newPlayerIndex[1]
@@ -107,10 +124,10 @@ export default function Mousegame(){
                     const playerIndex = prev.playerIndex;
                     const manhattanDistance = Math.abs(mouseIndex[0]-playerIndex[0])+Math.abs(mouseIndex[1]-playerIndex[1]);
                     if(Math.random()< Math.exp(-.1155*(manhattanDistance-1))){
-                        console.log('Positive sense at index: ',playerIndex)
+                        sensorLog.push({position: playerIndex, turn:prev.turn+1, beep: true})
                     }
                     else{
-                        console.log('Negative sense at index: ',playerIndex)
+                        sensorLog.push({position: playerIndex, turn:prev.turn+1, beep: false})
                     }
                     break;
             }
@@ -137,6 +154,7 @@ export default function Mousegame(){
                 playerIndex: newPlayerIndex,
                 gameStatus: gameStatus,
                 playerPath,
+                sensorLog
             })
             });
         }   
@@ -146,14 +164,27 @@ export default function Mousegame(){
         }
       }, [gameData]);
 
-
-    return <><div> <a href='/'>Home</a> This is the mouse game. Turn: {gameState.turn} Game Status: {gameState.gameStatus} <button onClick={()=>window.location.reload()}>Restart</button>
+    
+    return <><div> <a href='/'>Home</a> This is the mouse game. 
+    Turn: {gameState.turn} 
+    Game Status: {gameState.gameStatus} 
+    <button onClick={()=>window.location.reload()}>Restart</button>
     {gameData ? <RenderGridMousegame 
     data={gameData} 
     turn={gameState.turn} 
+    sensorLog = {gameState.sensorLog}
+    showSenses = {showSenses}
     playerIndex={gameState.playerIndex ? gameState.playerIndex : gameData.game.botStartingIndex}
     mouseIndex = {gameState.mouseIndex ? gameState.mouseIndex : gameData.game.mouseStartingIndex}
-    playerPath ={gameState.playerPath ? gameState.playerPath : [gameData.game.botStartingIndex]}/> : <div>Loading...</div>}
+    playerPath ={gameState.playerPath ? gameState.playerPath : [gameData.game.botStartingIndex]}
+    hoverIndex = {hoverIndex}/> : <div>Loading...</div>}
+    <SensorInfoBox 
+    sensorLog={gameState.sensorLog} 
+    boxRef={boxRef} 
+    showSenses={showSenses} 
+    setShowSenses={setShowSenses}
+    hoverIndex={hoverIndex}
+    setHoverIndex={setHoverIndex}/>
     </div>
     </>
 }

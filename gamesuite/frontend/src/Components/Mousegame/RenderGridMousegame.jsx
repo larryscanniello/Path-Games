@@ -4,12 +4,34 @@ export default function RenderGridMousegame(props){
     if(!props.data) return <p>Loading...</p>
 
     const grid = props.data.game.grid.map(row => [...row])
+    const grid2 = Array.from({ length: grid.length }, () =>
+        Array.from({ length: grid.length }, () => [0, 0])
+      );
     const turn = props.turn
     const playerIndex = props.playerIndex
     const playerPath = props.playerPath
+    const sensorLog = props.sensorLog
     for(let i=0;i<playerPath.length;i++){
         grid[playerPath[i][0]][playerPath[i][1]]=3
     }
+    for(let i=0;i<sensorLog.length;i++){
+        grid2[sensorLog[i].position[0]][sensorLog[i].position[1]][1] += 1
+        if(sensorLog[i].beep){
+            grid2[sensorLog[i].position[0]][sensorLog[i].position[1]][0] += 1
+        }
+    }
+    const grid3 = grid2.map(row => row.map(([a,b]) => b>0 ? getRGBColorFromValue(a/b) : -1))
+
+    function getRGBColorFromValue(value) {
+        const clamped = Math.max(0, Math.min(1, value));
+        let r;
+        if(value===0){
+            return `rgb(255,0,0,${1-value})`
+        }
+        const g = Math.round(255 * clamped);
+        return `rgb(0,200,0,${value})`;
+      }
+
     return(
     <div className='container'>
         {grid.map((row,i)=>(
@@ -21,6 +43,13 @@ export default function RenderGridMousegame(props){
                     } else if(mod===3){
                         bgColor = 'seashell'
                     }
+                    if(grid3[i][j]!==-1&&props.showSenses){
+                        bgColor = grid3[i][j]
+                    }
+                    if(props.hoverIndex){
+                        if(i===props.hoverIndex[0]&&j==props.hoverIndex[1]){
+                            bgColor = grid3[i][j].charAt(4)==='0' ? 'green' : 'red';
+                    }}
                     return (<><div 
                     className= 'item'
                     style={{
