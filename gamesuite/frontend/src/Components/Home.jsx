@@ -1,10 +1,41 @@
+import { Link } from 'react-router-dom';
+import { useContext } from 'react';
+import { AuthContext } from './AuthProvider';
+import { useEffect } from 'react';
 
-export default function Home(){
-    return<>
-    <div>This is home</div>
-    <a href="/firegame">This is the link to the firegame</a>
-    <p></p><a href="/seefirebots">This is the link to see fire bots</a>
-    <p></p><a href="/seemicebots">This is the link to see the mice bots </a>
-    <p></p><a href="/mousegame">This is the link to play the mousegame</a>
+export default function Home() {
+    const [isAuthorized,setIsAuthorized] = useContext(AuthContext);
+    const username = localStorage.getItem("username");
+    
+    useEffect(() => {
+        const token = localStorage.getItem("access");
+        if (token) {
+          setIsAuthorized(true);
+        } else {
+          setIsAuthorized(false);
+        }
+      }, []);
+
+    const handleLogout = () => {
+        localStorage.clear()
+        setIsAuthorized(false);
+    }
+
+  return (
+    <>
+      <div>This is home</div>
+      <nav>
+        <ul>
+          {!isAuthorized ? <><li><Link to="/login">Login</Link></li>
+          <li><Link to="/register">Register</Link></li></>
+        : <div><li>Welcome {username}!</li>
+        <li><button onClick= {handleLogout}>Logout</button></li></div>}
+          <li><Link to="/firegame">Play Fire Game</Link></li>
+          <li><Link to="/seefirebots">See Fire Bots</Link></li>
+          <li><Link to="/seemicebots">See Mice Bots</Link></li>
+          <li><Link to="/mousegame">Play Mouse Game</Link></li>
+        </ul>
+      </nav>
     </>
+  );
 }

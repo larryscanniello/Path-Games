@@ -23,7 +23,7 @@ export default function Mousegame(){
     useEffect(() => {
         async function fetchGame(){
             try{
-            const res = await fetch('http://localhost:8000/api/mousegame/10');
+            const res = await fetch('http://localhost:8000/api/mousegame/11');
             if(!res.ok){
                 throw new Error('Game not found')
             }

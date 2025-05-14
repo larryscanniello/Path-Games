@@ -5,8 +5,14 @@ import SeeMiceBots from './Components/Mousegame/SeeMiceBots'
 import Mousegame from './Components/Mousegame/Mousegame';
 import Home from './Components/Home'
 import Firegame from './Components/Firegame/Firegame'
+import Login from './Components/Login'
+import Register from './Components/Register'
 import reportWebVitals from './reportWebVitals';
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
+import ProtectedRoute from './Components/ProtectedRoute';
+import {useState,createContext} from 'react';
+import { AuthProvider } from './Components/AuthProvider';
+
 
 const router = createBrowserRouter([
   {
@@ -27,15 +33,24 @@ const router = createBrowserRouter([
   },
   {
     path: "/mousegame",
-    element: <Mousegame/>
-  }
-
+    element: <ProtectedRoute><Mousegame/></ProtectedRoute>
+  },
+  {
+    path: "/login",
+    element: <Login/>
+  },
+  {
+    path: "/register",
+    element: <Register/>
+  },
 ])
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <RouterProvider router = {router} />
+    <AuthProvider>
+      <RouterProvider router = {router} />
+      </AuthProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
