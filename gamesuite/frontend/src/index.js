@@ -12,7 +12,7 @@ import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import ProtectedRoute from './Components/ProtectedRoute';
 import {useState,createContext} from 'react';
 import { AuthProvider } from './Components/AuthProvider';
-
+import SeeOldMouseGames from './Components/Mousegame/SeeOldMouseGames'
 
 const router = createBrowserRouter([
   {
@@ -30,6 +30,10 @@ const router = createBrowserRouter([
   {
     path: "/seemicebots",
     element: <SeeMiceBots/>
+  },
+  {
+    path: "/seeoldmousegames",
+    element: <SeeOldMouseGames/>
   },
   {
     path: "/mousegame",

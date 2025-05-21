@@ -4,7 +4,8 @@ export default function RenderGridSeeBots(props){
 
     const grid = props.data.game.grid.map(rows => [...rows])
     const turn = props.turn    
-    const showBot3Probabilities = props.showBot3Probabilities
+    const showProbabilities = props.showProbabilities
+
 
     function roundTo4DecimalPlaces(number) {
         const factor = Math.pow(10, 4);
@@ -26,7 +27,8 @@ export default function RenderGridSeeBots(props){
             count += row.length+1
         }
     }
-    throw new Error("Turn t is out of range of botplans");
+    console.log("Turn t is out of range of botplans");
+    return []
     }
     if(turn>5){
         const row = processFromFlatIndex(props.data.bot4.plans,props.turn-6)
@@ -45,6 +47,11 @@ export default function RenderGridSeeBots(props){
         bot4index = props.data.game.bot_starting_index;
     }
     grid[bot4index[0]][bot4index[1]] +=3
+
+    const states = ['',props.data.bot1.states,
+                    props.data.bot2.states,
+                    props.data.bot3.states,
+                    props.data.bot4.states]
     return(
     <div className='container'>
         {grid.map((row,i)=>(
@@ -55,7 +62,7 @@ export default function RenderGridSeeBots(props){
                         bgColor = 'black'
                     } else if(mod===2){
                         bgColor = 'green'
-                    } else if(mod==3){
+                    } else if(mod==3&&props.showAgent[3]){
                         bgColor = 'aliceblue'
                     }
                     return (<><div 
@@ -66,8 +73,12 @@ export default function RenderGridSeeBots(props){
                         fontSize: "8px",
                     }}
                     >
-                    <BotSlot data={props.data} turn={props.turn} showBot3Probabilities={showBot3Probabilities} i={i} j={j}/>
-                    {props.showBot3Probabilities ? roundTo4DecimalPlaces(props.data.bot4.states[props.turn][i][j]) : ''}</div>
+                    <BotSlot data={props.data} 
+                            turn={props.turn} 
+                            i={i} 
+                            j={j}
+                            showAgent = {props.showAgent}/>
+                    {props.showProbabilities ? roundTo4DecimalPlaces(states[showProbabilities][Math.min(props.turn,states[showProbabilities].length-1)][i][j]) : ''}</div>
                     </>
                 )})
         ))}
@@ -75,13 +86,15 @@ export default function RenderGridSeeBots(props){
 }
 
 function BotSlot(props){
+    const showAgent = props.showAgent
     const turn = props.turn
-    let bot1index,bot2index,bot3index,bot4index,mouse_index;
+    let bot1index,bot2index,bot3index,bot4index,mouse_index,player_index;
     if(turn!==0){
         const bot1path = props.data.bot1.evidence.map(([t,type,[i,j]])=> [i,j])
         const bot2path = props.data.bot2.evidence.map(([t,type,[i,j]])=> [i,j])
         const bot3path = props.data.bot3.evidence.map(([t,type,[i,j]])=> [i,j])
         const bot4path = props.data.bot4.evidence.map(([t,type,[i,j]])=> [i,j])
+        const player_path = props.data.game.player_path
 
         if(!props.data.game.stoch){
             mouse_index = props.data.game.mouse_starting_index
@@ -94,10 +107,11 @@ function BotSlot(props){
         bot2index = bot2path[Math.min(turn-1,bot2path.length-1)]
         bot3index = bot3path[Math.min(turn-1,bot3path.length-1)]
         bot4index = bot4path[Math.min(turn-1,bot4path.length-1)]
+        player_index = player_path[Math.min(turn-1,player_path.length-1)]
 
     } else{
         bot4index = props.data.game.bot_starting_index
-        bot1index = bot2index = bot3index = bot4index
+        bot1index = bot2index = bot3index = player_index = bot4index 
         mouse_index = props.data.game.mouse_starting_index
     }
     
@@ -105,16 +119,20 @@ function BotSlot(props){
     if(mouse_index[0]===props.i && mouse_index[1]===props.j){
         botsInSpace.push({ id: 0, position: {top: '50%', left:'50%', transform: 'translate(-50%, -50%)' }, color: 'red'})
     }
-
-    
-    /*if(bot1index[0]==props.i && bot1index[1]==props.j){
+    if(bot1index[0]==props.i && bot1index[1]==props.j && showAgent[0]){
         botsInSpace.push({ id: 1, position: { top: '2px', left: '2px' }, color: 'blue' })
     }
-    if(bot2index[0]==props.i && bot2index[1]==props.j){
+    if(bot2index[0]==props.i && bot2index[1]==props.j && showAgent[1]){
         botsInSpace.push({ id: 2, position: { top: '2px', right: '2px' }, color: 'purple' })
-    }*/
-    if(bot4index[0]==props.i && bot4index[1]==props.j){
-        botsInSpace.push({ id: 3, position: { bottom: '2px', left: '2px' }, color: 'orange' })
+    }
+    if(bot3index[0]===props.i && bot3index[1]===props.j && showAgent[2]){
+        botsInSpace.push({id: 3, position: {bottom: '2px', right: '2px'}, color:'cyan'})
+    }
+    if(bot4index[0]==props.i && bot4index[1]==props.j && showAgent[3]){
+        botsInSpace.push({ id: 4, position: { bottom: '2px', left: '2px' }, color: 'orange' })
+    }
+    if(player_index[0]==props.i && player_index[1]==props.j && showAgent[4]){
+        botsInSpace.push({ id: 5, position: { top: '50%', left: '50%',transform: 'translate(-50%, -50%)' },  color: 'green' })
     }
 
 

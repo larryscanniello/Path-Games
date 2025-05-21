@@ -1,6 +1,10 @@
-import {useState, useEffect, useRef} from 'react'
+import {useState, useEffect, useRef, useContext} from 'react'
 import RenderGridMousegame from './RenderGridMousegame';
 import SensorInfoBox from './SensorInfoBox';
+import api from "../../api"
+import { AuthContext } from '../AuthProvider';
+import { USERNAME } from '../../constants';
+import {MousegameMenu,GameOverMenu} from './MousegameMenu';
 
 const GRID_SIZE = 25;
 
@@ -16,59 +20,84 @@ export default function Mousegame(){
         playerPath: null,
         sensorLog: [],
     })
+    const gameID = useRef(null);
     const boxRef = useRef(null);
     const [showSenses,setShowSenses] = useState(false);
     const [hoverIndex,setHoverIndex] = useState(null);
+    const [stoch,setStoch] = useState(null);
+    const [stochVersion,setStochVersion] = useState(0);
+    const [noMoreGamesMenu,setNoMoreGamesMenu] = useState(null);
 
     useEffect(() => {
         async function fetchGame(){
             try{
-            const res = await fetch('http://localhost:8000/api/mousegame/11');
-            if(!res.ok){
-                throw new Error('Game not found')
-            }
-            const responsedata = await res.json()
-            const parseddata = {
-                game: {
-                    grid: JSON.parse(responsedata.game.grid),
-                    stoch: responsedata.game.stochastic,
-                    mousePath: responsedata.game.mouse_path,
-                    botStartingIndex: JSON.parse(responsedata.game.bot_starting_index),
-                    mouseStartingIndex: JSON.parse(responsedata.game.mouse_starting_index)
-                },
-                bot1: {
-                    evidence: JSON.parse(responsedata.bots[0].evidence).slice(1),
-                    states: JSON.parse(responsedata.bots[0].states)
-                },
-                bot2: {
-                    evidence: JSON.parse(responsedata.bots[1].evidence).slice(1),
-                    states: JSON.parse(responsedata.bots[1].states)
-                },
-                bot3: {
-                    evidence: JSON.parse(responsedata.bots[2].evidence).slice(1),
-                    states: JSON.parse(responsedata.bots[2].states)
-                }
-            }
-            setGameData(parseddata);
-            const playerIndex = parseddata.game.botStartingIndex;
-            const mouseIndex = parseddata.game.mouseStartingIndex;
-            setGameState({
-                turn: 0,
-                playerIndex,
-                mouseIndex,
-                gameStatus: 'in_progress',
-                playerPath: [parseddata.game.botStartingIndex],
-                sensorLog: []
+            const res = await api.post('mousegame/',{
+                username: localStorage.getItem(USERNAME),
+                stoch,                
             })
+            .catch((e)=>{throw new Error("Error fetching game.")});
+            const responsedata = res.data;
+            if(responsedata.success===true){
+                gameID.current = responsedata.game.id
+                const parseddata = {
+                    game: {
+                        grid: JSON.parse(responsedata.game.grid),
+                        stoch: responsedata.game.stochastic,
+                        mousePath: responsedata.game.mouse_path,
+                        botStartingIndex: JSON.parse(responsedata.game.bot_starting_index),
+                        mouseStartingIndex: JSON.parse(responsedata.game.mouse_starting_index)
+                    },
+                    bot1: {
+                        evidence: JSON.parse(responsedata.bots[0].evidence).slice(1),
+                        states: JSON.parse(responsedata.bots[0].states)
+                    },
+                    bot2: {
+                        evidence: JSON.parse(responsedata.bots[1].evidence).slice(1),
+                        states: JSON.parse(responsedata.bots[1].states)
+                    },
+                    bot3: {
+                        evidence: JSON.parse(responsedata.bots[2].evidence).slice(1),
+                        states: JSON.parse(responsedata.bots[2].states)
+                    }
+                }
+                setGameData(parseddata);
+                const playerIndex = parseddata.game.botStartingIndex;
+                const mouseIndex = parseddata.game.mouseStartingIndex;
+                setGameState({
+                    turn: 0,
+                    playerIndex,
+                    mouseIndex,
+                    gameStatus: 'in_progress',
+                    playerPath: [parseddata.game.botStartingIndex],
+                    sensorLog: []
+                })
+            }
+            else{
+                const stoch = responsedata.game.stochastic
+                if(!noMoreGamesMenu){
+                    if(stoch){
+                        setNoMoreGamesMenu('stoch')
+                    }else{
+                        setNoMoreGamesMenu('stationary');
+                    }
+                }else if(noMoreGamesMenu==='stoch'&&!stoch){
+                    setNoMoreGamesMenu('both')
+                }else if(noMoreGamesMenu==='stationary'&&stoch){
+                    setNoMoreGamesMenu('both')
+                }
+
+            }
             } catch(err){
                 setError(err.message);
             }
         }
-        fetchGame();
-        }, [])
+        if(stoch){
+            fetchGame();
+        }
+        }, [stoch,stochVersion])
 
         useEffect(()=>{
-            if(boxRef){
+            if(boxRef&&stoch){
                 boxRef.current.scrollTop = boxRef.current.scrollHeight;
             }
         },[gameState])
@@ -148,6 +177,9 @@ export default function Mousegame(){
             }
             const playerPath = prev.playerPath.map(row => [...row])
             playerPath.push(newPlayerIndex)
+            if(gameStatus!=='in_progress'){
+                handleGameOver(gameStatus,playerPath)
+            }
             return({
                 turn: prev.turn+1,
                 mouseIndex: mouseIndex,
@@ -164,12 +196,23 @@ export default function Mousegame(){
         }
       }, [gameData]);
 
+    async function handleGameOver(result,path){
+        const username = localStorage.getItem(USERNAME);
+        console.log(gameID)
+        const obj = {result,path,username,id:gameID.current}
+        const response = await api.post('handle_game_over/',obj)
+            .then(response => {console.log(response)})
+            .catch((e)=>{console.log('Check handleGameOver in Mousegame.jsx');
+                console.log(e)
+            })
+    }
+
     
     return <><div> <a href='/'>Home</a> This is the mouse game. 
     Turn: {gameState.turn} 
     Game Status: {gameState.gameStatus} 
     <button onClick={()=>window.location.reload()}>Restart</button>
-    {gameData ? <RenderGridMousegame 
+    {gameData && stoch ? <RenderGridMousegame 
     data={gameData} 
     turn={gameState.turn} 
     sensorLog = {gameState.sensorLog}
@@ -178,13 +221,15 @@ export default function Mousegame(){
     mouseIndex = {gameState.mouseIndex ? gameState.mouseIndex : gameData.game.mouseStartingIndex}
     playerPath ={gameState.playerPath ? gameState.playerPath : [gameData.game.botStartingIndex]}
     hoverIndex = {hoverIndex}/> : <div>Loading...</div>}
-    <SensorInfoBox 
+    {stoch ? <SensorInfoBox 
     sensorLog={gameState.sensorLog} 
     boxRef={boxRef} 
     showSenses={showSenses} 
     setShowSenses={setShowSenses}
     hoverIndex={hoverIndex}
-    setHoverIndex={setHoverIndex}/>
+    setHoverIndex={setHoverIndex}/> : <div></div>}
+    <MousegameMenu stoch={stoch} setStoch={setStoch} noMoreGamesMenu={noMoreGamesMenu}/>
+    <GameOverMenu gameStatus={gameState.gameStatus} setStoch={setStoch} setStochVersion={setStochVersion}/>
     </div>
     </>
 }

@@ -7,12 +7,14 @@ export default function RenderGridMousegame(props){
     const grid2 = Array.from({ length: grid.length }, () =>
         Array.from({ length: grid.length }, () => [0, 0])
       );
-    const turn = props.turn
-    const playerIndex = props.playerIndex
-    const playerPath = props.playerPath
-    const sensorLog = props.sensorLog
-    for(let i=0;i<playerPath.length;i++){
-        grid[playerPath[i][0]][playerPath[i][1]]=3
+    const turn = props.turn;
+    const playerIndex = props.playerIndex;
+    const playerPath = props.playerPath;
+    const sensorLog = props.sensorLog;
+    if(!props.data.game.stoch){
+        for(let i=0;i<playerPath.length;i++){
+            grid[playerPath[i][0]][playerPath[i][1]]=3
+        }
     }
     for(let i=0;i<sensorLog.length;i++){
         grid2[sensorLog[i].position[0]][sensorLog[i].position[1]][1] += 1
@@ -50,13 +52,18 @@ export default function RenderGridMousegame(props){
                         if(i===props.hoverIndex[0]&&j==props.hoverIndex[1]){
                             bgColor = grid3[i][j].charAt(4)==='0' ? 'green' : 'red';
                     }}
-                    return (<><div 
+                    return (<><div key={i.toString()+','+j.toString()} 
                     className= 'item'
                     style={{
                         backgroundColor: bgColor
                     }}
                     >
-                    <BotSlot data={props.data} playerIndex={props.playerIndex} currentTurn={props.currentTurn} i={i} j={j}/></div>
+                    <BotSlot data={props.data} 
+                            playerIndex={props.playerIndex} 
+                            currentTurn={props.currentTurn} 
+                            i={i} 
+                            j={j}/>
+                    </div>
                     </>
                 )})
         ))}

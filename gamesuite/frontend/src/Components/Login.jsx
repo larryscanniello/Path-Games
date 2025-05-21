@@ -2,6 +2,7 @@ import React, { useState,useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ACCESS_TOKEN, REFRESH_TOKEN,USERNAME } from '../constants';
 import { AuthContext, AuthProvider } from './AuthProvider';
+import api from '../api.js'
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -9,26 +10,24 @@ function Login() {
   const [isAuthorized,setIsAuthorized] = useContext(AuthContext)
   const navigate = useNavigate();
 
+
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/api/token/', {
+      /*const response = await fetch('http://localhost:8000/api/token/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, password }),
-      });
+      });*/
+      const response = await api.post('token/',{username,password})
+        .catch((error)=> {throw new Error('Invalid Credentials')});
 
-      if (!response.ok) {
-        throw new Error('Invalid credentials');
-      }
-
-      const data = await response.json();
-      localStorage.setItem(ACCESS_TOKEN, data.access);
-      localStorage.setItem(REFRESH_TOKEN, data.refresh);
+      localStorage.setItem(ACCESS_TOKEN, response.data.access);
+      localStorage.setItem(REFRESH_TOKEN, response.data.refresh);
       localStorage.setItem(USERNAME, username);
-      setIsAuthorized(true);
+      setIsAuthorized(true)
       navigate('/');
     } catch (err) {
       alert(err.message);
