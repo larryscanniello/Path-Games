@@ -5,6 +5,8 @@ import FiregameStyles from '../../Styles/FiregameStyles.css'
 import SelectGameMenu from "./SelectGameMenu.jsx";
 import api from "../../api.js";
 import { USERNAME } from "../../constants.js";
+import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 
 export default function SeeMiceBots(){
@@ -15,20 +17,21 @@ export default function SeeMiceBots(){
     const [showProbabilities,setShowProbabilities] = useState(0);
     const [showGameSelection,setShowGameSelection] = useState(null);
     const intervalRef = useRef(null);
-    const currentGame = useRef(null);
     const gameList = useRef(null);
-    const [showAgent,setShowAgent] = useState([true,true,true,true,true]);
+    const [showAgent,setShowAgent] = useState([false,false,false,true,true]);
+    const {username, gameID} = useParams();
+    const [currentGame,setCurrentGame] = useState(gameID);
 
 
     useEffect(()=>{
         async function fetchGameList(){
-            const res = await api.post('getgamelist/',{
+            const res = await api.post('getmousegamelist/',{
                 username: localStorage.getItem(USERNAME),
             })
-            .catch((e)=>{throw new Error("Error fetching game.")});
-            gameList.current = res.data.map(([id,result,datetime])=>{
+            .catch((e)=>{throw new Error("Error fetching list.")});
+            gameList.current = res.data.map(([id,result,stoch,datetime])=>{
                 const date = new Date(datetime);
-                return [id,result,date];
+                return [id,result,stoch,date];
             });
             setShowGameSelection(true);
             console.log(gameList.current,showGameSelection);
@@ -42,10 +45,11 @@ export default function SeeMiceBots(){
             const res = await api.post('get_mousegame_by_id/',
             {
                 username: localStorage.getItem(USERNAME),
-                id: currentGame.current,
+                id: currentGame,
             })
             .catch((e)=>{throw new Error("Error fetching game.")});
             const responsedata = res.data;
+            console.log('responsedata: ',responsedata);
             const parseddata = {
                 game: {
                     grid: JSON.parse(responsedata.game.grid),
@@ -74,16 +78,18 @@ export default function SeeMiceBots(){
                     modechange: responsedata.bots[3].modechange
                 }
             }
+            console.log('check333');
+            console.log('currgame: ',currentGame);
             setSimData(parseddata);
             setTurn(0);
           } catch(err){
           setError(err.message)
           }
         }
-        if(currentGame.current){
+        if(currentGame){
             fetchGame();
         }
-      }, [currentGame.current])
+      }, [currentGame])
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -139,8 +145,9 @@ export default function SeeMiceBots(){
     <>
     <NavBar/>
     <button onClick = {()=> setShowGameSelection(true)}>
-        Select New Game
+        Select New Game to Watch
     </button>
+    <Link to='/mousegame/'><button>Play Game</button></Link>
     <div>
       Turn: {turn}
     </div>
@@ -161,6 +168,7 @@ export default function SeeMiceBots(){
     <SelectGameMenu showGameSelection={showGameSelection} 
                     setShowGameSelection={setShowGameSelection} 
                     currentGame={currentGame}
+                    setCurrentGame={setCurrentGame}
                     gameList={gameList}/>
               
     <RenderGridSeeMouseBots 

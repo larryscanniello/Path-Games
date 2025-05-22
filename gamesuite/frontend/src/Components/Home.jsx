@@ -31,9 +31,10 @@ export default function Home() {
         : <div><li>Welcome {username}!</li>
         <li><button onClick= {handleLogout}>Logout</button></li></div>}
           <li><Link to="/firegame">Play Fire Game</Link></li>
-          <li><Link to="/seefirebots">See Fire Bots</Link></li>
-          <li><Link to="/seeoldmousegames">See Old Mouse Games</Link></li>
+          <li><Link to="/seeoldfiregames">See Fire Bots</Link></li>
           <li><Link to="/mousegame">Play Mouse Game</Link></li>
+          <li><Link to="/seeoldmousegames">See Old Mouse Games</Link></li>
+          
         </ul>
       </nav>
     </>

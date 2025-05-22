@@ -126,10 +126,10 @@ function BotSlot(props){
         botsInSpace.push({ id: 2, position: { top: '2px', right: '2px' }, color: 'purple' })
     }
     if(bot3index[0]===props.i && bot3index[1]===props.j && showAgent[2]){
-        botsInSpace.push({id: 3, position: {bottom: '2px', right: '2px'}, color:'cyan'})
+        botsInSpace.push({id: 3, position: {bottom: '2px', left: '2px'}, color:'cyan'})
     }
     if(bot4index[0]==props.i && bot4index[1]==props.j && showAgent[3]){
-        botsInSpace.push({ id: 4, position: { bottom: '2px', left: '2px' }, color: 'orange' })
+        botsInSpace.push({ id: 4, position: { bottom: '2px', right: '2px' }, color: 'orange' })
     }
     if(player_index[0]==props.i && player_index[1]==props.j && showAgent[4]){
         botsInSpace.push({ id: 5, position: { top: '50%', left: '50%',transform: 'translate(-50%, -50%)' },  color: 'green' })

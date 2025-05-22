@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from firegame.models import FiregameMap
-from firegame.gamelogic.Firegame import create_grid,fire_step,bot_logic,get_adj_indices
+from firegame.gamelogic import create_grid,fire_step,bot_logic,get_adj_indices
 import random
 import numpy as np
 import json
@@ -72,15 +72,17 @@ def gauge_difficulty(newmap):
         return 'too hard'
     bot1success = test_bot_1(newmap)
     if bot1success:
-        return 'easy'
+        return 'too easy'
     bot2or3success = test_bots_2_3(newmap)
-    if bot2or3success:
-        return 'medium'
-    bot4success = test_bot_4(newmap)
-    if bot4success:
-        return 'medium'
+    if not bot2or3success:
+        bot4success = test_bot_4(newmap)
+        if bot4success:
+            return 'medium'
+        else:
+            return 'hard'
     else:
-        return 'hard'
+        test_bot_4(newmap)
+        return 'easy'
     
 def success_possible(newmap):
     grid,botindex,fire = get_correct_datatypes(newmap)
@@ -149,10 +151,9 @@ def test_bots_2_3(newmap):
             newmap.bot2path = json.dumps(bot2path)
             newmap.bot3path = json.dumps(bot3path)
             return False
-        if grid[bot2index]%10==5 or grid[bot2index]%10==5:
+        if (grid[bot2index]%10==5 and grid[bot3index]%10==2) or (grid[bot2index]%10==2 and grid[bot3index]%10==5) or (grid[bot2index]%10==5 and grid[bot3index]%10==5):
             newmap.bot2path = json.dumps(bot2path)
             newmap.bot3path = json.dumps(bot3path)
-            newmap.bot4path = json.dumps([])
             return True
 
 def test_bot_4(newmap):

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import SeeFireBots from './Components/Firegame/SeeFireBots'
+import SeeOldFireGames from './Components/Firegame/SeeOldFireGames'
 import SeeMiceBots from './Components/Mousegame/SeeMiceBots'
 import Mousegame from './Components/Mousegame/Mousegame';
 import Home from './Components/Home'
@@ -10,9 +10,11 @@ import Register from './Components/Register'
 import reportWebVitals from './reportWebVitals';
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import ProtectedRoute from './Components/ProtectedRoute';
-import {useState,createContext} from 'react';
 import { AuthProvider } from './Components/AuthProvider';
-import SeeOldMouseGames from './Components/Mousegame/SeeOldMouseGames'
+import ViewFiregameList from './Components/Firegame/ViewFiregameList';
+import SeeOldMouseGames from './Components/Mousegame/SeeOldMouseGames';
+import ViewMousegameList from "./Components/Mousegame/ViewMousegameList";
+
 
 const router = createBrowserRouter([
   {
@@ -21,11 +23,15 @@ const router = createBrowserRouter([
   },
   {
     path: "/firegame",
-    element: <Firegame/>,
+    element: <ProtectedRoute><Firegame/></ProtectedRoute>,
   },
   {
-    path: "/seefirebots",
-    element: <SeeFireBots/>,
+    path: "/seeoldfiregames/:username/:gameID/",
+    element: <SeeOldFireGames/>,
+  },
+  {
+    path: "/seeoldfiregames/",
+    element: <ViewFiregameList/>
   },
   {
     path: "/seemicebots",
@@ -33,6 +39,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/seeoldmousegames",
+    element: <ViewMousegameList/>
+  },
+  {
+    path: "/seeoldmousegames/:username/:gameID/",
     element: <SeeOldMouseGames/>
   },
   {

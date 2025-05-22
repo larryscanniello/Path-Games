@@ -58,8 +58,13 @@ export default function Mousegame(){
                     bot3: {
                         evidence: JSON.parse(responsedata.bots[2].evidence).slice(1),
                         states: JSON.parse(responsedata.bots[2].states)
+                    },
+                    bot4: {
+                        evidence: JSON.parse(responsedata.bots[3].evidence).slice(1),
+                        states: JSON.parse(responsedata.bots[3].states)
                     }
                 }
+                console.log(parseddata);
                 setGameData(parseddata);
                 const playerIndex = parseddata.game.botStartingIndex;
                 const mouseIndex = parseddata.game.mouseStartingIndex;
@@ -172,13 +177,13 @@ export default function Mousegame(){
                 gameStatus = 'win'
             }
             
-            if(prev.turn === gameData.bot3.evidence.length){
+            if(prev.turn === gameData.bot4.evidence.length){
                 gameStatus = 'lose'
             }
             const playerPath = prev.playerPath.map(row => [...row])
             playerPath.push(newPlayerIndex)
             if(gameStatus!=='in_progress'){
-                handleGameOver(gameStatus,playerPath)
+                handleGameOver(gameStatus,playerPath,sensorLog)
             }
             return({
                 turn: prev.turn+1,
@@ -196,11 +201,10 @@ export default function Mousegame(){
         }
       }, [gameData]);
 
-    async function handleGameOver(result,path){
+    async function handleGameOver(result,path,sensorLog){
         const username = localStorage.getItem(USERNAME);
-        console.log(gameID)
-        const obj = {result,path,username,id:gameID.current}
-        const response = await api.post('handle_game_over/',obj)
+        const obj = {result,path,username,sensorLog,id:gameID.current}
+        const response = await api.post('handle_game_over_mousegame/',obj)
             .then(response => {console.log(response)})
             .catch((e)=>{console.log('Check handleGameOver in Mousegame.jsx');
                 console.log(e)
@@ -229,7 +233,7 @@ export default function Mousegame(){
     hoverIndex={hoverIndex}
     setHoverIndex={setHoverIndex}/> : <div></div>}
     <MousegameMenu stoch={stoch} setStoch={setStoch} noMoreGamesMenu={noMoreGamesMenu}/>
-    <GameOverMenu gameStatus={gameState.gameStatus} setStoch={setStoch} setStochVersion={setStochVersion}/>
+    <GameOverMenu gameID={gameID} gameStatus={gameState.gameStatus} setStoch={setStoch} setStochVersion={setStochVersion}/>
     </div>
     </>
 }

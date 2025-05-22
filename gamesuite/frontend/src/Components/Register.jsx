@@ -12,7 +12,7 @@ function Register() {
 
     try {
       // 1. Register the user
-      const registerResponse = await fetch('/api/register/', {
+      const registerResponse = await fetch('http://localhost:8000/api/user/register/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

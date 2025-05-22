@@ -26,6 +26,7 @@ export default function RenderGridFiregame(props){
                         bgColor = 'green'
                     }
                     return (<><div 
+                    key = {i.toString() + ',' + j.toString()}
                     className= 'item'
                     style={{
                         backgroundColor: bgColor

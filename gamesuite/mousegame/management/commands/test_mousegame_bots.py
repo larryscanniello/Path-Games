@@ -40,12 +40,17 @@ class Command(BaseCommand):
             return
         
         stationary_results = self.run_sim(False,num_stationary,grid_size,sensor_sensitivity,max_turns)
-        #generated_stochastic = self.run_sim(True,num_stochastic,grid_size,sensor_sensitivity,max_turns)
-        stationary_results = np.array(stationary_results)
+        stochastic_results = self.run_sim(True,num_stochastic,grid_size,sensor_sensitivity,max_turns)
+        """stationary_results = np.array(stationary_results)
         print(np.mean(stationary_results,axis=0))
         print(np.std(stationary_results,axis=0))
         print(stationary_results)
-        print(np.sum(stationary_results[:, 2] > stationary_results[:, 3]))
+        print(np.sum(stationary_results[:, 2] > stationary_results[:, 3]))"""
+        stochastic_results = np.array(stochastic_results)
+        print(np.mean(stochastic_results,axis=0))
+        print(np.std(stochastic_results,axis=0))
+        print(stochastic_results)
+        print(np.sum(stochastic_results[:, 2] > stochastic_results[:, 3]))
 
     def run_sim(self,stoch,num,grid_size,sensor_sensitivity,max_turns):
         results = []

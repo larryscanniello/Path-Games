@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from firegame.models import FiregameMap
 from mousegame.models import MousegameMap,BotData
-from api.models import MousegameGame
+from api.models import MousegameGame, FiregameGame
 from django.contrib.auth.models import User
 
 class FiregameSerializer(serializers.ModelSerializer):
@@ -25,6 +25,12 @@ class BotDataSerializer(serializers.ModelSerializer):
 class MousegameGameSerializer(serializers.ModelSerializer):
     class Meta:
         model = MousegameGame
+        fields = '__all__'
+        extra_kwargs = {'user':{'read_only':True}}
+
+class FiregameGameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FiregameGame
         fields = '__all__'
         extra_kwargs = {'user':{'read_only':True}}
 

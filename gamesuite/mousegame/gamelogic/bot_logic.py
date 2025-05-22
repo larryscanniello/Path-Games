@@ -162,7 +162,10 @@ def bot_3_alt(grid,bot3index,turn,plan,bot3evidence,mouseindex,a,bot3state,stoch
     #at this point mode=1
     bot3state = state_logic.filtering(bot3state.copy(),stoch,bot3evidence.copy(),turn,grid.copy(),a)
     destinationindex = np.unravel_index(bot3state.argmax(), bot3state.shape)
-    plan = bot_3_dynamic_UFCS(grid,bot3index,destinationindex,bot3state,1,stoch,bot3evidence,turn)
+    if stoch:
+        plan = bot_3_dynamic_UFCS(grid,bot3index,destinationindex,bot3state,3,stoch,bot3evidence,turn)
+    else:
+        plan = bot_3_dynamic_UFCS(grid,bot3index,destinationindex,bot3state,1,stoch,bot3evidence,turn)
     return grid,bot3index,bot3evidence,plan,bot3state,mode    
     
 def bot_4(grid,bot4index,turn,plan,bot4evidence,mouseindex,a,bot4state,stoch,mode):
@@ -212,7 +215,10 @@ def bot_4(grid,bot4index,turn,plan,bot4evidence,mouseindex,a,bot4state,stoch,mod
     #at this point mode=1
     bot4state = state_logic.filtering(bot4state.copy(),stoch,bot4evidence.copy(),turn,grid.copy(),a)
     destinationindex = np.unravel_index(bot4state.argmax(), bot4state.shape)
-    plan = bot_3_dynamic_UFCS(grid,bot4index,destinationindex,bot4state,1,stoch,bot4evidence,turn)
+    if stoch:
+        plan = bot_3_dynamic_UFCS(grid,bot4index,destinationindex,bot4state,3,stoch,bot4evidence,turn)
+    else:
+        plan = bot_3_dynamic_UFCS(grid,bot4index,destinationindex,bot4state,1,stoch,bot4evidence,turn)
     return grid,bot4index,bot4evidence,plan,bot4state,mode
     
     

@@ -1,4 +1,7 @@
+import {Link} from 'react-router-dom'
+import { USERNAME } from '../../constants'
 export {MousegameMenu,GameOverMenu}
+
 
 function MousegameMenu(props){
     if(props.stoch){
@@ -17,6 +20,7 @@ function GameOverMenu(props){
     if(!props.gameStatus||props.gameStatus==='in_progress'){
         return <></>
     }
+    const username = localStorage.getItem(USERNAME)
     return(
         <><div style={{zIndex: 3, position:'relative',backgroundColor: 'lightgreen'}}>
             <div>Game over. You {props.gameStatus}! </div>
@@ -25,7 +29,7 @@ function GameOverMenu(props){
                                 props.setStochVersion(prev=>prev+1)}}>Stationary</button>
         <button onClick={()=>{props.setStoch('stoch');
                                 props.setStochVersion(prev=>prev+1)}}>Stoch</button>
-        <button>Review Game, See Bots</button>
+        <Link to={'/seeoldmousegames/'+username+'/'+props.gameID.current+'/'}><button>Review Game, See Bots</button></Link>
         </div>
         </>
     )

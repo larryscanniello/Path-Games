@@ -11,6 +11,7 @@ export default function RenderGridMousegame(props){
     const playerIndex = props.playerIndex;
     const playerPath = props.playerPath;
     const sensorLog = props.sensorLog;
+    
     if(!props.data.game.stoch){
         for(let i=0;i<playerPath.length;i++){
             grid[playerPath[i][0]][playerPath[i][1]]=3
@@ -60,7 +61,7 @@ export default function RenderGridMousegame(props){
                     >
                     <BotSlot data={props.data} 
                             playerIndex={props.playerIndex} 
-                            currentTurn={props.currentTurn} 
+                            turn={turn} 
                             i={i} 
                             j={j}/>
                     </div>
@@ -72,11 +73,22 @@ export default function RenderGridMousegame(props){
 
 function BotSlot(props){
     const playerIndex = props.playerIndex
-    let playerSpace = {}
-    if(playerIndex[0]===props.i && playerIndex[1]===props.j){
-        playerSpace = { id: 0, position: {top: '50%', left:'50%', transform: 'translate(-50%, -50%)' }, color: 'blue' }
-    }
+    const bot4path = props.data.bot4.evidence.map(([t,type,[i,j]])=> [i,j])
 
+    let botsInSpace = []
+    let bot4index;
+    if(props.turn!==0){
+        bot4index = bot4path[Math.min(props.turn-1,bot4path.length-1)];
+    }
+    else{
+        bot4index = props.data.game.botStartingIndex;
+    }   
+    if(playerIndex[0]===props.i && playerIndex[1]===props.j){
+        botsInSpace.push({ id: 0, position: {top: '50%', left:'50%', transform: 'translate(-50%, -50%)' }, color: 'blue' })
+    }
+    if(bot4index[0]===props.i && bot4index[1]===props.j){
+        botsInSpace.push({ id: 1, position: {top: '50%', left:'50%', transform: 'translate(-50%, -50%)' }, color: 'orange' })
+    }
     const botStyle = {
         position: 'absolute',
         width: '10px',
@@ -84,7 +96,7 @@ function BotSlot(props){
         borderRadius: '50%',
         backgroundColor: 'blue',
     };
-    return(<>
+    /*return(<>
         <div
         key = {playerSpace.id}
         style ={{
@@ -94,6 +106,18 @@ function BotSlot(props){
         }}
         ></div>
     </>
+
+    )*/
+    return(<>{botsInSpace.map((bot)=>(
+        <div
+        key = {botsInSpace.id}
+        style ={{
+            ...botStyle,
+            ...bot.position,
+            backgroundColor: bot.color
+        }}
+        ></div>
+    ))}</>
 
     )
 }

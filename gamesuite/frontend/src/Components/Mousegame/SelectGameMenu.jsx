@@ -5,9 +5,10 @@ export default function SelectGameMenu(props){
     }
     return(
         <ul>
-        {props.gameList.current.map(([id,result,date])=><li><button onClick={()=>{
-            props.currentGame.current=id;
-            props.setShowGameSelection(false);}}>{result + ', ' + date.toString()}</button></li>)}
+        {props.gameList.current.map(([id,result,stoch,date])=><li><button onClick={()=>{
+            props.setCurrentGame(id);
+            console.log('check1245');
+            props.setShowGameSelection(false);}}>{result+', '+stoch+', '+date.toString()+', '+id}</button></li>)}
         </ul>
     )
 }

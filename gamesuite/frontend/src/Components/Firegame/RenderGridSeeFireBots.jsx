@@ -42,26 +42,32 @@ export default function RenderGridSeeBots(props){
 
 function BotSlot(props){
     const currentTurn = props.currentTurn
-    let successpossibleindex,bot1index,bot2index,bot3index,bot4index;
+    let successpossibleindex,bot1index,bot2index,bot3index,bot4index,playerindex;
     if(currentTurn!==0){
         const successpossiblepath = JSON.parse(props.data.successpossiblepath)
-        const bot1path = JSON.parse(props.data.bot1path)
-        const bot2path = JSON.parse(props.data.bot2path)
-        const bot3path = JSON.parse(props.data.bot3path)
-        const bot4path = JSON.parse(props.data.bot4path)
-        
+        const bot1path = JSON.parse(props.data.bot1path);
+        const bot2path = JSON.parse(props.data.bot2path);
+        const bot3path = JSON.parse(props.data.bot3path);
+        const bot4path = JSON.parse(props.data.bot4path);
+        const playerpath = props.data.player_path;
+        console.log(props.data)
+
         successpossibleindex = successpossiblepath[Math.min(currentTurn-1,successpossiblepath.length-1)]
         bot1index = bot1path[Math.min(currentTurn-1,bot1path.length-1)]
         bot2index = bot2path[Math.min(currentTurn-1,bot2path.length-1)]
         bot3index = bot3path[Math.min(currentTurn-1,bot3path.length-1)]
         bot4index = bot4path[Math.min(currentTurn-1,bot4path.length-1)]
+        playerindex = playerpath[Math.min(currentTurn-1,playerpath.length-1)]
     } else{
         successpossibleindex = JSON.parse(props.data.bot_index)
-        bot1index = bot2index = bot3index = bot4index = successpossibleindex
+        bot1index = bot2index = bot3index = bot4index = playerindex = successpossibleindex
     }
     const botsInSpace = []
     if(successpossibleindex[0]===props.i && successpossibleindex[1]===props.j){
         botsInSpace.push({ id: 0, position: {top: '50%', left:'50%', transform: 'translate(-50%, -50%)' }, color: 'cyan' })
+    }
+    if(playerindex[0]==props.i&& playerindex[1]==props.j){
+        botsInSpace.push({id: 5, position:{ top: '2px', left: '2px' }, color: 'black' })
     }
     if(bot1index[0]==props.i && bot1index[1]==props.j){
         botsInSpace.push({ id: 1, position: { top: '2px', left: '2px' }, color: 'blue' })
@@ -75,6 +81,7 @@ function BotSlot(props){
     if(bot4index[0]==props.i && bot4index[1]==props.j){
         botsInSpace.push({ id: 4, position: { bottom: '2px', right: '2px' }, color: 'green' })
     }
+
 
 
     const botStyle = {
@@ -93,7 +100,7 @@ function BotSlot(props){
             ...bot.position,
             backgroundColor: bot.color
         }}
-        ></div>
+        >{botsInSpace.id}</div>
     ))}</>
 
     )

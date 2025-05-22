@@ -1,6 +1,8 @@
 import {useState, useEffect, useRef} from 'react'
 import RenderGridFiregame from './RenderGridFiregame';
-
+import api from '../../api';
+import { USERNAME } from '../../constants';
+import GameOverMenu from './GameOverMenu';
 const GRID_SIZE = 25;
 
 export default function Firegame(){
@@ -11,28 +13,42 @@ export default function Firegame(){
     const [gameState, setGameState] = useState({
         turn: 0,
         playerIndex: null,
+        playerPath: null,
         gameStatus: 'in_progress'
     })
+    const gameID = useRef(null);
+    const [difficulty,setDifficulty] = useState(null);
+    const [difficultyCount,setDifficultyCount] = useState(0);
 
     useEffect(() => {
         async function fetchGame(){
             try{
-            const res = await fetch('http://localhost:8000/api/games/79');
-            if(!res.ok){
-                throw new Error('Game not found')
-            }
-            const responsedata = await res.json();
+            const res = await api.post('firegame/',{
+                username: localStorage.getItem(USERNAME),
+                difficulty: difficulty})
+            .catch((e)=>{throw new Error("Error fetching game.")});
+            const responsedata = res.data.game;
+            gameID.current = responsedata.id
             const grid = JSON.parse(responsedata.initial_board);
             const firelist = JSON.parse(responsedata.fire_progression);
             const initialPlayerIndex = JSON.parse(responsedata.bot_index);
             const extIndex = JSON.parse(responsedata.ext_index);
-            setGameData({grid, firelist, extIndex, playerIndex: initialPlayerIndex})
+            setGameData({grid, 
+                        firelist, 
+                        extIndex, 
+                        playerIndex: initialPlayerIndex})
+            setGameState({
+                turn: 0,
+                playerIndex: null,
+                gameStatus: 'in_progress',
+                playerPath: [initialPlayerIndex],
+            })
             } catch(err){
                 setError(err.message);
             }
         }
         fetchGame();
-        }, [])
+        }, [difficulty,difficultyCount])
 
       useEffect(() => {
         const handleKeyDown = (e) => {
@@ -90,10 +106,16 @@ export default function Firegame(){
             if(gameData.extIndex[0]===newPlayerIndex[0]&&gameData.extIndex[1]===newPlayerIndex[1]){
                 gameStatus = 'win'
             }
-
+            const playerPath = prev.playerPath.map(row => [...row])
+            playerPath.push(newPlayerIndex)
+            if(gameStatus!=='in_progress'){
+                handleGameOver(gameStatus,playerPath);
+            }
+            
             return({
                 turn: prev.turn+1,
                 playerIndex: newPlayerIndex,
+                playerPath: playerPath,
                 gameStatus: gameStatus,
             })
             });
@@ -104,16 +126,27 @@ export default function Firegame(){
         }
       }, [gameData]);
 
-    function makeMove(e){
+      async function handleGameOver(result,path){
+        const username = localStorage.getItem(USERNAME);
+        const obj = {result,path,username,id:gameID.current}
+        const response = await api.post('handle_game_over_firegame/',obj)
+            .then(response => {console.log(response)})
+            .catch((e)=>{console.log('Check handleGameOver in Mousegame.jsx');
+                console.log(e)
+            })
         
     }
 
+    const levels = ['easy','medium','hard']
 
-    return <><div> <a href='/'>Home</a> This is the fire game. Turn: {gameState.turn} Game Status: {gameState.gameStatus} <button onClick={()=>window.location.reload()}>Restart</button>
+    return <> <a href='/'>Home</a> This is the fire game. Turn: {gameState.turn} Game Status: {gameState.gameStatus} <button onClick={()=>window.location.reload()}>Restart</button>
+    <ul>{levels.map((dif,i)=><li><button onClick={()=>{setDifficulty(dif);
+                                                        setDifficultyCount(prev=>prev+1)
+                                                        }}>New {dif} game</button></li>)}</ul>
     {gameData.firelist ? <RenderGridFiregame 
     data={gameData} 
     currentTurn={gameState.turn} 
     playerIndex={gameState.playerIndex ? gameState.playerIndex : gameData.playerIndex}/> : <div>Loading...</div>}
-    </div>
+    <GameOverMenu gameStatus={gameState.gameStatus} setDifficulty={setDifficulty} setDifficultyCount={setDifficultyCount} gameID={gameID}/>
     </>
 }
