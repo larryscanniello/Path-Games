@@ -1,4 +1,3 @@
-import '../../Styles/SensorInfoBoxStyles.css'
 
 
 export default function SensorInfoBox(props){
@@ -6,41 +5,45 @@ export default function SensorInfoBox(props){
     const sensorLog = props.sensorLog
 
     return (
-      <div ref={boxRef} className='info-box'>
+      <div className='info-box p-2'>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>Sensor Data</span>
+            
             <span><input type='checkbox' checked = {props.showSenses} onChange={(e)=>{
                 props.setShowSenses(e.target.checked);
                 e.target.blur();
             }}>
-            </input>See Data On Map</span>
+            </input>See Data on Map</span>
+            <span><input type='checkbox' checked = {props.seePath} onChange={(e)=>{
+                props.setSeePath(e.target.checked);
+                e.target.blur();
+            }}>
+            </input>See Path</span>
         </div>
-        {/*<div>
-          {sensorLog ? sensorLog.map(obj => (
-            <div style={{backgroundColor: obj.beep ? 'green' : 'red'}}>
-                Sense at position {obj.position[0].toString() + ',' + obj.position[1].toString()} at turn {obj.turn} is {obj.beep ? "positive." : "negative."} </div>
-          )) : ""}
-          
-        </div>*/}
-        <div>
-        <table border="1">
+        <div className="flex justify-center items-center pt-2"><span className="font-bold">Sensor Log</span></div>
+        
+        <div className="w-64 h-48 relative table-container">
+        <table className="table-fixed text-center text-cyan-200 border-collapse transform scale-75">
             <thead>
             <tr>
-                <th>Turn</th>
-                <th>Position</th>
-                <th>Beep</th>
+                <th className="px-0 border-b-2 border-gray-700">Turn</th>
+                <th className="px-10 py-2 border-b-2 border-gray-700">Position</th>
+                <th className="px-4 py-2 border-b-2 border-gray-700">Beep</th>
             </tr>
             </thead>
-            <tbody>
-            {sensorLog.map(obj => (
-                <tr onMouseEnter = {() => props.setHoverIndex(obj.position)} onMouseLeave = {() => props.setHoverIndex(null)}>
-                <td>{obj.turn}</td>
-                <td>{'(' + obj.position[0].toString() + ',' + obj.position[1].toString() + ')'}</td>
-                <td style={{backgroundColor: obj.beep ? 'rgb(0,255,0,.5)':'rgb(255,0,0,.5)'}}>{obj.beep ? "Yes" : "No"}</td>
-                </tr>
-            ))}
-            </tbody>
         </table>
+        <div ref={boxRef} className="overflow-y-auto h-[calc(100%-2.5rem)]">
+          <table className="table-fixed text-center w-full font-small text-cyan-200 border-collapse transform">
+              <tbody className="">
+              {sensorLog.map(obj => (
+                  <tr onMouseEnter = {() => props.setHoverIndex(obj.position)} onMouseLeave = {() => {props.setHoverIndex(null);}}>
+                  <td>{obj.turn}</td>
+                  <td>{'(' + obj.position[0].toString() + ',' + obj.position[1].toString() + ')'}</td>
+                  <td style={{backgroundColor: obj.beep ? 'rgb(0,255,0,.5)':'rgb(255,0,0,.5)'}}>{obj.beep ? "Yes" : "No"}</td>
+                  </tr>
+              ))}
+              </tbody>
+          </table>
+        </div>
         </div>
       </div>
     );

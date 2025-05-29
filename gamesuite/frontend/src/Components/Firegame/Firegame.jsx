@@ -3,6 +3,11 @@ import RenderGridFiregame from './RenderGridFiregame';
 import api from '../../api';
 import { USERNAME } from '../../constants';
 import GameOverMenu from './GameOverMenu';
+import NavBar from '../NavBar';
+import FiregameInstructions from './FiregameInstructions';
+import FiregameDifficultyMenu from './FiregameDifficultyMenu';
+import FiregameAbout from './FiregameAbout';
+
 const GRID_SIZE = 25;
 
 export default function Firegame(){
@@ -19,6 +24,10 @@ export default function Firegame(){
     const gameID = useRef(null);
     const [difficulty,setDifficulty] = useState(null);
     const [difficultyCount,setDifficultyCount] = useState(0);
+    const [showInstructions,setShowInstructions] = useState(true);
+    const [showDifficultyMenu,setShowDifficultyMenu] = useState(false)
+    const [showAbout,setShowAbout] = useState(false);
+    const [noMoreLevels,setNoMoreLevels] = useState([false,false,false]);
 
     useEffect(() => {
         async function fetchGame(){
@@ -28,6 +37,14 @@ export default function Firegame(){
                 difficulty: difficulty})
             .catch((e)=>{throw new Error("Error fetching game.")});
             const responsedata = res.data.game;
+            if(!responsedata){
+                setNoMoreLevels(difficulty);
+                if(gameState.gameStatus!=='win'&&gameState.gameStatus!=='lose'){
+                    setShowInstructions(true);
+                }           
+            }
+            else{
+            setNoMoreLevels(false);
             gameID.current = responsedata.id
             const grid = JSON.parse(responsedata.initial_board);
             const firelist = JSON.parse(responsedata.fire_progression);
@@ -43,9 +60,10 @@ export default function Firegame(){
                 gameStatus: 'in_progress',
                 playerPath: [initialPlayerIndex],
             })
-            } catch(err){
+            }} catch(err){
                 setError(err.message);
             }
+        
         }
         fetchGame();
         }, [difficulty,difficultyCount])
@@ -139,14 +157,41 @@ export default function Firegame(){
 
     const levels = ['easy','medium','hard']
 
-    return <> <a href='/'>Home</a> This is the fire game. Turn: {gameState.turn} Game Status: {gameState.gameStatus} <button onClick={()=>window.location.reload()}>Restart</button>
-    <ul>{levels.map((dif,i)=><li><button onClick={()=>{setDifficulty(dif);
-                                                        setDifficultyCount(prev=>prev+1)
-                                                        }}>New {dif} game</button></li>)}</ul>
-    {gameData.firelist ? <RenderGridFiregame 
-    data={gameData} 
-    currentTurn={gameState.turn} 
-    playerIndex={gameState.playerIndex ? gameState.playerIndex : gameData.playerIndex}/> : <div>Loading...</div>}
-    <GameOverMenu gameStatus={gameState.gameStatus} setDifficulty={setDifficulty} setDifficultyCount={setDifficultyCount} gameID={gameID}/>
-    </>
+    return <div><div className='min-h-screen bg-black text-cyan-200 font-mono'> 
+        <div>
+        <NavBar/>
+        <div className='flex justify-center items-center'> {gameData.firelist && <div>
+        <RenderGridFiregame 
+                        data={gameData} 
+                        currentTurn={gameState.turn} 
+                        playerIndex={gameState.playerIndex ? 
+                        gameState.playerIndex : gameData.playerIndex}/>
+    <div className='flex justify-between'>
+        <button className='hover:underline' onClick={()=>setShowDifficultyMenu(prev=>!prev)}>New game</button>
+        <button className='hover:underline' onClick={()=>setShowInstructions(prev=>!prev)}>Instructions</button>
+        <button className='hover:underline' onClick={()=>setShowAbout(prev=>!prev)}>About</button></div>
+    </div>}
+    {showAbout && <div className='fixed'><FiregameAbout/></div>}
+    {showInstructions && 
+    <div className={!gameData.firelist ? "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex justify-center items-center z-20 bg-black bg-opacity-80" : "fixed"}>
+        <FiregameInstructions noMoreLevels={noMoreLevels} difficulty={difficulty} 
+    setDifficulty={setDifficulty} 
+    setShowInstructions={setShowInstructions}/></div>}
+    {gameState.gameStatus!=='in_progress' && <div className='fixed'><GameOverMenu
+                    gameState={gameState}
+                    setGameState={setGameState}
+                    setDifficulty={setDifficulty} 
+                    setDifficultyCount={setDifficultyCount}
+                    gameID={gameID}
+                    noMoreLevels={noMoreLevels}/>
+    </div>}
+    {showDifficultyMenu && <div className='fixed'><div className='flex p-12 flex-col border border-gray-300 bg-gray-800/90'>{levels.map(dif=>{
+        return <button className='p-3 hover:underline' onClick={()=>{setDifficulty(dif);
+                                 setDifficultyCount(prev=> prev+1);
+                                    setShowDifficultyMenu(false);
+        }}>New {dif} game</button>
+    })}</div></div>}
+    </div>
+    
+    </div></div></div>
 }

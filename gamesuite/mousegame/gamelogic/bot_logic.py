@@ -158,7 +158,6 @@ def bot_3_alt(grid,bot3index,turn,plan,bot3evidence,mouseindex,a,bot3state,stoch
             return grid,bot3index,bot3evidence,plan,bot3state,mode
         else:
             mode=1
-            return grid,bot3index,bot3evidence,plan,bot3state,mode
     #at this point mode=1
     bot3state = state_logic.filtering(bot3state.copy(),stoch,bot3evidence.copy(),turn,grid.copy(),a)
     destinationindex = np.unravel_index(bot3state.argmax(), bot3state.shape)

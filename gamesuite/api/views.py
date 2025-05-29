@@ -35,7 +35,7 @@ def get_mousegame_by_id(request):
     username = request.data['username']
     map = MousegameMap.objects.get(id=id)
     game = get_object_or_404(MousegameGame,user__username=username,mousegame_map__id=id)
-    bots = BotData.objects.filter(mousegame_map = id)
+    bots = BotData.objects.filter(mousegame_map = id).order_by('bot')
     map_serializer = MousegameSerializer(map)
     game_serializer = MousegameGameSerializer(game)
     bot_serializer = BotDataSerializer(bots, many=True)
@@ -115,7 +115,7 @@ def mousegame(request):
 @authentication_classes([])
 def get_mousegame_list(request):
     userid = User.objects.get(username=request.data['username'])
-    games = MousegameGame.objects.filter(user=userid)
+    games = MousegameGame.objects.filter(user=userid).order_by('datetime')
     gamestrs = [[game.mousegame_map.id,game.result,game.mousegame_map.stochastic,game.datetime] for game in games]
     return Response(gamestrs)
 
@@ -125,7 +125,7 @@ def get_mousegame_list(request):
 @authentication_classes([])
 def get_firegame_list(request):
     userid = User.objects.get(username=request.data['username'])
-    games = FiregameGame.objects.filter(user=userid)
+    games = FiregameGame.objects.filter(user=userid).order_by('datetime')
     gamestrs = [[game.firegame_map.id,game.result,game.firegame_map.difficulty,game.datetime] for game in games]
     return Response(gamestrs)
 

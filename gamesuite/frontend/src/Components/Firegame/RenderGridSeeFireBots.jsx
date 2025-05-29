@@ -1,4 +1,3 @@
-import '../../Styles/FiregameStyles.css'
 
 export default function RenderGridSeeBots(props){
     if(!props.data) return <p>Loading...</p>
@@ -14,26 +13,29 @@ export default function RenderGridSeeBots(props){
     
 
     return(
-    <div className='container'>
+    <div className="grid grid-rows-25 grid-cols-25">
         {grid.map((row,i)=>(
                 row.map((cell,j) => {
-                    let bgColor = '';
-                    const mod = cell%10;
-                    if(mod===2){
-                        bgColor = 'red'
-                    } else if(mod===1){
-                        bgColor = 'black'
-                    } else if(mod===5){
-                        bgColor = 'green'
-                    }
+                let bgColor = '';
+                const mod = cell % 10;
+                if (mod === 2) {
+                  /*img = '/../../public/pixelfire.png';*/
+                  bgColor = 'bg-red-500 border-purple-400';
+                } else if (mod === 1) {
+                  bgColor = 'bg-black border-purple-400';
+                } else if (mod === 5) {
+                  bgColor = 'bg-green-700 border border-cyan-100';
+                } else {
+                  bgColor = 'bg-gray-400 border border-cyan-100';
+                }
                     return (<><div 
                     key={j} 
-                    className='item'
+                    className={`w-8 h-8 relative flex items-center justify-center ${bgColor}`}
                     style={{
                         backgroundColor: bgColor
                     }}
                     >
-                    <BotSlot data={props.data} currentTurn={props.currentTurn} i={i} j={j}/></div>
+                    <BotSlot data={props.data} currentTurn={props.currentTurn} i={i} j={j} difficulty={props.difficulty}/></div>
                     </>
                 )})
         ))}
@@ -50,7 +52,6 @@ function BotSlot(props){
         const bot3path = JSON.parse(props.data.bot3path);
         const bot4path = JSON.parse(props.data.bot4path);
         const playerpath = props.data.player_path;
-        console.log(props.data)
 
         successpossibleindex = successpossiblepath[Math.min(currentTurn-1,successpossiblepath.length-1)]
         bot1index = bot1path[Math.min(currentTurn-1,bot1path.length-1)]
@@ -63,36 +64,40 @@ function BotSlot(props){
         bot1index = bot2index = bot3index = bot4index = playerindex = successpossibleindex
     }
     const botsInSpace = []
-    if(successpossibleindex[0]===props.i && successpossibleindex[1]===props.j){
-        botsInSpace.push({ id: 0, position: {top: '50%', left:'50%', transform: 'translate(-50%, -50%)' }, color: 'cyan' })
-    }
     if(playerindex[0]==props.i&& playerindex[1]==props.j){
-        botsInSpace.push({id: 5, position:{ top: '2px', left: '2px' }, color: 'black' })
+        botsInSpace.push({id: 0, img:'./mouse.png'})
     }
-    if(bot1index[0]==props.i && bot1index[1]==props.j){
-        botsInSpace.push({ id: 1, position: { top: '2px', left: '2px' }, color: 'blue' })
+    if(props.difficulty==='hard'){
+        if(successpossibleindex[0]===props.i && successpossibleindex[1]===props.j){
+            botsInSpace.push({ id: 5,className:"absolute top-0 left-0 w-3 h-3 rounded-full bg-yellow-600 text-white text-xs flex items-center justify-center border border-black"})
+        }
+    }
+    else{
+        if(bot1index[0]==props.i && bot1index[1]==props.j){
+            botsInSpace.push({ id: 1, className:"absolute top-0 left-0 w-3 h-3 rounded-full bg-yellow-600 text-white text-xs flex items-center justify-center border border-black"})
+        }
     }
     if(bot2index[0]==props.i && bot2index[1]==props.j){
-        botsInSpace.push({ id: 2, position: { top: '2px', right: '2px' }, color: 'purple' })
+        botsInSpace.push({ id: 2, className:"absolute top-0 right-0 w-3 h-3 rounded-full bg-green-600 text-white text-xs flex items-center justify-center border border-black"})
     }
     if(bot3index[0]==props.i && bot3index[1]==props.j){
-        botsInSpace.push({ id: 3, position: { bottom: '2px', left: '2px' }, color: 'orange' })
+        botsInSpace.push({ id: 3, className:"absolute bottom-0 left-0 w-3 h-3 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center border border-black"})
     }
     if(bot4index[0]==props.i && bot4index[1]==props.j){
-        botsInSpace.push({ id: 4, position: { bottom: '2px', right: '2px' }, color: 'green' })
+        botsInSpace.push({ id: 4, className:"absolute bottom-0 right-0 w-3 h-3 rounded-full bg-orange-600 text-white text-xs flex items-center justify-center border border-black"})
     }
 
+    return(<div className="relative w-full h-full">
+        {botsInSpace.map((bot)=>(
+            <div
+                key = {bot.id}
+                className={bot.className}
+                >
+            {(bot.id!==0) && bot.id}</div>
+        ))}
+    </div>)
 
-
-    const botStyle = {
-        position: 'absolute',
-        width: '10px',
-        height: '10px',
-        borderRadius: '50%',
-        backgroundColor: 'blue',
-    };
-
-    return(<>{botsInSpace.map((bot)=>(
+    /*return(<>{botsInSpace.map((bot)=>(
         <div
         key = {botsInSpace.id}
         style ={{
@@ -103,5 +108,5 @@ function BotSlot(props){
         >{botsInSpace.id}</div>
     ))}</>
 
-    )
+    )*/
 }

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from './AuthProvider';
 import { useEffect } from 'react';
+import NavBar from './NavBar';
 
 export default function Home() {
     const [isAuthorized,setIsAuthorized] = useContext(AuthContext);
@@ -22,21 +23,15 @@ export default function Home() {
     }
 
   return (
-    <>
-      <div>This is home</div>
-      <nav>
-        <ul>
-          {!isAuthorized ? <><li><Link to="/login">Login</Link></li>
-          <li><Link to="/register">Register</Link></li></>
-        : <div><li>Welcome {username}!</li>
-        <li><button onClick= {handleLogout}>Logout</button></li></div>}
-          <li><Link to="/firegame">Play Fire Game</Link></li>
-          <li><Link to="/seeoldfiregames">See Fire Bots</Link></li>
-          <li><Link to="/mousegame">Play Mouse Game</Link></li>
-          <li><Link to="/seeoldmousegames">See Old Mouse Games</Link></li>
-          
-        </ul>
-      </nav>
-    </>
+    <div className='min-h-screen bg-black text-cyan-200 font-mono'>
+        <NavBar/>
+          <div className='m-24'></div>
+          <ul className='pl-48'>
+            <li className='mb-3 hover:underline'><Link to="/firegame">Play Fire Game</Link></li>
+            <li className='mb-3 hover:underline' ><Link to="/seeoldfiregames">See Fire Bots</Link></li>
+            <li className='mb-3 hover:underline'><Link to="/mousegame">Play Mouse Game</Link></li>
+            <li className='mb-3 hover:underline'><Link to="/seeoldmousegames">See Old Mouse Games</Link></li>
+          </ul>
+      </div>
   );
 }

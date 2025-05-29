@@ -1,10 +1,9 @@
-import '../../Styles/FiregameStyles.css'
 
 export default function RenderGridMousegame(props){
     if(!props.data) return <p>Loading...</p>
 
     const grid = props.data.game.grid.map(row => [...row])
-    const grid2 = Array.from({ length: grid.length }, () =>
+    const sensorcounts = Array.from({ length: grid.length }, () =>
         Array.from({ length: grid.length }, () => [0, 0])
       );
     const turn = props.turn;
@@ -12,53 +11,79 @@ export default function RenderGridMousegame(props){
     const playerPath = props.playerPath;
     const sensorLog = props.sensorLog;
     
-    if(!props.data.game.stoch){
+    if(props.seePath){
         for(let i=0;i<playerPath.length;i++){
             grid[playerPath[i][0]][playerPath[i][1]]=3
         }
     }
     for(let i=0;i<sensorLog.length;i++){
-        grid2[sensorLog[i].position[0]][sensorLog[i].position[1]][1] += 1
+        sensorcounts[sensorLog[i].position[0]][sensorLog[i].position[1]][1] += 1
         if(sensorLog[i].beep){
-            grid2[sensorLog[i].position[0]][sensorLog[i].position[1]][0] += 1
+            sensorcounts[sensorLog[i].position[0]][sensorLog[i].position[1]][0] += 1
         }
     }
-    const grid3 = grid2.map(row => row.map(([a,b]) => b>0 ? getRGBColorFromValue(a/b) : -1))
+    const colors = sensorcounts.map(row => row.map(([a,b]) => b>0 ? getColorFromValue(a,b) : -1))
 
-    function getRGBColorFromValue(value) {
-        const clamped = Math.max(0, Math.min(1, value));
-        let r;
-        if(value===0){
-            return `rgb(255,0,0,${1-value})`
+    function getColorFromValue(a,b) {
+        if(a===0){
+            return `bg-red-400`
         }
-        const g = Math.round(255 * clamped);
-        return `rgb(0,200,0,${value})`;
+        let c = Math.max(b,8);
+        if(a/c<=.2){
+            return 'bg-green-100'
+        }else if(.2<a/c<=.4){
+            return 'bg-green-200'
+        }else if(.4<a/c<=.6){
+            return 'bg-green-300'
+        }else if(.6<a/c<=.8){
+            return 'bg-green-400'
+        }else{
+            return 'bg-green-500'
+        }
       }
 
     return(
-    <div className='container'>
+    <div className="grid bg-gray-300 grid-rows-25 grid-cols-25">
         {grid.map((row,i)=>(
                 row.map((cell,j) => {
                     let bgColor = '';
                     const mod = cell%10;
                     if(mod===1){
-                        bgColor = 'black'
-                    } else if(mod===3){
-                        bgColor = 'seashell'
+                        if(i<24){
+                            if(grid[i+1][j]!==1){
+                                bgColor += 'bg-black border-b-2 border-purple-400 '
+                        }}
+                        if(i>0){
+                        if(grid[i-1][j]!==1){
+                            bgColor += 'bg-black border-t-2 border-purple-400 '
+                        }}
+                        if(j<24){
+                        if(grid[i][j+1]!==1){
+                            bgColor += 'bg-black border-r-2 border-purple-400 '
+                        }}
+                        if(j>0){
+                        if(grid[i][j-1]!==1){
+                            bgColor += 'bg-black border-l-2 border-purple-400 '
+                        }}
+                    }else if(mod===3){
+                        bgColor = 'bg-yellow-100 border border-cyan-100'
+                    }else{
+                        bgColor = 'bg-gray-300 border border-cyan-100'
                     }
-                    if(grid3[i][j]!==-1&&props.showSenses){
-                        bgColor = grid3[i][j]
+                    if(colors[i][j]!==-1&&props.showSenses){
+                        bgColor = colors[i][j]
                     }
-                    if(props.hoverIndex){
+                    /*if(props.hoverIndex){
                         if(i===props.hoverIndex[0]&&j==props.hoverIndex[1]){
-                            bgColor = grid3[i][j].charAt(4)==='0' ? 'green' : 'red';
-                    }}
+                            bgColor = colors[i][j].charAt(4)==='0' ? 'green' : 'red';
+                    }}*/
+                    
                     return (<><div key={i.toString()+','+j.toString()} 
-                    className= 'item'
+                    className= {`w-8 h-8 relative flex items-center justify-center ${bgColor}`}
                     style={{
                         backgroundColor: bgColor
                     }}
-                    >
+                    ><div className="text-black text-xs">{(sensorcounts[i][j][1]!==0&&props.showSenses)&&`${sensorcounts[i][j][0]}/${sensorcounts[i][j][1]}`}</div>
                     <BotSlot data={props.data} 
                             playerIndex={props.playerIndex} 
                             turn={turn} 

@@ -4,7 +4,11 @@ import SensorInfoBox from './SensorInfoBox';
 import api from "../../api"
 import { AuthContext } from '../AuthProvider';
 import { USERNAME } from '../../constants';
-import {MousegameMenu,GameOverMenu} from './MousegameMenu';
+import NavBar from '../NavBar';
+import MousegameInstructions from './MousegameInstructions';
+import MousegameAbout from './MousegameAbout'
+import GameOverMenu from './GameOverMenu';
+
 
 const GRID_SIZE = 25;
 
@@ -26,7 +30,11 @@ export default function Mousegame(){
     const [hoverIndex,setHoverIndex] = useState(null);
     const [stoch,setStoch] = useState(null);
     const [stochVersion,setStochVersion] = useState(0);
-    const [noMoreGamesMenu,setNoMoreGamesMenu] = useState(null);
+    const [showNewGameMenu,setShowNewGameMenu] = useState(false);
+    const [showInstructions,setShowInstructions] = useState(true);
+    const [showAbout,setShowAbout] = useState(false);
+    const [noMoreLevels,setNoMoreLevels] = useState(false);
+    const [seePath,setSeePath] = useState(false);
 
     useEffect(() => {
         async function fetchGame(){
@@ -37,7 +45,15 @@ export default function Mousegame(){
             })
             .catch((e)=>{throw new Error("Error fetching game.")});
             const responsedata = res.data;
-            if(responsedata.success===true){
+            if(!responsedata.success){
+                console.log('check666')
+                setNoMoreLevels(stoch);
+                if(gameState.gameStatus!=='win'&&gameState.gameStatus!=='lose'){
+                    setShowInstructions(true);
+                    setStoch(null);
+                }           
+            }else{
+                setNoMoreLevels(false);
                 gameID.current = responsedata.game.id
                 const parseddata = {
                     game: {
@@ -77,21 +93,7 @@ export default function Mousegame(){
                     sensorLog: []
                 })
             }
-            else{
-                const stoch = responsedata.game.stochastic
-                if(!noMoreGamesMenu){
-                    if(stoch){
-                        setNoMoreGamesMenu('stoch')
-                    }else{
-                        setNoMoreGamesMenu('stationary');
-                    }
-                }else if(noMoreGamesMenu==='stoch'&&!stoch){
-                    setNoMoreGamesMenu('both')
-                }else if(noMoreGamesMenu==='stationary'&&stoch){
-                    setNoMoreGamesMenu('both')
-                }
 
-            }
             } catch(err){
                 setError(err.message);
             }
@@ -211,29 +213,64 @@ export default function Mousegame(){
             })
     }
 
+    const stochoptions = ['stationary','stochastic']
+
+    return <div><div className='min-h-screen bg-black text-cyan-200 font-mono'>
+    <div>
+    <NavBar/>
+    {showInstructions && 
+        <div className="fixed scale-85 transform flex justify-center items-center z-20 bg-black bg-opacity-80">
+            <MousegameInstructions noMoreLevels={noMoreLevels} stoch={stoch} 
+        setStoch={setStoch} 
+        setShowInstructions={setShowInstructions}/></div>}
     
-    return <><div> <a href='/'>Home</a> This is the mouse game. 
-    Turn: {gameState.turn} 
-    Game Status: {gameState.gameStatus} 
-    <button onClick={()=>window.location.reload()}>Restart</button>
-    {gameData && stoch ? <RenderGridMousegame 
-    data={gameData} 
-    turn={gameState.turn} 
-    sensorLog = {gameState.sensorLog}
-    showSenses = {showSenses}
-    playerIndex={gameState.playerIndex ? gameState.playerIndex : gameData.game.botStartingIndex}
-    mouseIndex = {gameState.mouseIndex ? gameState.mouseIndex : gameData.game.mouseStartingIndex}
-    playerPath ={gameState.playerPath ? gameState.playerPath : [gameData.game.botStartingIndex]}
-    hoverIndex = {hoverIndex}/> : <div>Loading...</div>}
-    {stoch ? <SensorInfoBox 
+    <div className='grid grid-cols-[1fr_auto_1fr]'>
+    <div className=''></div>
+    {(gameData && stoch) && <div className='relative'>
+        {showNewGameMenu && <div className="fixed ml-62 mt-70 z-30 bg-black bg-opacity-80">
+            <div className="relative border border-gray-300 bg-gray-800/90 z-10">
+            <div className="flex flex-col items-center p-7">
+                {stochoptions.map(stoch=>{return <button className='hover:underline pb-4' onClick={()=>{setStoch(dif); setShowNewGameMenu(false);}}>
+                New game, {stoch} mouse</button>})}
+                <button className='hover:underline' onClick={()=>setShowNewGameMenu(false)}>Close</button>
+            </div></div></div>}
+        <RenderGridMousegame 
+            data={gameData} 
+            turn={gameState.turn} 
+            sensorLog = {gameState.sensorLog}
+            showSenses = {showSenses}
+            playerIndex={gameState.playerIndex ? gameState.playerIndex : gameData.game.botStartingIndex}
+            mouseIndex = {gameState.mouseIndex ? gameState.mouseIndex : gameData.game.mouseStartingIndex}
+            playerPath ={gameState.playerPath ? gameState.playerPath : [gameData.game.botStartingIndex]}
+            hoverIndex = {hoverIndex}
+            seePath = {seePath}/>
+        <div className='flex justify-between'>
+            <button className='hover:underline' onClick={()=>setShowNewGameMenu(prev=>!prev)}>New game</button>
+            <button className='hover:underline' onClick={()=>setShowInstructions(prev=>!prev)}>Instructions</button>
+            <button className='hover:underline' onClick={()=>setShowAbout(prev=>!prev)}>About</button>
+        </div>
+        <div className='absolute right-0 ml-4' style={{ top: 'calc(var(--navbar-height) + 1rem)' }}>
+        
+    </div></div>}
+    {showAbout && <div className='fixed'><MousegameAbout/></div>}
+    
+    
+    {gameState.gameStatus!=='in_progress'&& <div className='fixed'><GameOverMenu
+                        gameState={gameState}
+                        setGameState={setGameState}
+                        setStoch={setStoch} 
+                        setStochVersion={setStochVersion}
+                        gameID={gameID}
+                        noMoreLevels={noMoreLevels}/>
+        </div>}
+    <div className=''><div className='bg-gray-800 border border-white m-8'>{stoch && <SensorInfoBox 
     sensorLog={gameState.sensorLog} 
     boxRef={boxRef} 
     showSenses={showSenses} 
     setShowSenses={setShowSenses}
     hoverIndex={hoverIndex}
-    setHoverIndex={setHoverIndex}/> : <div></div>}
-    <MousegameMenu stoch={stoch} setStoch={setStoch} noMoreGamesMenu={noMoreGamesMenu}/>
-    <GameOverMenu gameID={gameID} gameStatus={gameState.gameStatus} setStoch={setStoch} setStochVersion={setStochVersion}/>
-    </div>
-    </>
+    setHoverIndex={setHoverIndex}
+    seePath = {seePath}
+    setSeePath = {setSeePath}/>}</div></div>
+    </div></div></div></div>
 }

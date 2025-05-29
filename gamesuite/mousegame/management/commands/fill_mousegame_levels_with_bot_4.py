@@ -53,32 +53,39 @@ class Command(BaseCommand):
             bot1states,bot2states,bot3states,bot4states = [bot1state.tolist()],[bot2state.tolist()],[bot3state.tolist()],[bot4state.tolist()]
             bot1evidence,bot2evidence,bot3evidence,bot4evidence = [None],[None],[None],[None]
             bot1plan,bot2plan,bot3plan,bot4plan = [],[],[],[None,None,None,None,None]
-            bot4plans = [bot4plan]
+            bot1plans,bot2plans,bot3plans,bot4plans = [],[],[],[bot4plan]
             b1done,b2done,b3done,b4done = False,False,False,False
             alpha = -math.log(0.5)/(sensor_sensitivity-1)
             results = [0,0,0,0]
             mousepath = [mouseindex]
             turn=1
-            bot4mode = 0
+            bot3mode,bot4mode = 0,0
             bot4modeprev = 0
             bot4modeturn = 0
             while((not b1done or not b2done or not b3done or not b4done) and turn<max_turns):
                 if not b1done:
+                    plantempbot1 = bot1plan.copy()
                     grid,bot1index,bot1evidence,bot1plan,bot1state = bot_logic.bot_1(grid,bot1index,turn,bot1plan,bot1evidence.copy(),mouseindex,alpha,bot1state.copy(),stoch)
+                    if plantempbot1==[]:
+                        bot1plans.append(bot1plan.copy())
                     bot1states.append(bot1state.tolist())
                 if not b2done:
                     grid,bot2index,bot2evidence,bot2plan,bot2state = bot_logic.bot_2(grid,bot2index,turn,bot2plan,bot2evidence.copy(),mouseindex,alpha,bot2state.copy(),stoch)
+                    bot2plans.append(bot2plan.copy())
                     bot2states.append(bot2state.tolist())
                 if not b3done:
-                    grid,bot3index,bot3evidence,bot3plan,bot3state = bot_logic.bot_3(grid,bot3index,turn,bot3plan,bot3evidence.copy(),mouseindex,alpha,bot3state.copy(),stoch)
+                    plantempbot3 = bot3plan.copy()
+                    grid,bot3index,bot3evidence,bot3plan,bot3state,bot3mode = bot_logic.bot_3_alt(grid,bot3index,turn,bot3plan,bot3evidence.copy(),mouseindex,alpha,bot3state.copy(),stoch,bot3mode)
+                    if plantempbot3==[]:
+                        bot3plans.append(bot3plan.copy())
                     bot3states.append(bot3state.tolist())
                 if not b4done:
-                    plantemp = bot4plan.copy()
+                    plantempbot4 = bot4plan.copy()
                     grid,bot4index,bot4evidence,bot4plan,bot4state,bot4mode = bot_logic.bot_4(grid,bot4index,turn,bot4plan,bot4evidence.copy(),mouseindex,alpha,bot4state.copy(),stoch,bot4mode)
                     if bot4mode==1 and bot4modeprev==0:
                         bot4modeturn = turn
                     bot4modeprev = bot4mode
-                    if plantemp == []:
+                    if plantempbot4 == []:
                         bot4plans.append(bot4plan.copy())
                     bot4states.append(bot4state.tolist())
                 if stoch:
@@ -110,7 +117,7 @@ class Command(BaseCommand):
                 bot1data.states,bot2data.states,bot3data.states,bot4data.states = json.dumps(bot1states),json.dumps(bot2states),json.dumps(bot3states),json.dumps(bot4states)
                 bot1data.bot,bot2data.bot,bot3data.bot,bot4data.bot = 1,2,3,4
                 bot4data.modechange = bot4modeturn
-                bot4data.plans = bot4plans
+                bot1data.plans,bot2data.plans,bot3data.plans,bot4data.plans = bot1plans,bot2plans,bot3plans,bot4plans
                 newmap.save()
                 print(newmap.id)
                 bot1data.save(),bot2data.save(),bot3data.save(),bot4data.save()

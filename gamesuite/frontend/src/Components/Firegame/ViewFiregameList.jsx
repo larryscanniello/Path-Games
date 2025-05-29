@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api";
 import { USERNAME } from "../../constants";
+import NavBar from "../NavBar";
+
 
 export default function ViewGameList(){
     const [gameList,setGameList] = useState(null);
@@ -23,18 +25,27 @@ export default function ViewGameList(){
     },[])
     
     return (
-        <>
-          {gameList && (
-            <ul>
-              {gameList.map(([id, result, difficulty, date]) => (
+        <div className='min-h-screen bg-black text-cyan-200 font-mono'>
+          <NavBar/>
+          <div className="m-24"></ div>
+         <div className="pl-48 font-bold">Select a game: </div>{gameList ? (
+            <ul className="pl-48">
+              {gameList.map(([id, result, difficulty, date], i) => (
                 <li key={id}>
-                  <button onClick={() => navigate(username+'/'+id.toString()+'/')}>
-                    {`${id}, ${result}, ${difficulty}, ${date}`}
+                  <button className="hover:underline" onClick={() => navigate(username+'/'+id.toString()+'/')}>
+                    {`${i+1}. ${result}, ${difficulty}, ${date.toLocaleString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+})}`}
                   </button>
                 </li>
               ))}
             </ul>
-          )}
-        </>
+          ) : <div>No games yet. Play a firegame and come back.</div>}
+        
+        </div>
       );
 }

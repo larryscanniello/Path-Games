@@ -5,80 +5,163 @@ export default function RenderGridSeeBots(props){
     const grid = props.data.game.grid.map(rows => [...rows])
     const turn = props.turn    
     const showProbabilities = props.showProbabilities
-
+    const bot4modechange = props.data.bot4.modechange
 
     function roundTo4DecimalPlaces(number) {
         const factor = Math.pow(10, 4);
         return Math.round(number * factor) / factor;
       }
     
-    function processFromFlatIndex(botplans, t) {
-    let count = 0;
-    for (let i = 0; i < botplans.length; i++) {
-        const row = botplans[i];
-        if (t < count + row.length) {
-            const startIndexInRow = t - count;
-            return row.slice(startIndexInRow);
+    function processFromFlatIndexBot3and4(botplans, t) {
+        let count = 0;
+        for (let i = 0; i < botplans.length; i++) {
+            const row = botplans[i];
+            if(row.length==0&&count>0){
+                count +=1;
+                continue; 
+            }
+            if (t < count + row.length) {
+                let startIndexInRow;
+                startIndexInRow = t-count;
+                if(startIndexInRow<0){
+                    return [null];
+                }
+                return row.slice(startIndexInRow);
+            }
+            if(i==0){
+                continue;
+            }
+            else{
+                count += row.length+1
+            }
         }
-        if(i==0){
-            count += row.length
-        }
-        else{
+        return []
+    }
+    function processFromFlatIndexBot3(botplans, t) {
+        let count = 0;
+        for (let i = 0; i < botplans.length; i++) {
+            const row = botplans[i];
+            if (t < count + row.length) {
+                let startIndexInRow;
+                startIndexInRow = t-count;
+                if(startIndexInRow<0){
+                    return [null];
+                }
+                return row.slice(startIndexInRow);
+            }
             count += row.length+1
         }
+        return []
     }
-    console.log("Turn t is out of range of botplans");
-    return []
-    }
-    if(turn>5){
-        const row = processFromFlatIndex(props.data.bot4.plans,props.turn-6)
-        for(let i=0;i<row.length;i++){
-            if(row[i]!==null){
-                grid[row[i][0]][row[i][1]] += 3
-            }
-        const currindex = props.data.bot4.turn
-    }}
-    let bot4index;
+    const bot1plan = processFromFlatIndexBot3(props.data.bot1.plans,turn-1)
+    const bot2plan = props.data.bot2.plans
+    const bot3plan = processFromFlatIndexBot3(props.data.bot3.plans,turn-1)
+    const bot4plan = processFromFlatIndexBot3and4(props.data.bot4.plans,turn-6)
+
+
+    const currindex = props.data.bot4.turn
+    let bot1index,bot2index,bot3index,bot4index;
     if(turn!==0){
-        const bot4path = props.data.bot4.evidence.map(([t,type,[i,j]])=> [i,j])
+        const bot1path = props.data.bot1.path
+        const bot2path = props.data.bot2.path
+        const bot3path = props.data.bot3.path
+        const bot4path = props.data.bot4.path
+        bot1index = bot1path[Math.min(turn-1,bot1path.length-1)]
+        bot2index = bot2path[Math.min(turn-1,bot2path.length-1)]
+        bot3index = bot3path[Math.min(turn-1,bot3path.length-1)]
         bot4index = bot4path[Math.min(turn-1,bot4path.length-1)]
     }
     else{
         bot4index = props.data.game.bot_starting_index;
     }
-    grid[bot4index[0]][bot4index[1]] +=3
+
+    bot1plan.push(bot1index);
+    bot2plan[Math.min(Math.max(0,turn-1),bot2plan.length-1)].push(bot2index);
+    bot3plan.push(bot3index);
+    bot4plan.push(bot4index);
 
     const states = ['',props.data.bot1.states,
                     props.data.bot2.states,
                     props.data.bot3.states,
                     props.data.bot4.states]
     return(
-    <div className='container'>
+    <div className='grid bg-gray-300 grid-rows-25 grid-cols-25'>
         {grid.map((row,i)=>(
                 row.map((cell,j) => {
                     let bgColor = '';
                     const mod = cell%10;
+                    
                     if(mod===1){
-                        bgColor = 'black'
-                    } else if(mod===2){
-                        bgColor = 'green'
-                    } else if(mod==3&&props.showAgent[3]){
-                        bgColor = 'aliceblue'
+                        if(i<24){
+                            if(grid[i+1][j]!==1){
+                                bgColor += 'bg-black border-b-2 border-purple-400 '
+                        }}
+                        if(i>0){
+                        if(grid[i-1][j]!==1){
+                            bgColor += 'bg-black border-t-2 border-purple-400 '
+                        }}
+                        if(j<24){
+                        if(grid[i][j+1]!==1){
+                            bgColor += 'bg-black border-r-2 border-purple-400 '
+                        }}
+                        if(j>0){
+                        if(grid[i][j-1]!==1){
+                            bgColor += 'bg-black border-l-2 border-purple-400 '
+                        }}
+                    }else if(mod===3){
+                        bgColor = 'bg-yellow-100 border border-cyan-100'
+                    }else{
+                        bgColor = 'bg-gray-300 border border-cyan-100'
                     }
+                    if(props.showAgent[0]&&turn<=props.data.bot1.evidence.length-1&&bot1plan.some(subarray=>{
+                        if(subarray){
+                            return subarray[0]==i&&subarray[1]==j
+                        }else{
+                            return false;
+                    }})){
+                        bgColor = 'bg-yellow-100 border border-cyan-100'
+                    }
+                    if(turn>0){
+                        if(props.showAgent[1]&&turn<=props.data.bot2.evidence.length-1&&bot2plan[turn-1].some(subarray=>{
+                            if(subarray){
+                                return subarray[0]==i&&subarray[1]==j
+                            }else{
+                                return false;
+                    }})){
+                        bgColor = 'bg-green-300 border border-cyan-100'
+                    }}
+                    if(props.showAgent[2]&&turn<=props.data.bot3.evidence.length-1&&bot3plan.some(subarray=>{
+                        if(subarray){
+                            return subarray[0]==i&&subarray[1]==j
+                        }else{
+                            return false;
+                    }})){
+                        bgColor = 'bg-indigo-300 border border-cyan-100'
+                    }
+                    if(props.showAgent[3]&&turn<=props.data.bot4.evidence.length-1&&bot4plan.some(subarray=>{
+                        if(subarray){
+                            return subarray[0]==i&&subarray[1]==j
+                        }else{
+                            return false;
+                    }})){
+                        bgColor = 'bg-red-300 border border-cyan-100'
+                    }
+                    
                     return (<><div 
                     key={j} 
-                    className='item'
+                    className={`w-8 h-8 relative ${bgColor}`}
                     style={{
                         backgroundColor: bgColor,
                         fontSize: "8px",
                     }}
                     >
+                    <div className="text-black fixed">{props.showProbabilities ? roundTo4DecimalPlaces(states[showProbabilities][Math.min(props.turn,states[showProbabilities].length-1)][i][j]) : ''}</div>
                     <BotSlot data={props.data} 
                             turn={props.turn} 
                             i={i} 
                             j={j}
                             showAgent = {props.showAgent}/>
-                    {props.showProbabilities ? roundTo4DecimalPlaces(states[showProbabilities][Math.min(props.turn,states[showProbabilities].length-1)][i][j]) : ''}</div>
+                    </div>
                     </>
                 )})
         ))}
@@ -89,13 +172,12 @@ function BotSlot(props){
     const showAgent = props.showAgent
     const turn = props.turn
     let bot1index,bot2index,bot3index,bot4index,mouse_index,player_index;
+    const bot1path = props.data.bot1.path
+    const bot2path = props.data.bot2.path
+    const bot3path = props.data.bot3.path
+    const bot4path = props.data.bot4.path
+    const player_path = props.data.game.player_path
     if(turn!==0){
-        const bot1path = props.data.bot1.evidence.map(([t,type,[i,j]])=> [i,j])
-        const bot2path = props.data.bot2.evidence.map(([t,type,[i,j]])=> [i,j])
-        const bot3path = props.data.bot3.evidence.map(([t,type,[i,j]])=> [i,j])
-        const bot4path = props.data.bot4.evidence.map(([t,type,[i,j]])=> [i,j])
-        const player_path = props.data.game.player_path
-
         if(!props.data.game.stoch){
             mouse_index = props.data.game.mouse_starting_index
         }else{
@@ -116,46 +198,53 @@ function BotSlot(props){
     }
     
     const botsInSpace = []
-    if(mouse_index[0]===props.i && mouse_index[1]===props.j){
-        botsInSpace.push({ id: 0, position: {top: '50%', left:'50%', transform: 'translate(-50%, -50%)' }, color: 'red'})
+    /*if(mouse_index[0]===props.i && mouse_index[1]===props.j){
+        botsInSpace.push({ id: 0, className: {top: '50%', left:'50%', transform: 'translate(-50%, -50%)' }, color: 'red'})
+    }*/
+    if(bot1index[0]==props.i && bot1index[1]==props.j&&showAgent[0]){
+        const bot1obj = { id: 1, className:"absolute top-0 left-0 w-3 h-3 rounded-full bg-yellow-600 text-white text-xs flex items-center justify-center border border-black"}
+        if(turn>bot1path.length-1&&props.data.game.stoch){
+            bot1obj.className += " opacity-40"
+        }
+        botsInSpace.push(bot1obj)
     }
-    if(bot1index[0]==props.i && bot1index[1]==props.j && showAgent[0]){
-        botsInSpace.push({ id: 1, position: { top: '2px', left: '2px' }, color: 'blue' })
+    if(bot2index[0]==props.i && bot2index[1]==props.j&&showAgent[1]){
+        const bot2obj = { id: 2, className:"absolute top-0 right-0 w-3 h-3 rounded-full bg-green-600 text-white text-xs flex items-center justify-center border border-black"}
+        if(turn>bot2path.length-1&&props.data.game.stoch){
+            bot2obj.className += " opacity-40"
+        }
+        botsInSpace.push(bot2obj)
     }
-    if(bot2index[0]==props.i && bot2index[1]==props.j && showAgent[1]){
-        botsInSpace.push({ id: 2, position: { top: '2px', right: '2px' }, color: 'purple' })
+    if(bot3index[0]==props.i && bot3index[1]==props.j&&showAgent[2]){
+        const bot3obj = { id: 3, className:"absolute bottom-0 left-0 w-3 h-3 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center border border-black"}
+        if(turn>bot3path.length-1&&props.data.game.stoch){
+            bot3obj.className += " opacity-40"
+        }
+        botsInSpace.push(bot3obj)
     }
-    if(bot3index[0]===props.i && bot3index[1]===props.j && showAgent[2]){
-        botsInSpace.push({id: 3, position: {bottom: '2px', left: '2px'}, color:'cyan'})
+    if(bot4index[0]==props.i && bot4index[1]==props.j&&showAgent[3]){
+        const bot4obj = { id: 4, className:"absolute bottom-0 right-0 w-3 h-3 rounded-full bg-orange-600 text-white text-xs flex items-center justify-center border border-black"}
+        if(turn>bot4path.length-1&&props.data.game.stoch){
+            bot4obj.className += " opacity-40"
+        }
+        botsInSpace.push(bot4obj)
     }
-    if(bot4index[0]==props.i && bot4index[1]==props.j && showAgent[3]){
-        botsInSpace.push({ id: 4, position: { bottom: '2px', right: '2px' }, color: 'orange' })
-    }
-    if(player_index[0]==props.i && player_index[1]==props.j && showAgent[4]){
-        botsInSpace.push({ id: 5, position: { top: '50%', left: '50%',transform: 'translate(-50%, -50%)' },  color: 'green' })
+    if(player_index[0]==props.i&& player_index[1]==props.j&&showAgent[4]){
+        const playerobj = {id: 0, className:"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-600 border border-black"}
+        if(turn>player_path.length-1&&props.data.game.stoch){
+            playerobj.className += " opacity-40"
+        }
+        botsInSpace.push(playerobj)
     }
 
 
-    const botStyle = {
-        position: 'absolute',
-        width: '10px',
-        height: '10px',
-        borderRadius: '50%',
-        backgroundColor: 'blue',
-    };
+    return(<div className="relative w-full h-full">
+        {botsInSpace.map((bot,i)=>(
+            <div
+                key = {bot.id}
+                className={bot.className}
+                >
+            {(bot.id!==0) && bot.id}</div>))}{(mouse_index[0]===props.i&&mouse_index[1]===props.j)&&<img src="/mouse.png"/>}
+    </div>)
 
-
-
-    return(<>{botsInSpace.map((bot)=>(
-        <div
-        key = {botsInSpace.id}
-        style ={{
-            ...botStyle,
-            ...bot.position,
-            backgroundColor: bot.color
-        }}
-        ></div>
-    ))}</>
-
-    )
 }
