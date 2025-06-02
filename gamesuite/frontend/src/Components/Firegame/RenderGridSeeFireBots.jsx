@@ -1,3 +1,4 @@
+import '../../Styles/flame.css'
 
 export default function RenderGridSeeBots(props){
     if(!props.data) return <p>Loading...</p>
@@ -18,26 +19,71 @@ export default function RenderGridSeeBots(props){
                 row.map((cell,j) => {
                 let bgColor = '';
                 const mod = cell % 10;
-                if (mod === 2) {
-                  /*img = '/../../public/pixelfire.png';*/
-                  bgColor = 'bg-red-500 border-purple-400';
+                if(mod===0){
+                    bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]"
+                  }
+                  if(mod===1){
+                    bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/glass.png')]"
+                  }
+                  if(mod===5){
+                    bgColor = "w-8 h-8 border border-green-300 bg-[url('/space_tiles_hyptosis/switch.png')]"
+                  }
+                /*if (mod === 2) {
+                  bgColor = 'bg-red-500 border border-cyan-100';
                 } else if (mod === 1) {
-                  bgColor = 'bg-black border-purple-400';
+                    if(i<24){
+                        if(grid[i+1][j]!==1){
+                            bgColor += 'bg-black border-b-1 border-cyan-100 '
+                        }
+                      }
+                      if(i>0){
+                        if(grid[i-1][j]!==1){
+                          bgColor += 'bg-black border-t-1 border-cyan-100 '
+                        }
+                      }
+                      if(j<24){
+                        if(grid[i][j+1]!==1){
+                          bgColor += 'bg-black border-r-1 border-cyan-100 '
+                        }
+                      }
+                      if(j>0){
+                        if(grid[i][j-1]!==1){
+                          bgColor += 'bg-black border-l-1 border-cyan-100 '
+                        }
+                      }
                 } else if (mod === 5) {
                   bgColor = 'bg-green-700 border border-cyan-100';
                 } else {
                   bgColor = 'bg-gray-400 border border-cyan-100';
-                }
-                    return (<><div 
-                    key={j} 
-                    className={`w-8 h-8 relative flex items-center justify-center ${bgColor}`}
-                    style={{
-                        backgroundColor: bgColor
-                    }}
-                    >
-                    <BotSlot data={props.data} currentTurn={props.currentTurn} i={i} j={j} difficulty={props.difficulty}/></div>
-                    </>
-                )})
+                }*/
+                    return (<>
+                        {mod!==2 ? <div
+                          key={`${i},${j}`}
+                          className={`w-8 h-8 relative flex items-center justify-center ${bgColor}`}
+                          style={{backgroundSize: '32px 32px'}}
+                        >
+                          <BotSlot
+                            data={props.data}
+                            difficulty = {props.difficulty}
+                            playerIndex={props.playerIndex}
+                            currentTurn={props.currentTurn}
+                            i={i}
+                            j={j}
+                          />
+                        </div>:<div className='container'><div
+                          key={`${i},${j}`}
+                          className={`open-sq`}
+                        >
+                          <BotSlot
+                            data={props.data}
+                            playerIndex={props.playerIndex}
+                            currentTurn={props.currentTurn}
+                            i={i}
+                            j={j}
+                          />
+                        </div><div className='fire-sprite'></div></div>}
+                        </>
+                      );})
         ))}
     </div>)
 }
@@ -46,11 +92,11 @@ function BotSlot(props){
     const currentTurn = props.currentTurn
     let successpossibleindex,bot1index,bot2index,bot3index,bot4index,playerindex;
     if(currentTurn!==0){
-        const successpossiblepath = JSON.parse(props.data.successpossiblepath)
-        const bot1path = JSON.parse(props.data.bot1path);
-        const bot2path = JSON.parse(props.data.bot2path);
-        const bot3path = JSON.parse(props.data.bot3path);
-        const bot4path = JSON.parse(props.data.bot4path);
+        const successpossiblepath = props.data.successpossiblepath
+        const bot1path = props.data.bot1path;
+        const bot2path = props.data.bot2path;
+        const bot3path = props.data.bot3path;
+        const bot4path = props.data.bot4path;
         const playerpath = props.data.player_path;
 
         successpossibleindex = successpossiblepath[Math.min(currentTurn-1,successpossiblepath.length-1)]
@@ -65,11 +111,12 @@ function BotSlot(props){
     }
     const botsInSpace = []
     if(playerindex[0]==props.i&& playerindex[1]==props.j){
-        botsInSpace.push({id: 0, img:'./mouse.png'})
+        botsInSpace.push({id: 0, className:"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black"})
     }
+    console.log('pd: ',props.difficulty);
     if(props.difficulty==='hard'){
         if(successpossibleindex[0]===props.i && successpossibleindex[1]===props.j){
-            botsInSpace.push({ id: 5,className:"absolute top-0 left-0 w-3 h-3 rounded-full bg-yellow-600 text-white text-xs flex items-center justify-center border border-black"})
+            botsInSpace.push({ id: 5, className:"absolute top-0 left-0 w-3 h-3 rounded-full bg-yellow-600 text-white text-xs flex items-center justify-center border border-black"})
         }
     }
     else{

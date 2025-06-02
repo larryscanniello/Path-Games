@@ -26,6 +26,9 @@ function SeeFireBots() {
   const [showAbout,setShowAbout] = useState(false);
   const [showToFiregame,setShowToFiregame] = useState(false);
   const [difficulty,setDifficulty] = useState(null);
+  const [winRate,setWinRate] = useState(null);
+  const [leaderboard,setLeaderboard] = useState(null);
+  const [result,setResult] = useState(null);
 
   useEffect(()=>{
       async function fetchGameList(){
@@ -33,10 +36,16 @@ function SeeFireBots() {
               username: localStorage.getItem(USERNAME),
           })
           .catch((e)=>{throw new Error("Error fetching game.")});
-          setGameList(res.data.map(([id,result,difficulty,datetime])=>{
+          setGameList(res.data.map(([id,result,difficulty,datetime,win_rate])=>{
               const date = new Date(datetime);
-              return [id,result,difficulty,date];
+              return [id,result,difficulty,date,win_rate];
           }));
+          const leaderboardres = await api.post('getfiregameleaderboard/',{
+            username: localStorage.getItem(USERNAME),
+          })
+          .catch((e)=>{throw new Error("Error fetching leaderboard.")});
+          console.log('l',leaderboardres.data)
+          setLeaderboard(leaderboardres.data)
       }
       fetchGameList();
   },[])
@@ -53,19 +62,25 @@ function SeeFireBots() {
       const player_path = res.data.playerdata.player_path;
       player_path.shift();
       for(let i=0; i<gameList.length;i++){
-        console.log(gameList[i][0],currentGame)
+        console.log('gameList',gameList)
         if(gameList[i][0]==currentGame){
           setDifficulty(gameList[i][2]);
-          console.log('check')
+          setWinRate(gameList[i][4]);
+          setResult(gameList[i][1])
         }
       }
-      const bot1length = JSON.parse(responsedata.bot1path).length;
-      const bot2length = JSON.parse(responsedata.bot2path).length;
-      const bot3length = JSON.parse(responsedata.bot3path).length;
-      const bot4length = JSON.parse(responsedata.bot4path).length;
-      const successpossiblelength = JSON.parse(responsedata.successpossiblepath).length;
+      const bot1path = JSON.parse(responsedata.bot1path)
+      const bot2path = JSON.parse(responsedata.bot2path)
+      const bot3path = JSON.parse(responsedata.bot3path)
+      const bot4path = JSON.parse(responsedata.bot4path)
+      const successpossiblepath = JSON.parse(responsedata.successpossiblepath)
+      const bot1length = bot1path.length;
+      const bot2length = bot2path.length;
+      const bot3length = bot3path.length;
+      const bot4length = bot4path.length;
+      const successpossiblelength = successpossiblepath.length;
       const simlength = Math.max(bot1length,bot2length,bot3length,bot4length,successpossiblelength,player_path.length);
-      setData({...responsedata,player_path,simlength})
+      setData({...responsedata,player_path,simlength,bot1path,bot2path,bot3path,bot4path,successpossiblepath})
       setCurrentGrid(JSON.parse(responsedata.initial_board));
       setFirelist(JSON.parse(responsedata.fire_progression));
       setCurrentTurn(0);
@@ -121,13 +136,37 @@ function SeeFireBots() {
       return () => clearInterval(intervalRef.current)
     }
   },[play])
+
+  useEffect(()=>{
+    if(play){
+      if(currentTurn===data.simlength){
+        setPlay(false);
+        clearInterval(intervalRef.current);
+      }
+    }
+    
+  },[currentTurn])
   
   return (
     <div><div className='min-h-screen bg-black text-cyan-200 font-mono'>
-    <div>
+    <div>{console.log('d ',difficulty)}
     <NavBar/>
-    <div className='flex justify-center items-center'>
+    <div className='grid grid-cols-[1fr_auto_1fr]'>
     <div>
+    {showAbout && <div className='fixed z-20 mt-40 text-sm'><SeeFiregameAbout setShowAbout={setShowAbout}/></div>}
+    </div>
+    
+    <div>
+    {showInstructions && 
+        <div className="fixed z-20">
+            <SeeFiregameInstructions setShowInstructions={setShowInstructions}/></div>}
+        
+        {showToFiregame && <div className='fixed z-20 ml-45 mt-80'><ToFiregame setShowToFiregame={setShowToFiregame}/></div>}
+        {showGameSelection && <div className='fixed border border-gray-300 bg-gray-800/90 mt-30 ml-44 mr-24 mb-12 z-20'>
+        <GameSelection setCurrentGame={setCurrentGame} 
+                      gameList={gameList} 
+                      setShowGameSelection={setShowGameSelection}
+                      setWinRate={setWinRate}/></div>}
     <RenderGridSeeBots data={data} currentGrid={currentGrid} currentTurn={currentTurn} difficulty={difficulty}/>
     <div className='flex justify-between'>
         <button className='hover:underline' onClick={()=>setShowGameSelection(prev=>!prev)}>Select new simulation</button>
@@ -136,28 +175,42 @@ function SeeFireBots() {
         <button className='hover:underline' onClick={()=>setShowAbout(prev=>!prev)}>About</button>
     </div>
         </div>  
-        {showInstructions && 
-        <div className="fixed">
-            <SeeFiregameInstructions setShowInstructions={setShowInstructions}/></div>}
-        {showAbout && <div className='fixed'><SeeFiregameAbout setShowAbout={setShowAbout}/></div>}
-        {showToFiregame && <div className='fixed'><ToFiregame setShowToFiregame={setShowToFiregame}/></div>}
-        {showGameSelection && <div className='fixed'><GameSelection setCurrentGame={setCurrentGame} gameList={gameList} setShowGameSelection={setShowGameSelection}/></div>}
+    <div>
+    <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4">
+                <div>Firegame Visualizer, Map: {currentGame}</div>
+                <div>Difficulty: {difficulty}</div>
+                <div>Result: {result}</div>                                    
+                <div className="">Map win rate: {Math.round(winRate*100)}% {console.log('wr:',winRate)}</div>
+            </div>
+      <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4">
+                <div>Turn: {currentTurn}</div>
+      </div>
+      {leaderboard && <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4">
+                <div>Score: {leaderboard.userscore}</div>
+                
+      </div>}
+      {leaderboard && <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4">
+                <div>Leaderboard</div>
+                <div className='border border-gray-500 p-4'>{leaderboard.leaderboard.map(([user,score])=><div className='flex justify-between'><div>{user}</div><div className='ml-40'></div> <div>{score}</div></div>)}</div>
+
+      </div>}
+    </div>   
     </div></div></div></div>
   )
 }
-
 function GameSelection(props){
-  return(
-    <div className="border border-gray-300 bg-gray-800/90 mt-12 ml-24 mr-24 mb-12 z-10">
-      <div className="flex flex-col items-center pr-8 pl-8 pb-6">
+  return(<div className="">
+      <div className="m-6">Select game to visualize:</div>
+      <div ref={props.showGameRef} className="flex flex-col items-center overflow-y-auto h-96 pr-8 pl-8 pb-6 text-white">
         <ul>
-        {props.gameList.map(([id, result, difficulty, date], i) => (
+        {props.gameList.map(([id, result, dif, date, winrate], i) => (
                 <li key={id}>
                   <button className="hover:underline" onClick={() => {
                     props.setCurrentGame(id);
                     props.setShowGameSelection(false);
+                    props.setWinRate(winrate)
                   }}>
-                    {`${i+1}. ${result}, ${difficulty}, ${date.toLocaleString('en-US', {
+                    {`${i+1}. ${result}, ${dif}, ${date.toLocaleString('en-US', {
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric',
@@ -168,8 +221,9 @@ function GameSelection(props){
                 </li>
               ))}
         </ul>
-        <div className="pt-3"><button onClick={()=>props.setShowGameSelection(false)} className="text-white hover:underline content-center">Close</button></div>
+        
       </div>
+      <div className="flex flex-col items-center"><div className="pt-4 pb-4"><button onClick={()=>props.setShowGameSelection(false)} className="text-white hover:underline content-center">Close</button></div></div>
     </div>
   )
 }

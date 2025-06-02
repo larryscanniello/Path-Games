@@ -35,10 +35,10 @@ export default function SensorInfoBox(props){
           <table className="table-fixed text-center w-full font-small text-cyan-200 border-collapse transform">
               <tbody className="">
               {sensorLog.map(obj => (
-                  <tr onMouseEnter = {() => props.setHoverIndex(obj.position)} onMouseLeave = {() => {props.setHoverIndex(null);}}>
+                  <tr onMouseEnter={() => props.setHoverIndex([obj.position,obj.beep])} onMouseLeave={() => {props.setHoverIndex(null);}}>
                   <td>{obj.turn}</td>
                   <td>{'(' + obj.position[0].toString() + ',' + obj.position[1].toString() + ')'}</td>
-                  <td style={{backgroundColor: obj.beep ? 'rgb(0,255,0,.5)':'rgb(255,0,0,.5)'}}>{obj.beep ? "Yes" : "No"}</td>
+                  <td className={obj.beep ? 'bg-green-500':'bg-red-500'}>{obj.beep ? "Yes" : "No"}</td>
                   </tr>
               ))}
               </tbody>

@@ -25,11 +25,11 @@ export default function ViewGameList(){
     },[])
     
     return (
-            <div className='min-h-screen bg-black text-cyan-200 font-mono'>
+            gameList && <div className='min-h-screen bg-black text-cyan-200 font-mono'>
               <NavBar/>
               <div className="m-24"></ div>
-             <div className="pl-48 font-bold">Select a game: </div>{gameList ? (
-                <ul className="pl-48">
+             <div className="pl-48 font-bold">Select a game: </div>{gameList.length>0 ? (
+                <ul className="pl-48 overflow-y-auto h-64">
                   {gameList.map(([id, result, stoch, date], i) => (
                     <li key={id}>
                       <button className="hover:underline" onClick={() => navigate(username+'/'+id.toString()+'/')}>
@@ -44,7 +44,7 @@ export default function ViewGameList(){
                     </li>
                   ))}
                 </ul>
-              ) : <div>No games yet. Play a firegame and come back.</div>}
+              ) : <div className="pl-48">No games yet. Play a mousegame and come back.</div>}
             
             </div>
           );

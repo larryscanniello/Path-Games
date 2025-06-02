@@ -43,54 +43,71 @@ export default function RenderGridMousegame(props){
       }
 
     return(
-    <div className="grid bg-gray-300 grid-rows-25 grid-cols-25">
+    <div className="grid bg-black grid-rows-25 grid-cols-25">
         {grid.map((row,i)=>(
                 row.map((cell,j) => {
                     let bgColor = '';
+                    let img = ''
                     const mod = cell%10;
+                    if(mod===0){
+                       img = 'space_tiles_hyptosis/wool_colored_white.png'
+                       bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]"
+                    }
                     if(mod===1){
+                        img = 'space_tiles_hyptosis/glass.png'
+                        bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/glass.png')]"
+                    }
+                    /*
+                    if(mod===1){
+                        bgColor = 'bg-black '
                         if(i<24){
                             if(grid[i+1][j]!==1){
-                                bgColor += 'bg-black border-b-2 border-purple-400 '
+                                bgColor += 'border border-cyan-100 '
                         }}
                         if(i>0){
                         if(grid[i-1][j]!==1){
-                            bgColor += 'bg-black border-t-2 border-purple-400 '
+                            bgColor += 'border border-cyan-100 '
                         }}
                         if(j<24){
                         if(grid[i][j+1]!==1){
-                            bgColor += 'bg-black border-r-2 border-purple-400 '
+                            bgColor += 'border border-cyan-100 '
                         }}
                         if(j>0){
                         if(grid[i][j-1]!==1){
-                            bgColor += 'bg-black border-l-2 border-purple-400 '
+                            bgColor += 'border border-cyan-100 '
                         }}
                     }else if(mod===3){
                         bgColor = 'bg-yellow-100 border border-cyan-100'
                     }else{
-                        bgColor = 'bg-gray-300 border border-cyan-100'
+                        bgColor = 'bg-gray-400 border border-cyan-100'
                     }
                     if(colors[i][j]!==-1&&props.showSenses){
                         bgColor = colors[i][j]
                     }
-                    /*if(props.hoverIndex){
-                        if(i===props.hoverIndex[0]&&j==props.hoverIndex[1]){
-                            bgColor = colors[i][j].charAt(4)==='0' ? 'green' : 'red';
-                    }}*/
-                    
-                    return (<><div key={i.toString()+','+j.toString()} 
-                    className= {`w-8 h-8 relative flex items-center justify-center ${bgColor}`}
-                    style={{
-                        backgroundColor: bgColor
+                    if(props.hoverIndex){
+                        if(i===props.hoverIndex[0][0]&&j==props.hoverIndex[0][1]){
+                            bgColor = props.hoverIndex[1] ? 'bg-green-500' : 'bg-red-500';
                     }}
-                    ><div className="text-black text-xs">{(sensorcounts[i][j][1]!==0&&props.showSenses)&&`${sensorcounts[i][j][0]}/${sensorcounts[i][j][1]}`}</div>
-                    <BotSlot data={props.data} 
-                            playerIndex={props.playerIndex} 
-                            turn={turn} 
-                            i={i} 
-                            j={j}/>
+                    */
+    return (<div className="">
+                <div key={i.toString()+','+j.toString()} 
+                    className= {`w-8 h-8 ${bgColor}`}
+                    style={{ backgroundSize: "32px 32px" }}
+                    >
+                    
+                    <div className=" w-8 h-8 top-0 left-0">
+                        <div className="text-black text-[9px] fixed">{(sensorcounts[i][j][1]!==0&&props.showSenses)&&`${sensorcounts[i][j][0]}/${sensorcounts[i][j][1]}`}</div>
+                        <BotSlot
+                                data={props.data} 
+                                playerIndex={props.playerIndex} 
+                                turn={turn} 
+                                i={i} 
+                                j={j}
+                                frameIndex = {props.frameIndex}
+                                gameStatus = {props.gameStatus}/>
                     </div>
-                    </>
+                </div>
+            </div>
                 )})
         ))}
     </div>)
@@ -108,41 +125,31 @@ function BotSlot(props){
     else{
         bot4index = props.data.game.botStartingIndex;
     }   
-    if(playerIndex[0]===props.i && playerIndex[1]===props.j){
-        botsInSpace.push({ id: 0, position: {top: '50%', left:'50%', transform: 'translate(-50%, -50%)' }, color: 'blue' })
-    }
     if(bot4index[0]===props.i && bot4index[1]===props.j){
-        botsInSpace.push({ id: 1, position: {top: '50%', left:'50%', transform: 'translate(-50%, -50%)' }, color: 'orange' })
+        if(playerIndex[0]===props.i && playerIndex[1]===props.j){
+            const bot4obj = { id: 4, className:"absolute top-1/2 left-2/7 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-orange-600 text-white text-xs flex items-center justify-center border border-black z-30"}
+            const playerobj = {id: 0, className:"absolute top-1/2 left-5/7 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black z-30"}
+            botsInSpace.push(bot4obj)
+            botsInSpace.push(playerobj)
+        }else{
+            const bot4obj = { id: 4, className:"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-orange-600 text-white text-xs flex items-center justify-center border border-black z-30"}
+            botsInSpace.push(bot4obj)
+        }
     }
-    const botStyle = {
-        position: 'absolute',
-        width: '10px',
-        height: '10px',
-        borderRadius: '50%',
-        backgroundColor: 'blue',
-    };
-    /*return(<>
-        <div
-        key = {playerSpace.id}
-        style ={{
-            ...botStyle,
-            ...playerSpace.position,
-            backgroundColor: playerSpace.color
-        }}
-        ></div>
-    </>
-
-    )*/
-    return(<>{botsInSpace.map((bot)=>(
-        <div
-        key = {botsInSpace.id}
-        style ={{
-            ...botStyle,
-            ...bot.position,
-            backgroundColor: bot.color
-        }}
-        ></div>
-    ))}</>
-
-    )
+    if(playerIndex[0]===props.i && playerIndex[1]===props.j&&!(bot4index[0]===props.i && bot4index[1]===props.j)){
+        const playerobj = {id: 0, className:"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black z-30"}
+        botsInSpace.push(playerobj)
+    }
+    
+    
+    return(<div className="relative w-full h-full z-30">
+        {(props.gameStatus==='lose'&&bot4index[0]===props.i && bot4index[1]===props.j)&&<img src={`/mouse/sprite_${['03','04','05'][props.frameIndex]}.png`}/>}
+        {(props.gameStatus==='win'&&playerIndex[0]==props.i&&playerIndex[1]==props.j)&&<img src={`/mouse/sprite_${['03','04','05'][props.frameIndex]}.png`}/>}
+        {botsInSpace.map((bot,i)=>(
+            <div
+                key = {bot.id}
+                className={bot.className}
+                >
+            {(bot.id!==0) && bot.id}</div>))}
+    </div>)
 }

@@ -23,29 +23,33 @@ export default function ViewGameList(){
     }
     fetchGameList();
     },[])
-    
+    if(!gameList){
+      return <></>
+    }
+      
+    else{
     return (
         <div className='min-h-screen bg-black text-cyan-200 font-mono'>
           <NavBar/>
           <div className="m-24"></ div>
-         <div className="pl-48 font-bold">Select a game: </div>{gameList ? (
-            <ul className="pl-48">
+         <div className="pl-48 font-bold">Select a game: </div>{gameList.length>0 ? (
+            <ul className="pl-48 overflow-y-auto h-64">
               {gameList.map(([id, result, difficulty, date], i) => (
                 <li key={id}>
                   <button className="hover:underline" onClick={() => navigate(username+'/'+id.toString()+'/')}>
                     {`${i+1}. ${result}, ${difficulty}, ${date.toLocaleString('en-US', {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-})}`}
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}`}
                   </button>
                 </li>
               ))}
             </ul>
-          ) : <div>No games yet. Play a firegame and come back.</div>}
+          ) : <div className="pl-48">No games yet. Play a firegame and come back.</div>}
         
         </div>
-      );
+      );}
 }

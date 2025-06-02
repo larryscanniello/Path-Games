@@ -3,6 +3,7 @@ from firegame.models import FiregameMap
 from mousegame.models import MousegameMap,BotData
 from api.models import MousegameGame, FiregameGame
 from django.contrib.auth.models import User
+from rest_framework.validators import UniqueValidator
 
 class FiregameSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,8 +40,22 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id','username','password']
-        extra_kwargs = {'password': {'write_only':True}}
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'username': {
+                'error_messages': {
+                    'unique': 'A user with this username already exists.'
+                }
+            }
+        }
+    def validate_username(self, value):
+        print('check')
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("A user with this username already exists.")
+        return value
     def create(self,validated_data):
+        print('checkkkk')
         user = User.objects.create_user(**validated_data)
+        
         return user
-
+    

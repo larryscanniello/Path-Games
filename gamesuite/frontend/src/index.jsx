@@ -12,6 +12,7 @@ import { AuthProvider } from './Components/AuthProvider';
 import ViewFiregameList from './Components/Firegame/ViewFiregameList';
 import SeeOldMouseGames from './Components/Mousegame/SeeOldMouseGames';
 import ViewMousegameList from "./Components/Mousegame/ViewMousegameList";
+import NicknameRoute from './Components/Nicknameroute';
 import './index.css';
 
 const router = createBrowserRouter([
@@ -25,7 +26,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/seeoldfiregames/:username/:gameID/",
-    element: <SeeOldFireGames/>,
+    element: <ProtectedRoute><SeeOldFireGames/></ProtectedRoute>
   },
   {
     path: "/seeoldfiregames/",
@@ -37,7 +38,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/seeoldmousegames/:username/:gameID/",
-    element: <SeeOldMouseGames/>
+    element: <ProtectedRoute><SeeOldMouseGames/></ProtectedRoute>
   },
   {
     path: "/mousegame",
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
     path: "/register",
     element: <Register/>
   },
+  {
+    path: "/nickname",
+    element: <NicknameRoute/>
+  }
 ])
 
 

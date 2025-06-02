@@ -24,3 +24,8 @@ class FiregameGame(models.Model):
     player_path = models.JSONField()
     result = models.CharField(max_length=10)
     datetime = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['firegame_map','user'],name='unique_firegame_map_user')
+        ]

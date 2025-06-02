@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from collections import defaultdict
 
 class FiregameMap(models.Model):
     initial_board = models.JSONField()  
@@ -17,4 +17,10 @@ class FiregameMap(models.Model):
     bot4path = models.JSONField(null=True)
     def __str__(self):
         return f"Game {self.id} - {self.difficulty}"
+    def win_rate(self):
+        total_played = self.firegamegame_set.count()
+        if total_played == 0:
+            return None
+        total_wins = self.firegamegame_set.filter(result='win').count()
+        return total_wins / total_played
     

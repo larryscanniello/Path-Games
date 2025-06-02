@@ -12,6 +12,7 @@ from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import authentication_classes
 from django.shortcuts import get_object_or_404
+from collections import defaultdict
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -20,12 +21,23 @@ def firegame(request):
     difficulty = request.data['difficulty']
     userid = User.objects.get(username=request.data['username'])
     played_map_ids = FiregameGame.objects.filter(user=userid).values_list('firegame_map',flat=True)
+
+    difficulties = ['easy','medium','hard']
+    levels_left = []
+    for i in range(len(difficulties)):
+        unplayed_maps = FiregameMap.objects.filter(difficulty=difficulties[i]).exclude(id__in=played_map_ids)
+        levels_left.append(len(unplayed_maps))
+
+    
     unplayed_maps = FiregameMap.objects.filter(difficulty=difficulty).exclude(id__in=played_map_ids)
     if unplayed_maps.exists():
         map_to_send = unplayed_maps.first()
         serialized_map = FiregameSerializer(map_to_send)
-        return Response({'success': True, 'game': serialized_map.data})
-    return Response({'success': False})
+        return Response({'success': True, 
+                         'game': serialized_map.data,
+                         'win_rate': map_to_send.win_rate(),
+                         'levels_left': levels_left})
+    return Response({'success': False,'levels_left':levels_left})
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -43,6 +55,7 @@ def get_mousegame_by_id(request):
         'game': map_serializer.data,
         'bots': bot_serializer.data,
         'playerdata': game_serializer.data,
+        'leaderboard': map.leaderboard()
     })
 
 @api_view(['POST'])
@@ -99,13 +112,25 @@ def mousegame(request):
     userid = User.objects.get(username=request.data['username'])
     played_map_ids = MousegameGame.objects.filter(user=userid).values_list('mousegame_map', flat=True)
     unplayed_maps = MousegameMap.objects.filter(stochastic=stoch).exclude(id__in=played_map_ids)
+
+    stochoptions = [False,True]
+    levels_left = []
+    for i in range(len(stochoptions)):
+        unplayed = MousegameMap.objects.filter(stochastic=stochoptions[i]).exclude(id__in=played_map_ids)
+        levels_left.append(len(unplayed))
+
     if unplayed_maps.exists():
         map_to_send = unplayed_maps.first()
         serialized_map = MousegameSerializer(map_to_send)
         bots = BotData.objects.filter(mousegame_map=map_to_send.id)
         bot_serializer = BotDataSerializer(bots, many=True)
-        return Response({'success': True, 'game': serialized_map.data,'bots':bot_serializer.data})
-    return Response({'success': False})
+        return Response({'success': True, 
+                         'game': serialized_map.data,
+                         'bots':bot_serializer.data,
+                         'win_rate':map_to_send.win_rate(),
+                         'leaderboard':map_to_send.leaderboard(),
+                         'levels_left':levels_left})
+    return Response({'success': False,'levels_left':levels_left})
 
 
 
@@ -116,7 +141,7 @@ def mousegame(request):
 def get_mousegame_list(request):
     userid = User.objects.get(username=request.data['username'])
     games = MousegameGame.objects.filter(user=userid).order_by('datetime')
-    gamestrs = [[game.mousegame_map.id,game.result,game.mousegame_map.stochastic,game.datetime] for game in games]
+    gamestrs = [[game.mousegame_map.id,game.result,game.mousegame_map.stochastic,game.datetime,game.mousegame_map.win_rate()] for game in games]
     return Response(gamestrs)
 
 @csrf_exempt
@@ -126,8 +151,48 @@ def get_mousegame_list(request):
 def get_firegame_list(request):
     userid = User.objects.get(username=request.data['username'])
     games = FiregameGame.objects.filter(user=userid).order_by('datetime')
-    gamestrs = [[game.firegame_map.id,game.result,game.firegame_map.difficulty,game.datetime] for game in games]
+    gamestrs = [[game.firegame_map.id,game.result,game.firegame_map.difficulty,game.datetime,game.firegame_map.win_rate()] for game in games]
     return Response(gamestrs)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@authentication_classes([])
+def get_firegame_leaderboard(request):
+    score_map = {
+            'easy': 50,
+            'medium': 100,
+            'hard': 200,
+        }
+    scores = defaultdict(int)
+    for game in FiregameGame.objects.all():
+        user = game.user
+        difficulty = game.firegame_map.difficulty
+        scores[user] += score_map.get(difficulty, 0)
+    top_users = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:5]
+    return Response({'leaderboard':[[user.username, score] for user, score in top_users],
+                     'userscore':scores[User.objects.get(username=request.data['username'])]})
+
+def get_mousegame_map_leaderboard(request):
+    id = request.data['id']
+    stoch = True
+    if request.data['stoch']=='stationary':
+        stoch = False
+    userid = User.objects.get(username=request.data['username'])
+    played_map_ids = MousegameGame.objects.filter(user=userid).values_list('mousegame_map', flat=True)
+    unplayed_maps = MousegameMap.objects.filter(stochastic=stoch).exclude(id__in=played_map_ids)
+    if unplayed_maps.exists():
+        map_to_send = unplayed_maps.first()
+        serialized_map = MousegameSerializer(map_to_send)
+        bots = BotData.objects.filter(mousegame_map=map_to_send.id)
+        bot_serializer = BotDataSerializer(bots, many=True)
+        return Response({'success': True, 
+                         'game': serialized_map.data,
+                         'bots':bot_serializer.data,
+                         'win_rate':map_to_send.win_rate(),
+                         'leaderboard':map_to_send.leaderboard()})
+    return Response({'success': False})
+
 
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
