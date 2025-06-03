@@ -172,11 +172,10 @@ export default function SeeMiceBots(){
     useEffect(() => {
       if(simData){
       const simlength = Math.max(simData.bot1.evidence.length,simData.bot2.evidence.length,simData.bot3.evidence.length,simData.bot4.evidence.length)
-        if (simData && 1<turn&&turn<simlength) {
+        if (simData && 1<turn&&turn<simlength && simData.game.stoch) {
           const path = simData.game.mouse_path;
           const deltai = path[turn-1][0] - path[turn-2][0];
           const deltaj = path[turn-1][1] - path[turn-2][1];
-            
           if (deltai === -1) {
             setDirectionFrames(['00', '01', '02']);
           } else if (deltai === 1) {
@@ -215,7 +214,6 @@ export default function SeeMiceBots(){
         <div className="flex fixed">
         </div>
         {showAbout && <SeeMousegameAbout setShowAbout={setShowAbout}/>}
-
             </div><div>
         {showGameSelection && <div><SelectGameMenu 
                     showGameSelection={showGameSelection} 
@@ -277,8 +275,7 @@ export default function SeeMiceBots(){
             <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
             <div>Map {gameID.current} Leaderboard</div>
             <div className='border border-gray-500 p-4 rounded-2xl text-[14px]'>{leaderboard && leaderboard.length>0 ? leaderboard.map(([leader,turns],i)=>{
-            const plus = turns - leaderboard[0][1]
-            return <div className='flex flex-row justify-between'><div>{leader}</div>{i>0 && <div className='ml-40'></div>}{i>0&&<div>{`+${plus}`}</div>}</div>}) : <div>No winners yet</div>}</div>
+            return <div className='flex flex-row justify-between'><div>{leader}</div>{<div className='ml-40'></div>}{i>0&&<div>{`${turns}`}</div>}</div>}) : <div>No winners yet</div>}</div>
         </div>
             
             </div>

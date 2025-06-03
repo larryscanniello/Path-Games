@@ -101,7 +101,6 @@ export default function Mousegame(){
                 setError(err.message);
             }
         }
-        console.log('check051')
         fetchGame();
         }, [stoch,stochVersion])
 
@@ -110,6 +109,28 @@ export default function Mousegame(){
                 boxRef.current.scrollTop = boxRef.current.scrollHeight;
             }
         },[gameState])
+
+        useEffect(() => {
+            const handleBeforeUnload = () => {
+                if(gameState.gameStatus==='in_progress'){
+                    const username = localStorage.getItem(USERNAME);
+                    const obj = {
+                        result: 'lose',
+                        path: gameState.playerPath,
+                        username,
+                        sensorLog: gameState.sensorLog,
+                        id: gameID.current
+                    };
+                    //const blob = new Blob([JSON.stringify(obj)], JSON.stringify({ foo: 'bar' }));
+                    navigator.sendBeacon('http://localhost:8000/api/handle_game_over_mousegame/', JSON.stringify(obj));
+                }   
+            };
+            window.addEventListener('beforeunload', handleBeforeUnload);
+            return () => {
+                window.removeEventListener('beforeunload', handleBeforeUnload);
+            };
+        }, [gameState.playerPath, gameState.sensorLog, gameState.gameStatus,gameID]);
+        
 
       useEffect(() => {
         const handleKeyDown = (e) => {

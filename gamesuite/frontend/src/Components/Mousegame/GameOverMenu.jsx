@@ -12,6 +12,7 @@ export default function GameOverMenu(props){
                     <ul>{stochoptions.map((stochvar,i)=>
                     {return props.levelsLeft[i]>0 ? <li key={i}><button className='hover:underline' 
                                             onClick={()=>{props.setStoch(stochvar);
+                                            props.setStochVersion(prev=>prev+1);
                                             props.setShowInstructions(false);}}
                                         >New {stochvar} mouse game ({props.levelsLeft[i]} left)</button></li> 
                                 : <li className="opacity-60">No {stochvar} levels left</li>})}</ul></div>}           

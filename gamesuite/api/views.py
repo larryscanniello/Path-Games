@@ -13,6 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import authentication_classes
 from django.shortcuts import get_object_or_404
 from collections import defaultdict
+import json
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -74,30 +75,42 @@ def get_firegame_by_id(request):
         'playerdata': game_serializer.data,
     })
 
+   
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @authentication_classes([])
 def handle_game_over_mousegame(request):
-    username,id = request.data['username'],request.data['id']
-    game = get_object_or_404(MousegameGame,user__username=username,firegame_map__id=id)
-    game.player_path = request.data['path']
-    game.sensor_log = request.data['sensorLog']
-    game.result = request.data['result']
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+    except json.JSONDecodeError:
+        return Response({'error': 'Invalid JSON'}, status=400)
+    username,id = data['username'],data['id']
+    game = get_object_or_404(MousegameGame,user__username=username,mousegame_map__id=id)
+    game.player_path = data['path']
+    game.sensor_log = data['sensorLog']
+    game.result = data['result']
     game.save()
     return Response({'hell':'yeah'})
+
+
 
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @authentication_classes([])
 def handle_game_over_firegame(request):
-    username,id = request.data['username'],request.data['id']
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+    except json.JSONDecodeError:
+        return Response({'error': 'Invalid JSON'}, status=400)
+    username,id = data['username'],data['id']
     game = get_object_or_404(FiregameGame,user__username=username,firegame_map__id=id)
-    game.player_path = request.data['path']
-    game.result = request.data['result']
+    game.player_path = data['path']
+    game.result = data['result']
     game.save()
     return Response({'hell':'yeah'})
+    
 
 @csrf_exempt
 @api_view(['POST'])

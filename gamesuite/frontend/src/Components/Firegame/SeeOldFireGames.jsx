@@ -171,6 +171,7 @@ function SeeFireBots() {
     <div className='flex justify-between'>
         <button className='hover:underline' onClick={()=>setShowGameSelection(prev=>!prev)}>Select new simulation</button>
         <button className='hover:underline' onClick={()=>setShowToFiregame(prev=>!prev)}>Firegame</button>
+        <button className='hover:underline' onClick={()=>setCurrentTurn(0)}>Restart</button>
         <button className='hover:underline' onClick={()=>setShowInstructions(prev=>!prev)}>Instructions</button>
         <button className='hover:underline' onClick={()=>setShowAbout(prev=>!prev)}>About</button>
     </div>

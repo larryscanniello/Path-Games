@@ -19,6 +19,7 @@ class MousegameMap(models.Model):
         return total_wins / total_played
     def leaderboard(self):
         games = self.mousegamegame_set.exclude(result='lose')
+        games = games.exclude(result='forfeit')
         # Sort by length of player_path
         sorted_games = sorted(games, key=lambda g: len(g.player_path or []))
         top_three_users = [[game.user.username,len(game.player_path)] for game in sorted_games[:3]]

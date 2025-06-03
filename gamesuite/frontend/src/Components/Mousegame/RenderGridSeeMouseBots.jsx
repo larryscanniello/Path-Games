@@ -154,7 +154,7 @@ export default function RenderGridSeeBots(props){
                         }else{
                             return false;
                     }})){
-                        bgColor += ' border-2 border-cyan-200'//'bg-red-300 border border-cyan-100'
+                        bgColor += ' border-2 border-cyan-100'//'bg-red-300 border border-cyan-100'
                     }
                     
                     return (<><div 
@@ -215,38 +215,40 @@ function BotSlot(props){
     }*/
     if(bot1index[0]==props.i && bot1index[1]==props.j&&showAgent[0]){
         const bot1obj = { id: 1, className:"absolute top-0 left-0 w-3 h-3 rounded-full bg-yellow-600 text-white text-xs flex items-center justify-center border border-black"}
-        if(turn>bot1path.length-1&&props.data.game.stoch){
+        if(turn>bot1path.length-1){
             bot1obj.className += " opacity-40"
         }
         botsInSpace.push(bot1obj)
     }
     if(bot2index[0]==props.i && bot2index[1]==props.j&&showAgent[1]){
         const bot2obj = { id: 2, className:"absolute top-0 right-0 w-3 h-3 rounded-full bg-green-600 text-white text-xs flex items-center justify-center border border-black"}
-        if(turn>bot2path.length-1&&props.data.game.stoch){
+        if(turn>bot2path.length-1){
             bot2obj.className += " opacity-40"
         }
         botsInSpace.push(bot2obj)
     }
     if(bot3index[0]==props.i && bot3index[1]==props.j&&showAgent[2]){
         const bot3obj = { id: 3, className:"absolute bottom-0 left-0 w-3 h-3 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center border border-black"}
-        if(turn>bot3path.length-1&&props.data.game.stoch){
+        if(turn>bot3path.length-1){
             bot3obj.className += " opacity-40"
         }
         botsInSpace.push(bot3obj)
     }
     if(bot4index[0]==props.i && bot4index[1]==props.j&&showAgent[3]){
         const bot4obj = { id: 4, className:"absolute bottom-0 right-0 w-3 h-3 rounded-full bg-orange-600 text-white text-xs flex items-center justify-center border border-black"}
-        if(turn>bot4path.length-1&&props.data.game.stoch){
+        if(turn>bot4path.length-1){
             bot4obj.className += " opacity-40"
         }
         botsInSpace.push(bot4obj)
     }
-    if(player_index[0]==props.i&& player_index[1]==props.j&&showAgent[4]){
-        const playerobj = {id: 0, className:"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black"}
-        if(turn>player_path.length-1&&props.data.game.stoch){
-            playerobj.className += " opacity-40"
+    if(props.data.game.result!=='forfeit'){
+        if(player_index[0]==props.i&& player_index[1]==props.j&&showAgent[4]){
+            const playerobj = {id: 0, className:"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black"}
+            if(turn>player_path.length-1){
+                playerobj.className += " opacity-40"
+            }
+            botsInSpace.push(playerobj)
         }
-        botsInSpace.push(playerobj)
     }
     if(props.showAgent[0]&&turn<=props.data.bot1.evidence.length-1&&bot1plan.some(subarray=>{
         if(subarray){
@@ -272,7 +274,7 @@ function BotSlot(props){
     }})){
         botsInSpace.push({ id: 13, className:"absolute bottom-0 left-0 w-1.5 h-1.5 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center"})
     }
-    if(props.showAgent[3]&&turn<=props.data.bot3.evidence.length-1&&bot4plan.some(subarray=>{
+    if(props.showAgent[3]&&turn<=props.data.bot4.evidence.length-1&&bot4plan.some(subarray=>{
         if(subarray){
             return subarray[0]==props.i&&subarray[1]==props.j&&!(props.i===bot4index[0]&&props.j===bot4index[1])
         }else{

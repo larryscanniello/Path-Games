@@ -162,78 +162,28 @@ export default function Firegame(){
         }
       }, [gameData]);
 
-      /*useEffect(() => {
-        console.log('check')
+      useEffect(() => {
         const handleBeforeUnload = () => {
-            if(gameState.gameStatus!=='in_progress'||gameState.currentTurn<1){
-                return
-            }
-            const username = localStorage.getItem(USERNAME);
-            const data = {path:gameState.playerPath,username,id:gameID.current,result:'lose'};
-            const blob = new Blob([data], { type: 'application/json' });
-            navigator.sendBeacon('http://localhost:8000/api/handle_game_over_firegame/', blob);
+            if(gameState.gameStatus==='in_progress'){
+                const username = localStorage.getItem(USERNAME);
+                const obj = {
+                    result: 'lose',
+                    path: gameState.playerPath,
+                    username,
+                    sensorLog: gameState.sensorLog,
+                    id: gameID.current
+                };
+                //const blob = new Blob([JSON.stringify(obj)], JSON.stringify({ foo: 'bar' }));
+                navigator.sendBeacon('http://localhost:8000/api/handle_game_over_firegame/', JSON.stringify(obj));
+            }   
         };
         window.addEventListener('beforeunload', handleBeforeUnload);
-        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-      }, [gameState.currentTurn]);*/
-
-      useEffect(() => {
-        console.log('Setting up unload handler');
-
-        const handlePageHide = () => {
-            // Only send if the game was in progress and had turns
-            if (gameState.gameStatus !== 'in_progress' || gameState.currentTurn < 1) {
-                console.log('Game not in progress or no turns, not sending beacon.');
-                return;
-            }
-
-            const username = localStorage.getItem(USERNAME);
-            const dataToSend = {
-                path: gameState.playerPath,
-                username: username,
-                id: gameID.current, // Access current value of useRef
-                result: 'lose'
-            };
-
-            // 1. Stringify the JSON data
-            const jsonString = JSON.stringify(dataToSend);
-            // 2. Create Blob with correct content type
-            const blob = new Blob([jsonString], { type: 'application/json' });
-
-            // 3. Use fully qualified URL
-            const url = 'http://localhost:8000/api/handle_game_over_firegame/';
-
-            console.log('Attempting to send beacon:', dataToSend);
-            const success = navigator.sendBeacon(url, blob);
-
-            if (success) {
-                console.log('Beacon successfully queued.');
-            } else {
-                console.error('Beacon failed to queue (possibly too large or browser issue).');
-                // Fallback for older browsers or larger data (less reliable on unload)
-                // fetch(url, {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: jsonString,
-                //     keepalive: true // Crucial for fetch on unload
-                // }).then(response => {
-                //     console.log('Fetch with keepalive sent:', response.status);
-                // }).catch(error => {
-                //     console.error('Fetch with keepalive failed:', error);
-                // });
-            }
-        };
-
-        // Prefer 'pagehide' or 'visibilitychange' over 'beforeunload' for reliability
-        window.addEventListener('pagehide', handlePageHide);
-        // window.addEventListener('visibilitychange', handlePageHide); // Could also use this
-
         return () => {
-            console.log('Cleaning up unload handler');
-            window.removeEventListener('pagehide', handlePageHide);
-            // window.removeEventListener('visibilitychange', handlePageHide);
+            window.removeEventListener('beforeunload', handleBeforeUnload);
         };
-    }, [gameState.currentTurn, gameState.gameStatus, gameState.playerPath]); // Add all relevant state as dependencies
+    }, [gameState.playerPath, gameState.sensorLog, gameState.gameStatus,gameID]);
+
+      
 
       async function handleGameOver(result,path){
         setLevelsLeft(prev=>{
