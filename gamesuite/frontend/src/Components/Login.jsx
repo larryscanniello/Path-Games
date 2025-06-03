@@ -60,7 +60,7 @@ function Login() {
           />
           <div className='pt-4'>New user? <button className='text-blue-400 hover:underline' onClick={()=>navigate('/register/')}> Register</button></div>
           <div className='flex flex-col items-center'>
-          <button className='mt-4 bg-blue-300 rounded-3xl pl-4 pr-4 pt-2 pb-2 font-bold' type="submit">Log In</button>
+          <button className='mt-4 bg-blue-300 hover:bg-blue-200 rounded-3xl pl-4 pr-4 pt-2 pb-2 font-bold' type="submit">Log In</button>
           </div>
           
         </form>

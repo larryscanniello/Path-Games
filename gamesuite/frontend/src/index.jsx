@@ -30,11 +30,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/seeoldfiregames/",
-    element: <ViewFiregameList/>
+    element: <ProtectedRoute><ViewFiregameList/></ProtectedRoute>
   },
   {
     path: "/seeoldmousegames",
-    element: <ViewMousegameList/>
+    element: <ProtectedRoute><ViewMousegameList/></ProtectedRoute>
   },
   {
     path: "/seeoldmousegames/:username/:gameID/",

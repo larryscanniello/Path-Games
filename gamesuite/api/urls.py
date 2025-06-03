@@ -19,4 +19,6 @@ urlpatterns = [
     path('getmousegamelist/',views.get_mousegame_list,name='get_game_list'),
     path('getfiregamelist/',views.get_firegame_list,name='get_firegame_list'),
     path('getfiregameleaderboard/',views.get_firegame_leaderboard,name='get_firegame_leaderboard'),
+    path('handle_first_turn_firegame/',views.handle_first_turn_firegame),
+    path('handle_first_turn_mousegame/',views.handle_first_turn_mousegame)
 ]

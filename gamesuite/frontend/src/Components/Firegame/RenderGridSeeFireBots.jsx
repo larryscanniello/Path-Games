@@ -26,7 +26,7 @@ export default function RenderGridSeeBots(props){
                     bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/glass.png')]"
                   }
                   if(mod===5){
-                    bgColor = "w-8 h-8 border border-green-300 bg-[url('/space_tiles_hyptosis/switch.png')]"
+                    bgColor = "w-8 h-8 bg-[url('/suppresor2.png')]"
                   }
                 /*if (mod === 2) {
                   bgColor = 'bg-red-500 border border-cyan-100';
@@ -67,6 +67,7 @@ export default function RenderGridSeeBots(props){
                             difficulty = {props.difficulty}
                             playerIndex={props.playerIndex}
                             currentTurn={props.currentTurn}
+                            result={props.result}
                             i={i}
                             j={j}
                           />
@@ -78,6 +79,7 @@ export default function RenderGridSeeBots(props){
                             data={props.data}
                             playerIndex={props.playerIndex}
                             currentTurn={props.currentTurn}
+                            result={props.result}
                             i={i}
                             j={j}
                           />
@@ -110,9 +112,12 @@ function BotSlot(props){
         bot1index = bot2index = bot3index = bot4index = playerindex = successpossibleindex
     }
     const botsInSpace = []
-    if(playerindex[0]==props.i&& playerindex[1]==props.j){
+    if(props.result!=='forfeit'){
+      if(playerindex[0]==props.i&& playerindex[1]==props.j){
         botsInSpace.push({id: 0, className:"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black"})
     }
+    }
+    
     console.log('pd: ',props.difficulty);
     if(props.difficulty==='hard'){
         if(successpossibleindex[0]===props.i && successpossibleindex[1]===props.j){
@@ -144,16 +149,4 @@ function BotSlot(props){
         ))}
     </div>)
 
-    /*return(<>{botsInSpace.map((bot)=>(
-        <div
-        key = {botsInSpace.id}
-        style ={{
-            ...botStyle,
-            ...bot.position,
-            backgroundColor: bot.color
-        }}
-        >{botsInSpace.id}</div>
-    ))}</>
-
-    )*/
 }

@@ -74,11 +74,12 @@ function NicknameRoute() {
               </div>
             </form>}
             {isAuthorized && <div className='flex flex-col items-center'>
-            <div className='font-bold pt-4'>Welcome {username}. Select an option: </div>
+            <div className='font-bold pt-4'>Welcome {username}.</div>
+            <div className='pt-4'>In the future, you can log in with your</div>
+            <div className=''>nickname as your username and password.</div>
+            <div className='mt-4 font-bold'>Select an option: </div>
             <Link to='/firegame/' className='text-white hover:underline pt-4'>Play Firegame</Link>
             <Link to='/mousegame/' className='text-white hover:underline pt-4'>Play Mousegame</Link>
-            <div className='pt-4'>To access your profile again, login with</div>
-            <div className=''>your nickname as your username and password.</div>
             </div>}
             </div>
           </div>

@@ -2,7 +2,7 @@
 
 export default function SeeMousegameAbout(props) {
     return (
-        <div className="fixed z-20 border border-gray-300 bg-gray-800/90 mt-24 ml-24 mr-24 text-sm">
+        <div className="fixed z-20 border border-gray-300 bg-gray-800/90 mt-24 ml-24 mr-24 text-sm rounded-md">
             <div className="pt-12 pr-8 pl-8 pb-12 text-indigo-100">
                 <p className="pb-4">The key feature of the bots is that they each maintain their own belief array.
                     For a given bot, each number in its array at a point in time represents the probability of the mouse

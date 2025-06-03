@@ -189,6 +189,15 @@ export default function Mousegame(){
             if(gameStatus!=='in_progress'){
                 handleGameOver(gameStatus,playerPath,sensorLog)
             }
+            if(prev.turn+1===1){
+                handleFirstTurn()
+            }
+            async function handleFirstTurn(){
+                const username = localStorage.getItem(USERNAME);
+                const obj = {username,id:gameID.current}
+                const res = api.post('/handle_first_turn_mousegame/',obj)
+                .catch(e=>{console.log('Check handleFirstTurn',e)})
+            }
             return({
                 turn: prev.turn+1,
                 mouseIndex: mouseIndex,
@@ -238,7 +247,7 @@ export default function Mousegame(){
     <div>
     <NavBar/>
     {(showInstructions && levelsLeft) &&
-        <div className="fixed scale-85 transform flex justify-center items-center z-20">
+        <div className="fixed scale-85 transform flex justify-center items-center z-90">
             <MousegameInstructions  stoch={stoch} 
                                     setStoch={setStoch} 
                                     setShowInstructions={setShowInstructions}
@@ -255,19 +264,18 @@ export default function Mousegame(){
         </div>}
     <div className='grid grid-cols-[1fr_auto_1fr]'>
     <div className=''></div>
-    {(gameData && stoch) && <div className='relative'>
-        {showNewGameMenu && <div className="fixed ml-52 mt-70 z-30">
-            <div className="relative border border-gray-300 bg-gray-800/90 z-10">
-            <div className="flex flex-col items-center p-7">
+    {(gameData && stoch) && <div className='relative z-50'>
+        {showNewGameMenu && <div className="fixed ml-52 mt-70 z-90">
+            <div className="relative border border-gray-300 bg-gray-800/90 z-10 rounded-md flex flex-col items-center p-7">
             {stochoptions.map((stochvar,i)=>
-                    {return levelsLeft[i]>0 ? <div key={i}><button className='hover:underline pb-4 text-white' 
+                    {return levelsLeft[i]>0 ? <button className='hover:underline pb-4 text-white' 
                                             onClick={()=>{setStoch(stochvar);
                                             setShowNewGameMenu(false);}}
-                                        >New {stochvar} mouse game ({levelsLeft[i]} left)</button></div> 
+                                        >New {stochvar} mouse game ({levelsLeft[i]} left)</button> 
                                 : <div className="opacity-60 pb-4 text-white">No {stochvar} levels left</div>})}
                 <button className='hover:underline text-white' onClick={()=>setShowNewGameMenu(false)}>Close</button>
-            </div></div></div>}
-        {showAbout && <div className='fixed z-30'><MousegameAbout setShowAbout={setShowAbout}/></div>}
+            </div></div>}
+        {showAbout && <div className='fixed z-90'><MousegameAbout setShowAbout={setShowAbout}/></div>}
         
         <RenderGridMousegame 
             data={gameData} 
@@ -293,14 +301,14 @@ export default function Mousegame(){
     
     
     <div className=''>
-        {stoch&&<div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4">
+        {stoch&&<div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
             <div>Mousegame, Map: {gameID.current}</div>
             <div>Mode: {stoch} mouse</div>    
         </div>}
-        {stoch&& <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4">
+        {stoch&& <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
             <div>Turn: {gameState.turn}</div>   
         </div>}
-        {stoch && <div className='bg-gray-800 border border-white m-8'>
+        {stoch && <div className='bg-gray-800 border border-white m-8 rounded-md flex flex-col items-center'>
             <SensorInfoBox 
             sensorLog={gameState.sensorLog} 
             boxRef={boxRef} 
@@ -312,11 +320,11 @@ export default function Mousegame(){
             setSeePath = {setSeePath}/></div>}
     
     
-        {stoch&&<div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4">
+        {stoch&&<div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
             <div>Map {gameID.current} Leaderboard</div>
-            <div className='border border-gray-500 p-4'>{leaderboard.current && leaderboard.current.length>0 ? leaderboard.current.map(([leader,turns],i)=>{
+            <div className='border border-gray-500 p-4 rounded-2xl text-[14px]'>{leaderboard.current && leaderboard.current.length>0 ? leaderboard.current.map(([leader,turns],i)=>{
             const plus = turns - leaderboard.current[0][1]
-            return <div className='flex justify-between'><div>{leader}{i>0 && <div className='ml-40'></div>}{i>0&&<div>{`+${plus}`}</div>}</div></div>}) : <div>No winners yet</div>}</div>
+            return <div className='flex flex-row justify-between'><div>{leader}</div>{i>0 && <div className='ml-40'></div>}{i>0&&<div>{`+${plus}`}</div>}</div>}) : <div>No winners yet</div>}</div>
         </div>}
     </div>
     

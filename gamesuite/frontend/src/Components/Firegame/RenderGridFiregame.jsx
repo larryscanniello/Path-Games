@@ -3,7 +3,6 @@ import '../../Styles/flame.css'
 
 export default function RenderGridFiregame(props){
     if(!props.data) return <p>Loading...</p>
-
     const grid = props.data.grid.map(row => [...row]);
     const firelist = props.data.firelist
     const currentTurn = props.currentTurn
@@ -15,7 +14,7 @@ export default function RenderGridFiregame(props){
     
 
     return (
-        <div className>
+        <div>
           <div className="grid bg-black grid-rows-25 grid-cols-25">
             {grid.map((row, i) =>
               row.map((cell, j) => {
@@ -64,7 +63,7 @@ export default function RenderGridFiregame(props){
                   bgColor = 'bg-gray-400 border border-cyan-100';
                 }
                 */
-                return (<>
+                return (<div key={`${i},${j}`}>
                   {mod!==2 ? <div
                     key={`${i},${j}`}
                     className={`w-8 h-8 relative flex items-center justify-center ${bgColor}`}
@@ -78,7 +77,7 @@ export default function RenderGridFiregame(props){
                       j={j}
                     />
                   </div>:<div className='container'><div
-                    key={`${i},${j}`}
+                    key={`${i+25},${j+25}`}
                     className={`open-sq`}
                   >
                     <BotSlot
@@ -89,7 +88,7 @@ export default function RenderGridFiregame(props){
                       j={j}
                     />
                   </div><div className='fire-sprite'></div></div>}
-                  </>
+                  </div>
                 );
               })
             )}

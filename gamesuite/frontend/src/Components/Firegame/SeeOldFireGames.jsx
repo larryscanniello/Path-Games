@@ -66,7 +66,7 @@ function SeeFireBots() {
         if(gameList[i][0]==currentGame){
           setDifficulty(gameList[i][2]);
           setWinRate(gameList[i][4]);
-          setResult(gameList[i][1])
+          setResult(gameList[i][1]);
         }
       }
       const bot1path = JSON.parse(responsedata.bot1path)
@@ -158,16 +158,16 @@ function SeeFireBots() {
     
     <div>
     {showInstructions && 
-        <div className="fixed z-20">
+        <div className="fixed z-50">
             <SeeFiregameInstructions setShowInstructions={setShowInstructions}/></div>}
         
         {showToFiregame && <div className='fixed z-20 ml-45 mt-80'><ToFiregame setShowToFiregame={setShowToFiregame}/></div>}
-        {showGameSelection && <div className='fixed border border-gray-300 bg-gray-800/90 mt-30 ml-44 mr-24 mb-12 z-20'>
+        {showGameSelection && <div className='fixed border border-gray-300 bg-gray-800/90 mt-30 ml-44 mr-24 mb-12 z-20 rounded-md'>
         <GameSelection setCurrentGame={setCurrentGame} 
                       gameList={gameList} 
                       setShowGameSelection={setShowGameSelection}
                       setWinRate={setWinRate}/></div>}
-    <RenderGridSeeBots data={data} currentGrid={currentGrid} currentTurn={currentTurn} difficulty={difficulty}/>
+    <RenderGridSeeBots data={data} currentGrid={currentGrid} currentTurn={currentTurn} difficulty={difficulty} result={result}/>
     <div className='flex justify-between'>
         <button className='hover:underline' onClick={()=>setShowGameSelection(prev=>!prev)}>Select new simulation</button>
         <button className='hover:underline' onClick={()=>setShowToFiregame(prev=>!prev)}>Firegame</button>
@@ -176,22 +176,22 @@ function SeeFireBots() {
     </div>
         </div>  
     <div>
-    <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4">
+    <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
                 <div>Firegame Visualizer, Map: {currentGame}</div>
                 <div>Difficulty: {difficulty}</div>
                 <div>Result: {result}</div>                                    
                 <div className="">Map win rate: {Math.round(winRate*100)}% {console.log('wr:',winRate)}</div>
             </div>
-      <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4">
+      <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
                 <div>Turn: {currentTurn}</div>
       </div>
-      {leaderboard && <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4">
+      {leaderboard && <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
                 <div>Score: {leaderboard.userscore}</div>
                 
       </div>}
-      {leaderboard && <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4">
+      {leaderboard && <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
                 <div>Leaderboard</div>
-                <div className='border border-gray-500 p-4'>{leaderboard.leaderboard.map(([user,score])=><div className='flex justify-between'><div>{user}</div><div className='ml-40'></div> <div>{score}</div></div>)}</div>
+                <div className='border border-gray-500 p-4 rounded-2xl'>{leaderboard.leaderboard.map(([user,score])=><div className='flex justify-between'><div>{user}</div><div className='ml-40'></div> <div>{score}</div></div>)}</div>
 
       </div>}
     </div>   
@@ -231,7 +231,7 @@ function GameSelection(props){
 
 function ToFiregame(props){
   return(
-    <div className="border border-gray-300 bg-gray-800/90 mt-12 ml-24 mr-24 mb-12 z-10">
+    <div className="border border-gray-300 bg-gray-800/90 mt-12 ml-24 mr-24 mb-12 z-10 rounded-md">
       <div className="flex flex-col items-center pr-8 pl-8 pb-6">
         <Link className="hover:underline pt-6 text-white" to="/firegame">Proceed To Firegame</Link>
         <div className="pt-3"><button onClick={()=>props.setShowToFiregame(false)} className="text-white hover:underline content-center">Close</button></div>

@@ -139,7 +139,15 @@ export default function Firegame(){
             if(gameStatus!=='in_progress'){
                 handleGameOver(gameStatus,playerPath);
             }
-            
+            if(prev.turn+1===1){
+                handleFirstTurn()
+            }
+            async function handleFirstTurn(){
+                const username = localStorage.getItem(USERNAME);
+                const obj = {username,id:gameID.current}
+                const res = api.post('/handle_first_turn_firegame/',obj)
+                .catch(e=>{console.log('Check handleFirstTurn',e)})
+            }
             return({
                 turn: prev.turn+1,
                 playerIndex: newPlayerIndex,
@@ -153,6 +161,79 @@ export default function Firegame(){
           window.removeEventListener('keydown',handleKeyDown);
         }
       }, [gameData]);
+
+      /*useEffect(() => {
+        console.log('check')
+        const handleBeforeUnload = () => {
+            if(gameState.gameStatus!=='in_progress'||gameState.currentTurn<1){
+                return
+            }
+            const username = localStorage.getItem(USERNAME);
+            const data = {path:gameState.playerPath,username,id:gameID.current,result:'lose'};
+            const blob = new Blob([data], { type: 'application/json' });
+            navigator.sendBeacon('http://localhost:8000/api/handle_game_over_firegame/', blob);
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+      }, [gameState.currentTurn]);*/
+
+      useEffect(() => {
+        console.log('Setting up unload handler');
+
+        const handlePageHide = () => {
+            // Only send if the game was in progress and had turns
+            if (gameState.gameStatus !== 'in_progress' || gameState.currentTurn < 1) {
+                console.log('Game not in progress or no turns, not sending beacon.');
+                return;
+            }
+
+            const username = localStorage.getItem(USERNAME);
+            const dataToSend = {
+                path: gameState.playerPath,
+                username: username,
+                id: gameID.current, // Access current value of useRef
+                result: 'lose'
+            };
+
+            // 1. Stringify the JSON data
+            const jsonString = JSON.stringify(dataToSend);
+            // 2. Create Blob with correct content type
+            const blob = new Blob([jsonString], { type: 'application/json' });
+
+            // 3. Use fully qualified URL
+            const url = 'http://localhost:8000/api/handle_game_over_firegame/';
+
+            console.log('Attempting to send beacon:', dataToSend);
+            const success = navigator.sendBeacon(url, blob);
+
+            if (success) {
+                console.log('Beacon successfully queued.');
+            } else {
+                console.error('Beacon failed to queue (possibly too large or browser issue).');
+                // Fallback for older browsers or larger data (less reliable on unload)
+                // fetch(url, {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: jsonString,
+                //     keepalive: true // Crucial for fetch on unload
+                // }).then(response => {
+                //     console.log('Fetch with keepalive sent:', response.status);
+                // }).catch(error => {
+                //     console.error('Fetch with keepalive failed:', error);
+                // });
+            }
+        };
+
+        // Prefer 'pagehide' or 'visibilitychange' over 'beforeunload' for reliability
+        window.addEventListener('pagehide', handlePageHide);
+        // window.addEventListener('visibilitychange', handlePageHide); // Could also use this
+
+        return () => {
+            console.log('Cleaning up unload handler');
+            window.removeEventListener('pagehide', handlePageHide);
+            // window.removeEventListener('visibilitychange', handlePageHide);
+        };
+    }, [gameState.currentTurn, gameState.gameStatus, gameState.playerPath]); // Add all relevant state as dependencies
 
       async function handleGameOver(result,path){
         setLevelsLeft(prev=>{
@@ -168,16 +249,10 @@ export default function Firegame(){
             }
             return newll
         })
-        
         const username = localStorage.getItem(USERNAME);
-        const obj = {result,path,username,id:gameID.current}
-        const response = await api.post('handle_game_over_firegame/',obj)
-            .then(response => {console.log(response)})
-            .catch((e)=>{console.log('Check handleGameOver in Mousegame.jsx');
-                console.log(e)
-            })
-        
-        
+                const obj = {path,username,id:gameID.current,result}
+                const res = api.post('/handle_game_over_firegame/',obj)
+                .catch(e=>{console.log('Check handleGameOver',e)})
     }
 
     const levels = ['easy','medium','hard']
@@ -211,7 +286,7 @@ export default function Firegame(){
         <div>
         {gameData.firelist && <div>
         {(showDifficultyMenu&&levelsLeft) && <div className='fixed z-20'>
-            <div className='flex p-6 ml-72 mt-68 flex-col border border-gray-300 bg-gray-800/90'>
+            <div className='flex p-6 ml-61 mt-68 flex-col border border-gray-300 bg-gray-800/90 text-white rounded-md'>
             {levels.map((dif,i)=>{
             return levelsLeft[i]>0 ? <button className='p-3 hover:underline' onClick={()=>{setDifficulty(dif);
                                     setDifficultyCount(prev=> prev+1);
@@ -250,7 +325,7 @@ export default function Firegame(){
       </div>
       <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
                 <div>Leaderboard</div>
-                <div className='border border-gray-500 p-4 rounded-2xl'>{leaderboard.leaderboard.map(([user,score])=><div className='flex justify-between'><div>{user}</div><div className='ml-40'></div> <div>{score}</div></div>)}</div>
+                <div className='border border-gray-500 p-4 rounded-2xl'>{leaderboard.leaderboard.map(([user,score])=><div key={user} className='flex justify-between'><div>{user}</div><div className='ml-40'></div> <div>{score}</div></div>)}</div>
 
       </div>
     </div> }

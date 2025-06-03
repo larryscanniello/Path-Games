@@ -248,16 +248,16 @@ export default function SeeMiceBots(){
             <button className='hover:underline' onClick={()=>setShowAbout(prev=>!prev)}>About</button>
         </div></div>
         <div>
-        <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4">
+        <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
                 <div>Mousegame Visualizer, Map {currentGame}</div>
                 {simData && <div>Mode: {simData.game.stoch ? 'Stochastic' : 'Stationary'} mouse</div>}
                 {simData && <div>Result: {simData.game.result}</div>}                                    
                 <div className="">Map win rate: {Math.round(winRateRef.current*100)}%</div>
             </div> 
-            <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4">
+            <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
                 <div>Turn: {turn}</div>
             </div>    
-            <div className='bg-gray-800 border border-white m-8 p-2'><div>Show bot:</div><div className="ml-6 mr-6">
+            <div className='bg-gray-800 border border-white m-8 p-2 rounded-md'><div>Show bot:</div><div className="ml-6 mr-6">
             {optionarray.map((option,i)=><label className={i===4&&'text-xs'}><input type="checkbox" checked={showAgent[i]}
                                                 onChange={(e)=>setShowAgent(prev=>{
                                                     e.target.blur()
@@ -274,11 +274,12 @@ export default function SeeMiceBots(){
                                                     e.target.blur()}}/>{option}&nbsp;&nbsp;</label>)}</div>      
             </div>
             </div>
-            <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4">
-            <div>Map {currentGame} Leaderboard</div>
-            <div className='border border-gray-500 p-4'>{leaderboard && leaderboard.length>0 ? leaderboard.map(([leader,turns],i)=>{
-            return <div className='flex justify-between'><div>{leader}</div><div className='ml-40'></div><div>{turns}</div></div>}) : <div>No winners yet</div>}</div>
-            </div>
+            <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
+            <div>Map {gameID.current} Leaderboard</div>
+            <div className='border border-gray-500 p-4 rounded-2xl text-[14px]'>{leaderboard && leaderboard.length>0 ? leaderboard.map(([leader,turns],i)=>{
+            const plus = turns - leaderboard[0][1]
+            return <div className='flex flex-row justify-between'><div>{leader}</div>{i>0 && <div className='ml-40'></div>}{i>0&&<div>{`+${plus}`}</div>}</div>}) : <div>No winners yet</div>}</div>
+        </div>
             
             </div>
         </div>
@@ -290,7 +291,7 @@ export default function SeeMiceBots(){
 
 function ToMousegame(props){
     return(
-      <div className="border border-gray-300 bg-gray-800/90 mt-80 ml-68 mr-24 mb-12">
+      <div className="border border-gray-300 bg-gray-800/90 mt-80 ml-68 mr-24 mb-12 rounded-md">
         <div className="flex flex-col items-center pr-8 pl-8 pb-6">
           <Link className="hover:underline pt-6 text-white" to="/mousegame">Proceed To Mousegame</Link>
           <div className="pt-3"><button onClick={()=>props.setShowToMousegame(false)} className="text-white hover:underline content-center">Close</button></div>

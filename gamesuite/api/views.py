@@ -62,6 +62,7 @@ def get_mousegame_by_id(request):
 @permission_classes([AllowAny])
 @authentication_classes([])
 def get_firegame_by_id(request):
+    print('check')
     id = request.data['id']
     username = request.data['username']
     map = FiregameMap.objects.get(id=id)
@@ -78,9 +79,8 @@ def get_firegame_by_id(request):
 @permission_classes([AllowAny])
 @authentication_classes([])
 def handle_game_over_mousegame(request):
-    game = MousegameGame()
-    game.user = User.objects.get(username = request.data['username'])
-    game.mousegame_map = MousegameMap.objects.get(id=request.data['id'])
+    username,id = request.data['username'],request.data['id']
+    game = get_object_or_404(MousegameGame,user__username=username,firegame_map__id=id)
     game.player_path = request.data['path']
     game.sensor_log = request.data['sensorLog']
     game.result = request.data['result']
@@ -92,15 +92,40 @@ def handle_game_over_mousegame(request):
 @permission_classes([AllowAny])
 @authentication_classes([])
 def handle_game_over_firegame(request):
-    game = FiregameGame()
-    game.user = User.objects.get(username = request.data['username'])
-    game.firegame_map = FiregameMap.objects.get(id=request.data['id'])
+    username,id = request.data['username'],request.data['id']
+    game = get_object_or_404(FiregameGame,user__username=username,firegame_map__id=id)
     game.player_path = request.data['path']
     game.result = request.data['result']
     game.save()
     return Response({'hell':'yeah'})
 
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@authentication_classes([])
+def handle_first_turn_firegame(request):
+    game = FiregameGame()
+    game.user = User.objects.get(username = request.data['username'])
+    game.firegame_map = FiregameMap.objects.get(id=request.data['id'])
+    game.player_path = []
+    game.result = 'forfeit'
+    game.save()
+    return Response({'hell':'yeah'})
 
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@authentication_classes([])
+def handle_first_turn_mousegame(request):
+    game = MousegameGame()
+    game.user = User.objects.get(username = request.data['username'])
+    game.mousegame_map = MousegameMap.objects.get(id=request.data['id'])
+    game.player_path = []
+    game.sensor_log = []
+    game.result = 'forfeit'
+    game.save()
+    return Response({'hell':'yeah'})
+    
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -200,13 +225,3 @@ class CreateUserView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
 
-"""
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def create_user_view(request):
-    serializer = UserSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
-    return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-"""

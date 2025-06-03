@@ -5,7 +5,7 @@ export default function MousegameInstructions(props){
     const username = localStorage.getItem(USERNAME);
 
     return(
-        <div className="border bg-gray-800/90 z-10">
+        <div className={props.stoch ? "border border-white rounded-md bg-gray-800/90" : "bg-black"}>
             <div className="pr-8 pl-8 pb-12">
                 <p className="text-cyan-200 pt-12 pb-6">
                     You are in deep space aboard the ship Archaeopteryx,

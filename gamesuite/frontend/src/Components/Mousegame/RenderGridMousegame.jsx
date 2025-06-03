@@ -75,11 +75,9 @@ export default function RenderGridMousegame(props){
                         if(j>0){
                         if(grid[i][j-1]!==1){
                             bgColor += 'border border-cyan-100 '
-                        }}
-                    }else if(mod===3){
-                        bgColor = 'bg-yellow-100 border border-cyan-100'
-                    }else{
-                        bgColor = 'bg-gray-400 border border-cyan-100'
+                        }}*/
+                    if(mod===3){
+                        bgColor = "w-8 h-8 border border-gray-400 bg-amber-100"
                     }
                     if(colors[i][j]!==-1&&props.showSenses){
                         bgColor = colors[i][j]
@@ -88,7 +86,7 @@ export default function RenderGridMousegame(props){
                         if(i===props.hoverIndex[0][0]&&j==props.hoverIndex[0][1]){
                             bgColor = props.hoverIndex[1] ? 'bg-green-500' : 'bg-red-500';
                     }}
-                    */
+                    
     return (<div className="">
                 <div key={i.toString()+','+j.toString()} 
                     className= {`w-8 h-8 ${bgColor}`}
@@ -125,6 +123,7 @@ function BotSlot(props){
     else{
         bot4index = props.data.game.botStartingIndex;
     }   
+    
     if(bot4index[0]===props.i && bot4index[1]===props.j){
         if(playerIndex[0]===props.i && playerIndex[1]===props.j){
             const bot4obj = { id: 4, className:"absolute top-1/2 left-2/7 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-orange-600 text-white text-xs flex items-center justify-center border border-black z-30"}

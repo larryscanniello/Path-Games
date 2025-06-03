@@ -5,7 +5,7 @@ export default function GameOverMenu(props){
     const stochoptions = ['stationary','stochastic']
     const username = localStorage.getItem(USERNAME)
     return(
-        <><div className= "border border-white bg-gray-800/90 p-12">
+        <><div className= "border border-white bg-gray-800/90 p-12 rounded-md">
             <div className="text-center font-bold text-3xl pb-12">You {props.gameState.gameStatus}! </div>
             <div className="pb-6">Select an option: </div>
             {(!props.stoch&&props.levelsLeft )&& <div className='text-center text-white'>

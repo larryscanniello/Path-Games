@@ -1,6 +1,6 @@
 export default function MousegameAbout(props){
     return(
-        <div className="border border-gray-300 bg-gray-800/90 mt-56 ml-18 mr-24 text-sm text-purple-100">
+        <div className="border border-gray-300 bg-gray-800/90 mt-56 ml-18 mr-24 text-sm text-purple-100 rounded-md">
             <div className="pr-8 pl-8 pb-12">
             <p className="pt-12 ">
                 Jeff is bot 4, whose initial strategy is to maximize information gain.

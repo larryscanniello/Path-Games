@@ -7,7 +7,7 @@ export default function FiregameInstructions(props){
     const username = localStorage.getItem(USERNAME);
 
     return(
-        <div className="border border-gray-300 bg-gray-800/90 mt-24 ml-24 mr-24 z-10">
+        <div className="border border-gray-300 bg-gray-800/90 mt-24 ml-24 mr-24 z-10 rounded-md text-sm">
             <div className="pr-8 pl-8 pb-12">
                 <p className="text-cyan-200 pt-12 pb-12">
                     You are in deep hibernation on an intergalactic voyage on the space ship Archaeopteryx
@@ -18,27 +18,29 @@ export default function FiregameInstructions(props){
                     to the switch to activate the system.
                 </p>
                 <div className="flex flex-col items-center">
+                <div>
                 <div className="flex items-center gap-2 mb-2">
                     <div className=" w-3 h-3 rounded-full bg-purple-600 border border-black"></div>
                     <div className="text-white">{username}</div>
                 </div>
                 <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 bg-green-500 text-white text-xs flex items-center justify-center border border-cyan-100"></div>
+                <div className="w-8 h-8 bg-[url('/suppresor2.png')] text-white text-xs flex items-center justify-center" style={{backgroundSize: '32px 32px'}}></div>
                 <div className="text-white">Fire suppression system</div>
                 </div>
                 <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 bg-red-500 text-white text-xs flex items-center justify-center border border-cyan-100"></div>
-                <div className="text-white">Fire</div>
+                <div className="w-8 h-8 text-white text-xs flex items-center justify-center bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]" style={{backgroundSize: '32px 32px'}}></div>
+                <div className="text-white">Open square</div>
                 </div>
-                <div className="flex items-center gap-2 mb-12">
-                <div className="w-7 h-7 bg-black text-white text-xs flex items-center justify-center border border-cyan-100"></div>
-                <div className="text-white">Closed</div>
+                <div className="flex items-center gap-2 mb-6">
+                <div className="w-8 h-8 bg-black text-white text-xs flex items-center justify-center bg-[url('/space_tiles_hyptosis/glass.png')]" style={{backgroundSize: '32px 32px'}}></div>
+                <div className="text-white">Closed square</div>
                 </div>
                 </div>
-                <p className="text-red-200 pb-12">Use arrow keys to navigate through the ship to the fire suppression system.
+                </div>
+                <p className="text-red-200 pb-6">Use arrow keys to navigate through the ship to the fire suppression system.
                     If you step into a fire square, it's game over.
                 </p>
-                <p className="text-red-200 pb-12">The fire starts at a random square, and spreads each time you take a step. 
+                <p className="text-red-200 pb-6">The fire starts at a random square, and spreads each time you take a step. 
                     Closed squares and the switch cannot catch on fire. An open square with one fire neighbor (up down left right) 
                     has a 40% chance of catching on fire. The more fire neighbors an open square has, 
                     the likelier it will catch on fire. The game has no time limit.
@@ -61,9 +63,9 @@ export function FiregameInstructionsatStart(props){
     const levels = ['easy','medium','hard']
 
     return(
-        <div className=" border-gray-300 bg-black rounded-2xl mt-12 ml-24 mr-24 z-10">
+        <div className=" border-gray-300 bg-black mt-12 ml-24 mr-24 z-10 rounded-md">
             <div className="pr-8 pl-8 pb-12">
-                <p className="text-cyan-200 pt-12 pb-12">
+            <p className="text-cyan-200 pt-12 pb-12">
                     You are in deep hibernation on an intergalactic voyage on the space ship Archaeopteryx
                     when suddenly, the fire alarm wakes you. 
                     Your ship has a built-in fire suppression system that will douse the fire,
@@ -72,27 +74,29 @@ export function FiregameInstructionsatStart(props){
                     to the switch to activate the system.
                 </p>
                 <div className="flex flex-col items-center">
+                <div>
                 <div className="flex items-center gap-2 mb-2">
                     <div className=" w-3 h-3 rounded-full bg-purple-600 border border-black"></div>
                     <div className="text-white">{username}</div>
                 </div>
                 <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 bg-green-500 text-white text-xs flex items-center justify-center border border-cyan-100"></div>
+                <div className="w-8 h-8 bg-[url('/suppresor2.png')] text-white text-xs flex items-center justify-center" style={{backgroundSize: '32px 32px'}}></div>
                 <div className="text-white">Fire suppression system</div>
                 </div>
                 <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 bg-red-500 text-white text-xs flex items-center justify-center border border-cyan-100"></div>
-                <div className="text-white">Fire</div>
+                <div className="w-8 h-8 text-white text-xs flex items-center justify-center bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]" style={{backgroundSize: '32px 32px'}}></div>
+                <div className="text-white">Open square</div>
                 </div>
-                <div className="flex items-center gap-2 mb-12">
-                <div className="w-7 h-7 bg-black text-white text-xs flex items-center justify-center border border-cyan-100"></div>
-                <div className="text-white">Closed</div>
+                <div className="flex items-center gap-2 mb-6">
+                <div className="w-8 h-8 bg-black text-white text-xs flex items-center justify-center bg-[url('/space_tiles_hyptosis/glass.png')]" style={{backgroundSize: '32px 32px'}}></div>
+                <div className="text-white">Closed square</div>
                 </div>
                 </div>
-                <p className="text-red-200 pb-12">Use arrow keys to navigate through the ship to the fire suppression system.
+                </div>
+                <p className="text-red-200 pb-6">Use arrow keys to navigate through the ship to the fire suppression system.
                     If you step into a fire square, it's game over.
                 </p>
-                <p className="text-red-200 pb-12">The fire starts at a random square, and spreads each time you take a step. 
+                <p className="text-red-200 pb-6">The fire starts at a random square, and spreads each time you take a step. 
                     Closed squares and the switch cannot catch on fire. An open square with one fire neighbor (up down left right) 
                     has a 40% chance of catching on fire. The more fire neighbors an open square has, 
                     the likelier it will catch on fire. The game has no time limit.

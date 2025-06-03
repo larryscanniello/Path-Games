@@ -5,7 +5,7 @@ import FiregameDifficultyMenu from "./FiregameDifficultyMenu"
 export default function FiregameAbout(props){
 
     return(
-        <div className="border border-gray-300 bg-gray-800/90 mt-12 ml-24 mr-24 z-10">
+        <div className="border border-gray-300 bg-gray-800/90 mt-12 ml-24 mr-24 z-10 rounded-md">
             <div className="pr-8 pl-8 pb-8">
                 <p className="text-purple-200 pt-12">
                     Bot 1 plans a shortest path to the switch at the start, and sticks with it no matter what.
