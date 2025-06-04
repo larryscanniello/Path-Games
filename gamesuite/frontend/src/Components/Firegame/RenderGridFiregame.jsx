@@ -61,7 +61,7 @@ function BotSlot(props){
     return(<>
         {isPlayerHere && (
         <div
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black z-10"
+          className="smooth-player absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black z-10 "
         />
       )}
     </>

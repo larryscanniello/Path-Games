@@ -33,3 +33,6 @@
     animation: fire-animate 0.6s steps(6) infinite;
 }
 
+.smooth-player{
+    transition: transform 1s ease-out;
+  }
