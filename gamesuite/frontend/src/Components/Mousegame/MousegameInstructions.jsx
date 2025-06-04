@@ -88,7 +88,7 @@ export default function MousegameInstructions(props){
                                             onClick={()=>{props.setStoch(stochvar);
                                             props.setShowInstructions(false);}}
                                         >New {stochvar} mouse game ({props.levelsLeft[i]} left)</button></li> 
-                                : <li className="opacity-60">No {stochvar} levels left</li>})}</ul></div>}
+                                : <li key={i} className="opacity-60">No {stochvar} levels left</li>})}</ul></div>}
                 {props.stoch && <div className="flex flex-col items-center">
                                     <button onClick={() => props.setShowInstructions(false)} className="text-white hover:underline">
                                         Close

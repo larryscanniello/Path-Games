@@ -19,13 +19,11 @@ export default function RenderGridSeeBots(props){
 
     const inbotplan = [2**1, 2**2, 2**3, 2**4]
     const botinspace = [2**5, 2**6, 2**7, 2**8, 2**9, 2**10]
-    
+
     for(let i=0;i<botinspace.length;i++){
-        console.log('indices i: ',indices[i])
         grid[indices[i][0]][indices[i][1]] += botinspace[i]
     }
     
-    console.log('plans',plans)
     for(let i=0;i<plans.length;i++){
         if(plans[i]){
             if(plans[i].length>0){
@@ -38,13 +36,13 @@ export default function RenderGridSeeBots(props){
         }    
     }
     const states = props.states
+    const showAgent = props.showAgent
 
     return(
     <div className='grid bg-black grid-rows-25 grid-cols-25'>
         {grid.map((row,i)=>(
-                row.map((cell,j) => {
+                row.map((g,j) => {
                     let bgColor = '';
-                    const g = cell
                     if(g==0||g>1){
                         bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]"
                     }
@@ -52,19 +50,26 @@ export default function RenderGridSeeBots(props){
                         bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/glass.png')]"
                     }
 
-                    if(g&2**1 &&props.showAgent[0]&&turn<=props.simlengths[0]-1){
+                    if(g&2**1 && showAgent[0]&&turn<=props.simlengths[0]-1){
                         bgColor += ' border-2 border-cyan-100'
                     }
                     if(turn>0){
-                        if(g&2**2 &&props.showAgent[1]&&turn<=props.simlengths[1]-1&&turn>0){
+                        if(g&2**2 && showAgent[1]&&turn<=props.simlengths[1]-1&&turn>0){
                         bgColor += ' border-2 border-cyan-100'
                     }}
-                    if(g&2**3 &&props.showAgent[2]&&turn<=props.simlengths[2]-1){
+                    if(g&2**3 && showAgent[2]&&turn<=props.simlengths[2]-1){
                         bgColor += ' border-2 border-cyan-100'
                     }
-                    if(g&2**4 &&props.showAgent[3]&&turn<=props.simlengths[3]-1){
+                    if(g&2**4 && showAgent[3]&&turn<=props.simlengths[3]-1){
                         bgColor += ' border-2 border-cyan-100'
                     }
+
+                    const condition0 = showAgent[0]&&(g&2||g&2**5)
+                    const condition1 = showAgent[1]&&(g&4||g&2**6)
+                    const condition2 = showAgent[2]&&(g&8||g&2**7)
+                    const condition3 = showAgent[3]&&(g&16||g&2**8)
+                    const condition4 = g>=2**9
+
                     return (<><div 
                     key={i.toString() + ',' + j.toString()} 
                     className={`w-8 h-8 relative ${bgColor}`}
@@ -74,7 +79,7 @@ export default function RenderGridSeeBots(props){
                     }}
                     >
                     <div className="text-black fixed">{props.showProbabilities ? roundTo4DecimalPlaces(states[showProbabilities][i][j]) : ''}</div>
-                    {g>1&&<BotSlot 
+                    {(condition0||condition1||condition2||condition3||condition4)&&<BotSlot 
                             g={g}
                             stoch = {props.stoch}
                             paths = {props.paths}
@@ -138,9 +143,7 @@ function BotSlot(props){
     if(props.result!=='forfeit'){
         if(g&2**9 &&showAgent[4]){
             const playerobj = {id: 0, className:"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black"}
-            console.log('sl4: ',props.simlengths[4])
             if(turn>props.simlengths[4]-1){
-                console.log('check141')
                 playerobj.className += " opacity-40"
             }
             botsInSpace.push(playerobj)

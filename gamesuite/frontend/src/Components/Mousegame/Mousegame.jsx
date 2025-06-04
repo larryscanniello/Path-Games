@@ -38,6 +38,9 @@ export default function Mousegame(){
     const leaderboard = useRef(null);
     const [frameIndex,setFrameIndex] = useState(0);
     const [levelsLeft,setLevelsLeft] = useState(null);
+    const [sensorCounts,setSensorCounts] = useState(null);
+    const [gridColors,setGridColors] = useState(null);
+    const lastExecutionTime = useRef(0);
 
     useEffect(() => {
         async function fetchGame(){
@@ -48,15 +51,15 @@ export default function Mousegame(){
             })
             .catch((e)=>{throw new Error("Error fetching game.")});
             const responsedata = res.data;
-            console.log('rds ',responsedata.success)
             if(!responsedata.success){
                 setLevelsLeft(responsedata.levels_left);          
             }else{
-                console.log(responsedata)
                 setLevelsLeft(responsedata.levels_left);
                 gameID.current = responsedata.game.id
                 winRateRef.current = responsedata.win_rate
                 leaderboard.current = responsedata.leaderboard
+                const bot4evidence = JSON.parse(responsedata.bots[3].evidence).slice(1);
+                const bot4path = bot4evidence.map(([t,type,[i,j]])=> [i,j])
                 const grid = JSON.parse(responsedata.game.grid)
                 const parseddata = {
                     game: {
@@ -79,11 +82,11 @@ export default function Mousegame(){
                         states: JSON.parse(responsedata.bots[2].states)
                     },
                     bot4: {
-                        evidence: JSON.parse(responsedata.bots[3].evidence).slice(1),
-                        states: JSON.parse(responsedata.bots[3].states)
+                        evidence: bot4evidence,
+                        states: JSON.parse(responsedata.bots[3].states),
+                        path: bot4path,
                     }
                 }
-                console.log(parseddata);
                 setGameData(parseddata);
                 const playerIndex = parseddata.game.botStartingIndex;
                 const mouseIndex = parseddata.game.mouseStartingIndex;
@@ -95,6 +98,8 @@ export default function Mousegame(){
                     playerPath: [parseddata.game.botStartingIndex],
                     sensorLog: []
                 })
+                setSensorCounts(Array.from({ length: 25 }, () => Array.from({ length: 25 }, () => [0, 0])))
+                setGridColors(Array.from({length: 25},()=> Array.from({length: 25},()=>-1)))
             }
 
             } catch(err){
@@ -112,7 +117,7 @@ export default function Mousegame(){
 
         useEffect(() => {
             const handleBeforeUnload = () => {
-                if(gameState.gameStatus==='in_progress'){
+                if(gameState.gameStatus==='in_progress'&&gameState.turn>0){
                     const username = localStorage.getItem(USERNAME);
                     const obj = {
                         result: 'lose',
@@ -121,7 +126,6 @@ export default function Mousegame(){
                         sensorLog: gameState.sensorLog,
                         id: gameID.current
                     };
-                    //const blob = new Blob([JSON.stringify(obj)], JSON.stringify({ foo: 'bar' }));
                     navigator.sendBeacon('http://localhost:8000/api/handle_game_over_mousegame/', JSON.stringify(obj));
                 }   
             };
@@ -134,11 +138,20 @@ export default function Mousegame(){
 
       useEffect(() => {
         const handleKeyDown = (e) => {
+            /*const now = Date.now();
+            // Only throttle arrow keys
+            if (['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(e.code)) {
+                if (now - lastExecutionTime.current < 100) {
+                    return; // Ignore key press if within throttle delay
+                }
+                lastExecutionTime.current = now; // Update last execution time
+            }*/
             setGameState(prev => {
             if(!prev||prev.gameStatus!=='in_progress') return prev;
             const newTurn = Math.min(gameData.bot4.evidence.length-1, prev.turn + 1);
             const newPlayerIndex = prev.playerIndex ? [...prev.playerIndex] : [...gameData.game.botStartingIndex]
-            const sensorLog = prev.sensorLog.map(obj=>({...obj}));
+            const sensorLog = prev.sensorLog;
+            let sensorLogObj;
             switch(e.code){
                 case('ArrowRight'):
                     if(newPlayerIndex[1]!==GRID_SIZE-1){
@@ -183,10 +196,10 @@ export default function Mousegame(){
                     const playerIndex = prev.playerIndex;
                     const manhattanDistance = Math.abs(mouseIndex[0]-playerIndex[0])+Math.abs(mouseIndex[1]-playerIndex[1]);
                     if(Math.random()< Math.exp(-.1155*(manhattanDistance-1))){
-                        sensorLog.push({position: playerIndex, turn:prev.turn+1, beep: true})
+                        sensorLogObj = {position: playerIndex, turn:prev.turn+1, beep: true}
                     }
                     else{
-                        sensorLog.push({position: playerIndex, turn:prev.turn+1, beep: false})
+                        sensorLogObj = {position: playerIndex, turn:prev.turn+1, beep: false}
                     }
                     break;
             }
@@ -205,10 +218,8 @@ export default function Mousegame(){
             if(prev.turn === gameData.bot4.evidence.length){
                 gameStatus = 'lose'
             }
-            const playerPath = prev.playerPath.map(row => [...row])
-            playerPath.push(newPlayerIndex)
             if(gameStatus!=='in_progress'){
-                handleGameOver(gameStatus,playerPath,sensorLog)
+                handleGameOver(gameStatus,[...prev.playerPath,newPlayerIndex],sensorLog)
             }
             if(prev.turn+1===1){
                 handleFirstTurn()
@@ -224,8 +235,8 @@ export default function Mousegame(){
                 mouseIndex: mouseIndex,
                 playerIndex: newPlayerIndex,
                 gameStatus: gameStatus,
-                playerPath,
-                sensorLog
+                playerPath: [...prev.playerPath,newPlayerIndex],
+                sensorLog: [...sensorLog,sensorLogObj]
             })
             });
         }   
@@ -235,12 +246,52 @@ export default function Mousegame(){
         }
       }, [gameData]); 
 
-      useEffect(() => {
-        const interval = setInterval(() => {
-          setFrameIndex(prev => (prev + 1) % 3);
-        }, 150);
-        return () => clearInterval(interval);
-      }, []);
+
+      useEffect(()=>{
+        function getColorFromValue(a,b) {
+            if(a===0){
+                return `bg-red-400`
+            }
+            let ratio = a/Math.max(b,5);
+            if(ratio<=.2){
+                return 'bg-green-100'
+            }else if(ratio<=.4){
+                return 'bg-green-200'
+            }else if(ratio<=.6){
+                return 'bg-green-300'
+            }else if(ratio<=.8){
+                return 'bg-green-400'
+            }else{
+                return 'bg-green-500'
+            }
+          }
+
+        if(gameState.sensorLog){
+            if(gameState.sensorLog.length>0){
+                const index = gameState.sensorLog.length-1
+                if(gameState.sensorLog[index]){
+                    const i = gameState.sensorLog[index].position[0]
+                    const j = gameState.sensorLog[index].position[1]
+                    setSensorCounts(prev => {
+                        const newCounts = [...prev];
+                        newCounts[i] = [...newCounts[i]];
+                        newCounts[i][j] = [...newCounts[i][j]];
+                        newCounts[i][j][1] += 1;
+                        if (gameState.sensorLog[index].beep) {
+                            newCounts[i][j][0] += 1;
+                        }
+                        const newColors = [...gridColors];
+                        newColors[i] = [...newColors[i]];
+                        newColors[i][j] = getColorFromValue(newCounts[i][j][0], newCounts[i][j][1]);
+                        setGridColors(newColors);
+                        return newCounts;
+                    });
+                }
+            }
+        }
+      },[gameState.sensorLog,gameState.turn])
+
+
 
     async function handleGameOver(result,path,sensorLog){
         setLevelsLeft(prev=>{
@@ -258,13 +309,25 @@ export default function Mousegame(){
         const response = await api.post('handle_game_over_mousegame/',obj)
             .then(response => {console.log(response)})
             .catch((e)=>{console.log('Check handleGameOver in Mousegame.jsx');
-                console.log(e)
             })
     }
 
+   
     const stochoptions = ['stationary','stochastic']
+    let bot4index;
+    if(gameData){
+        if(gameState.turn!==0){
+            bot4index = gameData.bot4.path[Math.min(gameState.turn-1,gameData.bot4.path.length-1)];
+        }
+        else{
+            bot4index = gameData.game.botStartingIndex;
+        }
+    }
 
-    return <div>{console.time()}<div className='min-h-screen bg-black text-cyan-200 font-mono'>
+
+
+
+    return <div><div className='min-h-screen bg-black text-cyan-200 font-mono'>
     <div>
     <NavBar/>
     {(showInstructions && levelsLeft) &&
@@ -297,19 +360,22 @@ export default function Mousegame(){
                 <button className='hover:underline text-white' onClick={()=>setShowNewGameMenu(false)}>Close</button>
             </div></div>}
         {showAbout && <div className='fixed z-90'><MousegameAbout setShowAbout={setShowAbout}/></div>}
-        
         <RenderGridMousegame 
-            data={gameData} 
+            grid = {gameData.game.grid}
             turn={gameState.turn} 
             sensorLog = {gameState.sensorLog}
             showSenses = {showSenses}
+            bot4index = {bot4index}
             playerIndex={gameState.playerIndex ? gameState.playerIndex : gameData.game.botStartingIndex}
             mouseIndex = {gameState.mouseIndex ? gameState.mouseIndex : gameData.game.mouseStartingIndex}
             playerPath ={gameState.playerPath ? gameState.playerPath : [gameData.game.botStartingIndex]}
             hoverIndex = {hoverIndex}
             seePath = {seePath}
             frameIndex = {frameIndex}
-            gameStatus = {gameState.gameStatus}/>
+            gameStatus = {gameState.gameStatus}
+            sensorCounts={sensorCounts}
+            setSensorCounts={setSensorCounts}
+            colors={gridColors}/>
         <div className='flex justify-between'>
             <button className='hover:underline' onClick={()=>setShowNewGameMenu(prev=>!prev)}>New game</button>
 
@@ -339,7 +405,7 @@ export default function Mousegame(){
             setHoverIndex={setHoverIndex}
             seePath = {seePath}
             setSeePath = {setSeePath}/></div>}
-    
+
     
         {stoch&&<div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
             <div>Map {gameID.current} Leaderboard</div>
@@ -348,6 +414,5 @@ export default function Mousegame(){
             return <div className='flex flex-row justify-between'><div>{leader}</div>{i>0 && <div className='ml-40'></div>}{i>0&&<div>{`+${plus}`}</div>}</div>}) : <div>No winners yet</div>}</div>
         </div>}
     </div>
-    {console.timeEnd()}
     </div></div></div></div>
 }

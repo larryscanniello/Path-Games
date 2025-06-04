@@ -312,7 +312,6 @@ export default function SeeMiceBots(){
         {showInstructions && 
                     <SeeMousegameInstructions setShowInstructions={setShowInstructions}/>}
         {showToMousegame && <div className='fixed z-20'><ToMousegame setShowToMousegame={setShowToMousegame}/></div>}
-        {console.log('sd',simData)}
         {simData&&<RenderGridSeeMouseBots
             grid = {simData.game.grid}
             plans = {[simData.bot1.plans[turn],simData.bot2.plans[turn],simData.bot3.plans[turn],simData.bot4.plans[turn]]}
