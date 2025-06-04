@@ -2,17 +2,8 @@ import '../../Styles/flame.css'
 
 export default function RenderGridSeeBots(props){
     if(!props.data) return <p>Loading...</p>
-
-    const grid = JSON.parse(props.data.initial_board)
-    const firelist = JSON.parse(props.data.fire_progression)
     const currentTurn = props.currentTurn
-    for(let i=0;i<Math.min(firelist.length-1,currentTurn);i++){
-        for(let j=0;j<firelist[i].length;j++){
-            grid[firelist[i][j][0]][firelist[i][j][1]] += 2;
-        };
-    };
-    
-
+    const grid = props.data.fireGrids[currentTurn]
     return(
     <div className="grid grid-rows-25 grid-cols-25">
         {grid.map((row,i)=>(
@@ -118,7 +109,6 @@ function BotSlot(props){
     }
     }
     
-    console.log('pd: ',props.difficulty);
     if(props.difficulty==='hard'){
         if(successpossibleindex[0]===props.i && successpossibleindex[1]===props.j){
             botsInSpace.push({ id: 5, className:"absolute top-0 left-0 w-3 h-3 rounded-full bg-yellow-600 text-white text-xs flex items-center justify-center border border-black"})

@@ -3,16 +3,9 @@ import '../../Styles/flame.css'
 
 export default function RenderGridFiregame(props){
     if(!props.data) return <p>Loading...</p>
-    const grid = props.data.grid.map(row => [...row]);
-    const firelist = props.data.firelist
     const currentTurn = props.currentTurn
-    for(let i=0;i<Math.min(firelist.length-1,currentTurn);i++){
-        for(let j=0;j<firelist[i].length;j++){
-            grid[firelist[i][j][0]][firelist[i][j][1]] += 2;
-        };
-    };
-    
-
+    const grid = props.data.fireGrids[currentTurn];
+    const firelist = props.data.firelist;
     return (
         <div>
           <div className="grid bg-black grid-rows-25 grid-cols-25">

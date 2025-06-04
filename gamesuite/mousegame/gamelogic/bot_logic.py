@@ -21,8 +21,6 @@ def bot_1(grid,bot1index,t,plan,bot1evidence,mouseindex,a,bot1state,stoch):
         return grid,bot1index,bot1evidence,plan,bot1state
     
     else:
-        """grid[bot1index]-=10
-        grid[plan[0]]+=10"""
         bot1index = plan[0]
         plan.pop(0)
         newevidence = (t,2,bot1index)
@@ -62,8 +60,6 @@ def bot_2(grid,bot2index,t,plan,bot2evidence,mouseindex,a,bot2state,stoch):
             plan = bfs(grid,bot2index,destinationindex,2)
         return grid,bot2index,bot2evidence,plan,bot2state
     else:
-        """grid[bot2index]-=100
-        grid[plan[0]]+=100"""
         bot2index = plan[0]
         plan.pop(0)
         newevidence = (t,2,bot2index)
@@ -289,8 +285,6 @@ def move_mouse(grid,mouseindex):
     if randomint == len(openadjlist):
         return grid,mouseindex
     else:
-        """grid[mouseindex]-=2
-        grid[openadjlist[randomint]]+=2"""
         mouseindex = openadjlist[randomint]
         return grid,mouseindex
 

@@ -27,7 +27,7 @@ export default function SeeMiceBots(){
     const showGameRef = useRef(null);
     const winRateRef = useRef(null);
     const [leaderboard,setLeaderboard] = useState(null);
-    const [directionFrames,setDirectionFrames] = useState(['03','04','05'])
+    const [directionFrames,setDirectionFrames] = useState(['anim-r'])
     const [frameIndex,setFrameIndex] = useState(0);
     const restartButtonRef = useRef(null);
     const showBotRef = useRef(null);
@@ -60,11 +60,29 @@ export default function SeeMiceBots(){
             setLeaderboard(responsedata.leaderboard)
             const bot3evidence = JSON.parse(responsedata.bots[2].evidence);
             bot3evidence[0] = bot3evidence[1];
-            const bot1path = JSON.parse(responsedata.bots[0].evidence).slice(1).map(([t,type,[i,j]])=> [i,j])
-            const bot2path = JSON.parse(responsedata.bots[1].evidence).slice(1).map(([t,type,[i,j]])=> [i,j])
-            const bot3path = bot3evidence.slice(1).map(([t,type,[i,j]])=> [i,j])
-            const bot4path = JSON.parse(responsedata.bots[3].evidence).slice(1).map(([t,type,[i,j]])=> [i,j])
-            const simlength = Math.max(bot1path.length,bot2path.length,bot3path.length,bot4path.length)
+            const bot1path = JSON.parse(responsedata.bots[0].evidence).slice(1).map(([t,type,[i,j]])=> [i,j]);
+            const bot2path = JSON.parse(responsedata.bots[1].evidence).slice(1).map(([t,type,[i,j]])=> [i,j]);
+            const bot3path = bot3evidence.slice(1).map(([t,type,[i,j]])=> [i,j]);
+            const bot4path = JSON.parse(responsedata.bots[3].evidence).slice(1).map(([t,type,[i,j]])=> [i,j]);
+            const simlength = Math.max(bot1path.length,bot2path.length,bot3path.length,bot4path.length);
+            const bot1plans = responsedata.bots[0].plans;
+            const bot2plans = responsedata.bots[1].plans;
+            bot2plans.unshift([null]);
+            const bot3plans = responsedata.bots[2].plans;
+            const bot4plans = responsedata.bots[3].plans;
+            const bot1plansprocessed = [];
+            const bot3plansprocessed = [];
+            const bot4plansprocessed = [];
+            
+            for(let i=0;i<bot1path.length;i++){
+              bot1plansprocessed.push(processFromFlatIndexBot3(bot1plans,i-1))
+            }
+            for(let i=0;i<bot3path.length;i++){
+              bot3plansprocessed.push(processFromFlatIndexBot3(bot3plans,i-1))
+            }
+            for(let i=0;i<bot4path.length;i++){
+              bot4plansprocessed.push(processFromFlatIndexBot4(bot4plans,i-6))
+            }
             const parseddata = {
                 game: {
                     grid: JSON.parse(responsedata.game.grid),
@@ -73,6 +91,7 @@ export default function SeeMiceBots(){
                     bot_starting_index: JSON.parse(responsedata.game.bot_starting_index),
                     mouse_starting_index: JSON.parse(responsedata.game.mouse_starting_index),
                     player_path: responsedata.playerdata.player_path,
+                    player_length: responsedata.playerdata.player_path.length,
                     result: responsedata.playerdata.result,
                     simlength,
                 },
@@ -80,30 +99,79 @@ export default function SeeMiceBots(){
                     evidence: JSON.parse(responsedata.bots[0].evidence).slice(1),
                     states: JSON.parse(responsedata.bots[0].states),
                     path: bot1path,
-                    plans: responsedata.bots[0].plans
+                    plans: bot1plansprocessed,
+                    length: bot1path.length,
                 },
                 bot2: {
                     evidence: JSON.parse(responsedata.bots[1].evidence).slice(1),
                     states: JSON.parse(responsedata.bots[1].states),
                     path: bot2path,
-                    plans: responsedata.bots[1].plans
+                    plans: bot2plans,
+                    length: bot2path.length,
                 },
                 bot3: {
                     evidence: JSON.parse(responsedata.bots[2].evidence).slice(1),
                     states: JSON.parse(responsedata.bots[2].states),
                     path: bot3path,
-                    plans: responsedata.bots[2].plans
+                    plans: bot3plansprocessed,
+                    length: bot3path.length,
                 },
                 bot4: {
                     evidence: JSON.parse(responsedata.bots[3].evidence).slice(1),
                     states: JSON.parse(responsedata.bots[3].states),
-                    plans: responsedata.bots[3].plans,
+                    plans: bot4plansprocessed,
                     modechange: responsedata.bots[3].modechange,
                     path: bot4path,
+                    length: bot4path.length,
                 }
             }
+            
             setSimData(parseddata);
             setTurn(0);
+
+
+            function processFromFlatIndexBot4(botplans, t) {
+        let count = 0;
+        for (let i = 0; i < botplans.length; i++) {
+            const row = botplans[i];
+            if(row.length==0&&count>0){
+                count +=1;
+                continue; 
+            }
+            if (t < count + row.length) {
+                let startIndexInRow;
+                startIndexInRow = t-count;
+                if(startIndexInRow<0){
+                    return [null];
+                }
+                return row.slice(startIndexInRow);
+            }
+            if(i==0){
+                continue;
+            }
+            else{
+                count += row.length+1
+            }
+        }
+        return []
+      }
+        function processFromFlatIndexBot3(botplans, t) {
+          let count = 0;
+          for (let i = 0; i < botplans.length; i++) {
+              const row = botplans[i];
+              if (t < count + row.length) {
+                  let startIndexInRow;
+                  startIndexInRow = t-count;
+                  if(startIndexInRow<0){
+                      return [null];
+                  }
+                  return row.slice(startIndexInRow);
+              }
+              count += row.length+1
+          }
+          return []
+      }
+    
           } catch(err){
           setError(err.message)
           }
@@ -177,23 +245,17 @@ export default function SeeMiceBots(){
           const deltai = path[turn-1][0] - path[turn-2][0];
           const deltaj = path[turn-1][1] - path[turn-2][1];
           if (deltai === -1) {
-            setDirectionFrames(['00', '01', '02']);
+            setDirectionFrames('anim-t');
           } else if (deltai === 1) {
-            setDirectionFrames(['06', '07', '08']);
+            setDirectionFrames('anim-b');
           } else if (deltaj === 1) {
-            setDirectionFrames(['03', '04', '05']);
+            setDirectionFrames('anim-r');
           } else if (deltaj === -1) {
-            setDirectionFrames(['09', '10', '11']);
+            setDirectionFrames('anim-l');
           }
         }}
       }, [turn]);
 
-      useEffect(() => {
-        const interval = setInterval(() => {
-          setFrameIndex(prev => (prev + 1) % 3);
-        }, 150);
-        return () => clearInterval(interval);
-      }, [directionFrames]);
 
     useEffect(()=>{
         if(showGameRef.current&&simData){
@@ -203,8 +265,32 @@ export default function SeeMiceBots(){
 
     const optionarray = ["1", "2", "3", "4", username]
     const optionarray2 = ["1", "2", "3", "4"]
-
-
+    let bot1index,bot2index,bot3index,bot4index,player_index,mouse_index;
+    if(simData){ 
+      
+      if(turn!==0){
+          if(!simData.game.stoch){
+            mouse_index = simData.game.mouse_starting_index
+          }else{
+            const mouse_path = simData.game.mouse_path
+            mouse_index = simData.game.mouse_path[Math.min(turn-1,mouse_path.length-1)]
+          }
+          const bot1path = simData.bot1.path
+          const bot2path = simData.bot2.path
+          const bot3path = simData.bot3.path
+          const bot4path = simData.bot4.path
+          bot1index = bot1path[Math.min(turn-1,bot1path.length-1)]
+          bot2index = bot2path[Math.min(turn-1,bot2path.length-1)]
+          bot3index = bot3path[Math.min(turn-1,bot3path.length-1)]
+          bot4index = bot4path[Math.min(turn-1,bot4path.length-1)]
+          player_index = simData.game.player_path[Math.min(turn-1,simData.game.player_path.length-1)]
+      }
+      else{
+          bot4index = simData.game.bot_starting_index;
+          player_index = bot1index = bot2index = bot3index = bot4index;
+          mouse_index = simData.game.mouse_starting_index;
+      }
+    }
   return (
     <div>
         <div className="min-h-screen bg-black text-cyan-200 font-mono">
@@ -226,14 +312,25 @@ export default function SeeMiceBots(){
         {showInstructions && 
                     <SeeMousegameInstructions setShowInstructions={setShowInstructions}/>}
         {showToMousegame && <div className='fixed z-20'><ToMousegame setShowToMousegame={setShowToMousegame}/></div>}
-
-        {<RenderGridSeeMouseBots 
-            data={simData} 
-            turn={turn} 
+        {console.log('sd',simData)}
+        {simData&&<RenderGridSeeMouseBots
+            grid = {simData.game.grid}
+            plans = {[simData.bot1.plans[turn],simData.bot2.plans[turn],simData.bot3.plans[turn],simData.bot4.plans[turn]]}
+            states = {[null,simData.bot1.states[turn],simData.bot2.states[turn],simData.bot3.states[turn],simData.bot4.states[turn]]}
+            simlengths = {[simData.bot1.length,simData.bot2.length,simData.bot3.length,simData.bot4.length,simData.game.player_length]}
+            paths = {[simData.bot1.path,simData.bot2.path,simData.bot3.path,simData.bot4.path]}
+            indices = {[bot1index,bot2index,bot3index,bot4index,player_index,mouse_index]}
+            turn={turn}
+            mouse_starting_index = {simData.game.mouse_starting_index}
+            mouse_path = {simData.game.mouse_path}
+            bot_starting_index = {simData.game.bot_starting_index} 
             showProbabilities={showProbabilities}
             showAgent = {showAgent}
             frameIndex = {frameIndex}
             directionFrames = {directionFrames}
+            player_path = {simData.game.player_path}
+            stoch = {simData.game.stoch}
+            result = {simData.game.result}
             />}
         <div className='flex justify-between'>
             <button className='hover:underline' onClick={()=>setShowGameSelection(prev=>!prev)}>Visualize new game</button>

@@ -264,7 +264,7 @@ export default function Mousegame(){
 
     const stochoptions = ['stationary','stochastic']
 
-    return <div><div className='min-h-screen bg-black text-cyan-200 font-mono'>
+    return <div>{console.time()}<div className='min-h-screen bg-black text-cyan-200 font-mono'>
     <div>
     <NavBar/>
     {(showInstructions && levelsLeft) &&
@@ -348,6 +348,6 @@ export default function Mousegame(){
             return <div className='flex flex-row justify-between'><div>{leader}</div>{i>0 && <div className='ml-40'></div>}{i>0&&<div>{`+${plus}`}</div>}</div>}) : <div>No winners yet</div>}</div>
         </div>}
     </div>
-    
+    {console.timeEnd()}
     </div></div></div></div>
 }

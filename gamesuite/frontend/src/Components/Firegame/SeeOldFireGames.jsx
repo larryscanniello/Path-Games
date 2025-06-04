@@ -44,7 +44,6 @@ function SeeFireBots() {
             username: localStorage.getItem(USERNAME),
           })
           .catch((e)=>{throw new Error("Error fetching leaderboard.")});
-          console.log('l',leaderboardres.data)
           setLeaderboard(leaderboardres.data)
       }
       fetchGameList();
@@ -62,7 +61,6 @@ function SeeFireBots() {
       const player_path = res.data.playerdata.player_path;
       player_path.shift();
       for(let i=0; i<gameList.length;i++){
-        console.log('gameList',gameList)
         if(gameList[i][0]==currentGame){
           setDifficulty(gameList[i][2]);
           setWinRate(gameList[i][4]);
@@ -79,10 +77,22 @@ function SeeFireBots() {
       const bot3length = bot3path.length;
       const bot4length = bot4path.length;
       const successpossiblelength = successpossiblepath.length;
+      const firelist = JSON.parse(responsedata.fire_progression)
       const simlength = Math.max(bot1length,bot2length,bot3length,bot4length,successpossiblelength,player_path.length);
-      setData({...responsedata,player_path,simlength,bot1path,bot2path,bot3path,bot4path,successpossiblepath})
-      setCurrentGrid(JSON.parse(responsedata.initial_board));
-      setFirelist(JSON.parse(responsedata.fire_progression));
+      const initial_board = JSON.parse(responsedata.initial_board)
+      const fireGrids = [initial_board];
+      for (let t = 1; t <= firelist.length; t++) {
+        const newGrid = fireGrids[t-1].map(row=>[...row]);
+        for (let [x, y] of firelist[t-1] || []) {
+          if(x&&y)
+            newGrid[x][y] += 2;
+        }
+        fireGrids.push(newGrid);
+      }
+      console.log({...responsedata,grid:initial_board,firelist,fireGrids,player_path,simlength,bot1path,bot2path,bot3path,bot4path,successpossiblepath})
+      setData({...responsedata,grid:initial_board,firelist,fireGrids,player_path,simlength,bot1path,bot2path,bot3path,bot4path,successpossiblepath})
+      setCurrentGrid(initial_board);
+      setFirelist(firelist);
       setCurrentTurn(0);
       } catch(err){
       setError(err.message)
@@ -149,7 +159,7 @@ function SeeFireBots() {
   
   return (
     <div><div className='min-h-screen bg-black text-cyan-200 font-mono'>
-    <div>{console.log('d ',difficulty)}
+    <div>
     <NavBar/>
     <div className='grid grid-cols-[1fr_auto_1fr]'>
     <div>
@@ -181,7 +191,7 @@ function SeeFireBots() {
                 <div>Firegame Visualizer, Map: {currentGame}</div>
                 <div>Difficulty: {difficulty}</div>
                 <div>Result: {result}</div>                                    
-                <div className="">Map win rate: {Math.round(winRate*100)}% {console.log('wr:',winRate)}</div>
+                <div className="">Map win rate: {Math.round(winRate*100)}%</div>
             </div>
       <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
                 <div>Turn: {currentTurn}</div>

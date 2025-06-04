@@ -1,0 +1,65 @@
+@keyframes mouse-animate-t {
+    from { background-position: 0 0; }
+    to   { background-position: -96px 0; }
+  }
+
+@keyframes mouse-animate-r {
+from { background-position: 0 -32px; }
+to   { background-position: -96px -32px; }
+}
+
+@keyframes mouse-animate-b{
+    from { background-position: 0 -64px; }
+    to   { background-position: -96px -64px; }
+}
+
+@keyframes mouse-animate-l{
+    from { background-position: 0 -96px; }
+    to   { background-position: -96px -96px; }
+}
+
+  .container {
+    position: relative;
+    width: 8px;
+    height: 8px;
+}
+
+.open-sq {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 32px;
+    height: 32px;
+    background-image: url('space_tiles_hyptosis/wool_colored_white.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.mouse-sprite{
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    margin: 0px;
+    background-image: url('/mouse.png');
+    background-size: 96px 128px;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    
+    
+}
+
+.anim-l{
+    animation: mouse-animate-l 0.4s steps(3) infinite;
+}
+
+.anim-r{
+    animation: mouse-animate-r 0.4s steps(3) infinite;
+}
+
+.anim-t{
+    animation: mouse-animate-t 0.4s steps(3) infinite;
+}
+
+.anim-b{
+    animation: mouse-animate-b 0.4s steps(3) infinite;
+}
