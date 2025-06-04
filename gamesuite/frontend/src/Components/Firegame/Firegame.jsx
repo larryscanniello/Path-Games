@@ -54,15 +54,25 @@ export default function Firegame(){
             }
             else{
             setInitialGameLoaded(true);
+            
             gameID.current = responsedata.id
             const grid = JSON.parse(responsedata.initial_board);
             const firelist = JSON.parse(responsedata.fire_progression);
+            const fireGrids = [grid];
+            for (let t = 1; t <= firelist.length; t++) {
+                const newGrid = fireGrids[t-1].map(row=>[...row]);
+                for (let [x, y] of firelist[t-1] || []) {
+                    newGrid[x][y] += 2;
+                }
+                fireGrids.push(newGrid);
+            }
             const initialPlayerIndex = JSON.parse(responsedata.bot_index);
             const extIndex = JSON.parse(responsedata.ext_index);
             setWinRate(res.data.win_rate)
             setGameData({grid, 
                         firelist, 
-                        extIndex, 
+                        extIndex,
+                        fireGrids, 
                         playerIndex: initialPlayerIndex})
             setGameState({
                 turn: 0,
@@ -247,11 +257,10 @@ export default function Firegame(){
         
         {showAbout && <div className='fixed z-20'><FiregameAbout setShowAbout={setShowAbout}/></div>}
 
-        <RenderGridFiregame 
-                        data={gameData} 
-                        currentTurn={gameState.turn} 
-                        playerIndex={gameState.playerIndex ? 
-                        gameState.playerIndex : gameData.playerIndex}/>
+        {gameData && <RenderGridFiregame 
+                        fireGrid = {gameData.fireGrids[gameState.turn]} 
+                        turn={gameState.turn} 
+                        playerIndex={gameState.playerIndex ? gameState.playerIndex : gameData.playerIndex}/>}
     <div className='flex justify-between'>
         <button className='hover:underline' onClick={()=>setShowDifficultyMenu(prev=>!prev)}>New game</button>
         <button className='hover:underline' onClick={()=>setShowInstructions(prev=>!prev)}>Instructions</button>

@@ -79,18 +79,38 @@ function SeeFireBots() {
       const successpossiblelength = successpossiblepath.length;
       const firelist = JSON.parse(responsedata.fire_progression)
       const simlength = Math.max(bot1length,bot2length,bot3length,bot4length,successpossiblelength,player_path.length);
-      const initial_board = JSON.parse(responsedata.initial_board)
+
+      const initial_board = JSON.parse(responsedata.initial_board).map(row=>row.map(cell=> cell===5 ? 4 : cell===10 ? 0 : cell))
+      console.log('ib',initial_board)
       const fireGrids = [initial_board];
+
       for (let t = 1; t <= firelist.length; t++) {
         const newGrid = fireGrids[t-1].map(row=>[...row]);
         for (let [x, y] of firelist[t-1] || []) {
-          if(x&&y)
             newGrid[x][y] += 2;
         }
         fireGrids.push(newGrid);
       }
-      console.log({...responsedata,grid:initial_board,firelist,fireGrids,player_path,simlength,bot1path,bot2path,bot3path,bot4path,successpossiblepath})
-      setData({...responsedata,grid:initial_board,firelist,fireGrids,player_path,simlength,bot1path,bot2path,bot3path,bot4path,successpossiblepath})
+      console.log({...responsedata,
+                      grid:initial_board,
+                      firelist,
+                      fireGrids,
+                      player_path,
+                      simlength,
+                      bot1path,
+                      bot2path,
+                      bot3path,bot4path,successpossiblepath})
+      setData({...responsedata,
+                grid:initial_board,
+                firelist,
+                fireGrids,
+                player_path,
+                simlength,
+                bot1path,
+                bot2path,
+                bot3path,
+                bot4path,
+                successpossiblepath})
       setCurrentGrid(initial_board);
       setFirelist(firelist);
       setCurrentTurn(0);
@@ -156,7 +176,28 @@ function SeeFireBots() {
     }
     
   },[currentTurn])
-  
+
+  let successpossibleindex,bot1index,bot2index,bot3index,bot4index,playerindex;
+  if(data){
+    if(currentTurn!==0){
+        const successpossiblepath = data.successpossiblepath
+        const bot1path = data.bot1path;
+        const bot2path = data.bot2path;
+        const bot3path = data.bot3path;
+        const bot4path = data.bot4path;
+        const playerpath = data.player_path;
+
+        successpossibleindex = successpossiblepath[Math.min(currentTurn-1,successpossiblepath.length-1)]
+        bot1index = bot1path[Math.min(currentTurn-1,bot1path.length-1)]
+        bot2index = bot2path[Math.min(currentTurn-1,bot2path.length-1)]
+        bot3index = bot3path[Math.min(currentTurn-1,bot3path.length-1)]
+        bot4index = bot4path[Math.min(currentTurn-1,bot4path.length-1)]
+        playerindex = playerpath[Math.min(currentTurn-1,playerpath.length-1)]
+    } else{
+        successpossibleindex = JSON.parse(data.bot_index)
+        bot1index = bot2index = bot3index = bot4index = playerindex = successpossibleindex
+    }
+  }
   return (
     <div><div className='min-h-screen bg-black text-cyan-200 font-mono'>
     <div>
@@ -177,7 +218,13 @@ function SeeFireBots() {
                       gameList={gameList} 
                       setShowGameSelection={setShowGameSelection}
                       setWinRate={setWinRate}/></div>}
-    <RenderGridSeeBots data={data} currentGrid={currentGrid} currentTurn={currentTurn} difficulty={difficulty} result={result}/>
+    {data && <RenderGridSeeBots 
+                      fireGrid = {data.fireGrids[currentTurn]}
+                      currentGrid={currentGrid} 
+                      currentTurn={currentTurn} 
+                      difficulty={difficulty} 
+                      result={result}
+                      indices = {[bot1index,bot2index,bot3index,bot4index,successpossibleindex,playerindex]}/>}
     <div className='flex justify-between'>
         <button className='hover:underline' onClick={()=>setShowGameSelection(prev=>!prev)}>Select new simulation</button>
         <button className='hover:underline' onClick={()=>setShowToFiregame(prev=>!prev)}>Firegame</button>

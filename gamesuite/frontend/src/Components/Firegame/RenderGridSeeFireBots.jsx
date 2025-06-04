@@ -1,79 +1,57 @@
 import '../../Styles/flame.css'
 
 export default function RenderGridSeeBots(props){
-    if(!props.data) return <p>Loading...</p>
     const currentTurn = props.currentTurn
-    const grid = props.data.fireGrids[currentTurn]
+    const grid = props.fireGrid.map(row=>[...row])
+    const indices = props.indices
+    for(let i=0;i<indices.length;i++){
+      if(indices[i]){
+        grid[indices[i][0]][indices[i][1]] += 2 ** (3+i)
+      }
+    }
+
     return(
     <div className="grid grid-rows-25 grid-cols-25">
         {grid.map((row,i)=>(
-                row.map((cell,j) => {
+                row.map((g,j) => {
                 let bgColor = '';
-                const mod = cell % 10;
-                if(mod===0){
+                if(g===0||g>=8){
                     bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]"
                   }
-                  if(mod===1){
+                  if(g===1){
                     bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/glass.png')]"
                   }
-                  if(mod===5){
+                  if(g&4){
                     bgColor = "w-8 h-8 bg-[url('/suppresor2.png')]"
                   }
-                /*if (mod === 2) {
-                  bgColor = 'bg-red-500 border border-cyan-100';
-                } else if (mod === 1) {
-                    if(i<24){
-                        if(grid[i+1][j]!==1){
-                            bgColor += 'bg-black border-b-1 border-cyan-100 '
-                        }
-                      }
-                      if(i>0){
-                        if(grid[i-1][j]!==1){
-                          bgColor += 'bg-black border-t-1 border-cyan-100 '
-                        }
-                      }
-                      if(j<24){
-                        if(grid[i][j+1]!==1){
-                          bgColor += 'bg-black border-r-1 border-cyan-100 '
-                        }
-                      }
-                      if(j>0){
-                        if(grid[i][j-1]!==1){
-                          bgColor += 'bg-black border-l-1 border-cyan-100 '
-                        }
-                      }
-                } else if (mod === 5) {
-                  bgColor = 'bg-green-700 border border-cyan-100';
-                } else {
-                  bgColor = 'bg-gray-400 border border-cyan-100';
-                }*/
                     return (<>
-                        {mod!==2 ? <div
-                          key={`${i},${j}`}
+                        {!(g&2) ? <div
+                          key={i*25+j}
                           className={`w-8 h-8 relative flex items-center justify-center ${bgColor}`}
-                          style={{backgroundSize: '32px 32px'}}
-                        >
-                          <BotSlot
-                            data={props.data}
+                          style={{backgroundSize: '32px 32px'}}>
+                          {!!((g&8)||(g&16)||(g&32)||(g&64)||(g&128)||(g&256)) && <BotSlot
+                            indices = {props.indices}
                             difficulty = {props.difficulty}
                             playerIndex={props.playerIndex}
                             currentTurn={props.currentTurn}
                             result={props.result}
                             i={i}
                             j={j}
-                          />
-                        </div>:<div className='container'><div
-                          key={`${i},${j}`}
+                          />}
+                        </div>
+                        : <div className='container'><div
+                          key={i*25+j}
                           className={`open-sq`}
                         >
-                          <BotSlot
-                            data={props.data}
+                          {!!((g&8)||(g&16)||(g&32)||(g&64)||(g&128)||(g&256)) && <BotSlot
+                            check = {0}
+                            indices = {props.indices}
                             playerIndex={props.playerIndex}
                             currentTurn={props.currentTurn}
                             result={props.result}
                             i={i}
                             j={j}
-                          />
+                          />}
                         </div><div className='fire-sprite'></div></div>}
                         </>
                       );})
@@ -82,26 +60,7 @@ export default function RenderGridSeeBots(props){
 }
 
 function BotSlot(props){
-    const currentTurn = props.currentTurn
-    let successpossibleindex,bot1index,bot2index,bot3index,bot4index,playerindex;
-    if(currentTurn!==0){
-        const successpossiblepath = props.data.successpossiblepath
-        const bot1path = props.data.bot1path;
-        const bot2path = props.data.bot2path;
-        const bot3path = props.data.bot3path;
-        const bot4path = props.data.bot4path;
-        const playerpath = props.data.player_path;
-
-        successpossibleindex = successpossiblepath[Math.min(currentTurn-1,successpossiblepath.length-1)]
-        bot1index = bot1path[Math.min(currentTurn-1,bot1path.length-1)]
-        bot2index = bot2path[Math.min(currentTurn-1,bot2path.length-1)]
-        bot3index = bot3path[Math.min(currentTurn-1,bot3path.length-1)]
-        bot4index = bot4path[Math.min(currentTurn-1,bot4path.length-1)]
-        playerindex = playerpath[Math.min(currentTurn-1,playerpath.length-1)]
-    } else{
-        successpossibleindex = JSON.parse(props.data.bot_index)
-        bot1index = bot2index = bot3index = bot4index = playerindex = successpossibleindex
-    }
+    const [bot1index,bot2index,bot3index,bot4index,successpossibleindex,playerindex] = props.indices
     const botsInSpace = []
     if(props.result!=='forfeit'){
       if(playerindex[0]==props.i&& playerindex[1]==props.j){

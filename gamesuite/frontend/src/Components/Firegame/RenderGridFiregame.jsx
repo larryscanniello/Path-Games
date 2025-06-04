@@ -2,16 +2,12 @@ import '../../Styles/flame.css'
 
 
 export default function RenderGridFiregame(props){
-    if(!props.data) return <p>Loading...</p>
-    const currentTurn = props.currentTurn
-    const grid = props.data.fireGrids[currentTurn];
-    const firelist = props.data.firelist;
+    const fireGrid = props.fireGrid
     return (
         <div>
           <div className="grid bg-black grid-rows-25 grid-cols-25">
-            {grid.map((row, i) =>
+            {fireGrid.map((row, i) =>
               row.map((cell, j) => {
-                let img = ''
                 let bgColor = '';
                 const mod = cell % 10;
                 if(mod===0){
@@ -23,42 +19,10 @@ export default function RenderGridFiregame(props){
                 if(mod===5){
                   bgColor = "w-8 h-8 border-green-300 bg-[url('/suppresor2.png')]"
                 }
-                /*
-                if (mod === 1) {
-                  
-                  bgColor = ' bg-black '
-                  if(i<24){
-                    if(grid[i+1][j]!==1){
-                        bgColor += ' border-b-1 border-cyan-100 '
-                    }
-                  }
-                  if(i>0){
-                    if(grid[i-1][j]!==1){
-                      bgColor += ' border-t-1 border-cyan-100 '
-                    }
-                  }
-                  if(j<24){
-                    if(grid[i][j+1]!==1){
-                      bgColor += ' bg-black border-r-1 border-cyan-100 '
-                    }
-                  }
-                  if(j>0){
-                    if(grid[i][j-1]!==1){
-                      bgColor += ' bg-black border-l-1 border-cyan-100 '
-                    }
-                  }
-                }
-                else if (mod===2){
-                  bgColor += 'bg-red-500 border border-cyan-100'
-                } else if (mod === 5) {
-                  bgColor = 'bg-green-500 border border-cyan-100';
-                } else {
-                  bgColor = 'bg-gray-400 border border-cyan-100';
-                }
-                */
+                
                 return (<div key={`${i},${j}`}>
                   {mod!==2 ? <div
-                    key={`${i},${j}`}
+                    key={i*25+j}
                     className={`w-8 h-8 relative flex items-center justify-center ${bgColor}`}
                     style={{backgroundSize: '32px 32px'}}
                   >
