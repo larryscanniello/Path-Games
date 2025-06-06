@@ -8,6 +8,7 @@ import NavBar from '../NavBar';
 import MousegameInstructions from './MousegameInstructions';
 import MousegameAbout from './MousegameAbout'
 import GameOverMenu from './GameOverMenu';
+import '../../Styles/mouse.css'
 
 
 const GRID_SIZE = 25;
@@ -40,7 +41,8 @@ export default function Mousegame(){
     const [levelsLeft,setLevelsLeft] = useState(null);
     const [sensorCounts,setSensorCounts] = useState(null);
     const [gridColors,setGridColors] = useState(null);
-    const lastExecutionTime = useRef(0);
+    const [flashState,setFlashState] = useState({show:false,color:''});    
+    const [flashList,setFlashList] = useState([]);
 
     useEffect(() => {
         async function fetchGame(){
@@ -138,14 +140,6 @@ export default function Mousegame(){
 
       useEffect(() => {
         const handleKeyDown = (e) => {
-            /*const now = Date.now();
-            // Only throttle arrow keys
-            if (['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(e.code)) {
-                if (now - lastExecutionTime.current < 100) {
-                    return; // Ignore key press if within throttle delay
-                }
-                lastExecutionTime.current = now; // Update last execution time
-            }*/
             setGameState(prev => {
             if(!prev||prev.gameStatus!=='in_progress') return prev;
             const newTurn = Math.min(gameData.bot4.evidence.length-1, prev.turn + 1);
@@ -195,12 +189,19 @@ export default function Mousegame(){
                     const mouseIndex = prev.mouseIndex;
                     const playerIndex = prev.playerIndex;
                     const manhattanDistance = Math.abs(mouseIndex[0]-playerIndex[0])+Math.abs(mouseIndex[1]-playerIndex[1]);
-                    if(Math.random()< Math.exp(-.1155*(manhattanDistance-1))){
+                    const beep = Math.random()< Math.exp(-.1155*(manhattanDistance-1));
+                    if(beep){
                         sensorLogObj = {position: playerIndex, turn:prev.turn+1, beep: true}
                     }
                     else{
                         sensorLogObj = {position: playerIndex, turn:prev.turn+1, beep: false}
                     }
+                    const color = beep ? 'bg-green-400' : 'bg-red-400';
+                    const flash = { id: Date.now(), color };
+                    setFlashList(prev => [...prev, flash]);
+                    setTimeout(() => {
+                        setFlashList(prev => prev.filter(f => f.id !== flash.id));
+                        }, 300);
                     break;
             }
             let mouseIndex;
@@ -346,7 +347,7 @@ export default function Mousegame(){
                         gameID={gameID}
                         />
         </div>}
-    <div className='grid grid-cols-[1fr_auto_1fr]'>
+    {stoch  && <div className='mousegame-div grid grid-cols-[1fr_auto_1fr]'>
     <div className=''></div>
     {(gameData && stoch) && <div className='relative z-50'>
         {showNewGameMenu && <div className="fixed ml-52 mt-70 z-90">
@@ -375,7 +376,10 @@ export default function Mousegame(){
             gameStatus = {gameState.gameStatus}
             sensorCounts={sensorCounts}
             setSensorCounts={setSensorCounts}
-            colors={gridColors}/>
+            colors={gridColors}
+            flashState={flashState}
+            flashList={flashList}/>
+            
         <div className='flex justify-between'>
             <button className='hover:underline' onClick={()=>setShowNewGameMenu(prev=>!prev)}>New game</button>
 
@@ -414,5 +418,5 @@ export default function Mousegame(){
             return <div className='flex flex-row justify-between'><div>{leader}</div>{i>0 && <div className='ml-40'></div>}{i>0&&<div>{`+${plus}`}</div>}</div>}) : <div>No winners yet</div>}</div>
         </div>}
     </div>
-    </div></div></div></div>
+    </div>}</div></div></div>
 }

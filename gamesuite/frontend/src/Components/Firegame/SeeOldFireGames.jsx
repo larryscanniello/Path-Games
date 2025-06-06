@@ -91,15 +91,6 @@ function SeeFireBots() {
         }
         fireGrids.push(newGrid);
       }
-      console.log({...responsedata,
-                      grid:initial_board,
-                      firelist,
-                      fireGrids,
-                      player_path,
-                      simlength,
-                      bot1path,
-                      bot2path,
-                      bot3path,bot4path,successpossiblepath})
       setData({...responsedata,
                 grid:initial_board,
                 firelist,
@@ -202,7 +193,7 @@ function SeeFireBots() {
     <div><div className='min-h-screen bg-black text-cyan-200 font-mono'>
     <div>
     <NavBar/>
-    <div className='grid grid-cols-[1fr_auto_1fr]'>
+    {data && <div className='firegame-div grid grid-cols-[1fr_auto_1fr]'>
     <div>
     {showAbout && <div className='fixed z-20 mt-40 text-sm'><SeeFiregameAbout setShowAbout={setShowAbout}/></div>}
     </div>
@@ -233,27 +224,28 @@ function SeeFireBots() {
         <button className='hover:underline' onClick={()=>setShowAbout(prev=>!prev)}>About</button>
     </div>
         </div>  
-    <div>
-    <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
-                <div>Firegame Visualizer, Map: {currentGame}</div>
-                <div>Difficulty: {difficulty}</div>
-                <div>Result: {result}</div>                                    
-                <div className="">Map win rate: {Math.round(winRate*100)}%</div>
+    <div className='pt-8 pl-10 pr-10 backdrop-blur-md' >
+    <div className='border-2 border-cyan-400/30 rounded-md shadow-[0_0_6px_rgba(0,255,255,0.15)] backdrop-blur-xl bg-black/60'>
+    <div className="flex flex-col text-cyan-100 p-4">
+                <div className='font-bold text-[18px]'>Firegame Visualizer, Map: {currentGame}</div>
+                <div className='text-[13px]'>Difficulty: {difficulty}</div>
+                <div className='text-[13px]'>Result: {result}</div>                                    
+                <div className="text-[13px]">Map win rate: {Math.round(winRate*100)}%</div>
             </div>
-      <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
-                <div>Turn: {currentTurn}</div>
+      <div className="flex flex-col p-4 rounded-md">
+                <div className='text-cyan-100'>Turn: {currentTurn}</div>
       </div>
-      {leaderboard && <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
+      {leaderboard && <div className="text-cyan-100 flex flex-col p-4 rounded-md">
                 <div>Score: {leaderboard.userscore}</div>
                 
       </div>}
-      {leaderboard && <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
+      {leaderboard && <div className="text-cyan-100 flex flex-col p-4 rounded-md">
                 <div>Leaderboard</div>
-                <div className='border border-gray-500 p-4 rounded-2xl'>{leaderboard.leaderboard.map(([user,score])=><div className='flex justify-between'><div>{user}</div><div className='ml-40'></div> <div>{score}</div></div>)}</div>
+                <div className=' rounded-2xl'>{leaderboard.leaderboard.map(([user,score])=><div className='flex justify-between'><div>{user}</div><div className=''></div> <div>{score}</div></div>)}</div>
 
       </div>}
-    </div>   
-    </div></div></div></div>
+    </div></div>   
+    </div>}</div></div></div>
   )
 }
 function GameSelection(props){

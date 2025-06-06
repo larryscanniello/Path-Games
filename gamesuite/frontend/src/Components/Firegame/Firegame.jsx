@@ -8,6 +8,7 @@ import FiregameInstructions from './FiregameInstructions';
 import FiregameDifficultyMenu from './FiregameDifficultyMenu';
 import FiregameAbout from './FiregameAbout';
 import { FiregameInstructionsatStart } from './FiregameInstructions';
+import '../../Styles/flame.css'
 
 const GRID_SIZE = 25;
 
@@ -217,10 +218,17 @@ export default function Firegame(){
 
     const levels = ['easy','medium','hard']
 
-    return <div><div className='min-h-screen bg-black text-cyan-200 font-mono'> 
+    return <div className=''><div className='min-h-screen bg-black text-cyan-200 font-mono'> 
         <div>
         <NavBar/>
-        <div className='grid grid-cols-[1fr_auto_1fr]'> 
+        {(showInstructionsatStart&&levelsLeft) && <div className= "fixed z-20 firegame-div">
+                <FiregameInstructionsatStart difficulty={difficulty}
+                showInstructionsatStart = {showInstructionsatStart} 
+                setDifficulty={setDifficulty} 
+                setShowInstructionsatStart={setShowInstructionsatStart}
+                levelsLeft={levelsLeft}/>                
+                </div>}  
+        {difficulty&&gameData.grid && <div className='firegame-div grid grid-cols-[1fr_auto_1fr]'> 
         {gameState.gameStatus!=='in_progress'&& <div className='fixed z-20 m-8'><GameOverMenu
                     gameState={gameState}
                     setGameState={setGameState}
@@ -235,13 +243,7 @@ export default function Firegame(){
                 <FiregameInstructions difficulty={difficulty} 
                 setDifficulty={setDifficulty} 
                 setShowInstructions={setShowInstructions}/></div>}
-              {(showInstructionsatStart&&levelsLeft) && <div className= "fixed z-20">
-                <FiregameInstructionsatStart difficulty={difficulty}
-                showInstructionsatStart = {showInstructionsatStart} 
-                setDifficulty={setDifficulty} 
-                setShowInstructionsatStart={setShowInstructionsatStart}
-                levelsLeft={levelsLeft}/>                
-                </div>}  
+              
                 </div>       
         <div>
         {gameData.firelist && <div>
@@ -291,7 +293,7 @@ export default function Firegame(){
     
     
     
-    </div>
+    </div>}
     
     </div></div></div>
 }

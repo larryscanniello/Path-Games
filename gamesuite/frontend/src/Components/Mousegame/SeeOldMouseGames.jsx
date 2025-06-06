@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import SeeMousegameInstructions from "./SeeMouseGameInstructions.jsx";
 import SeeMousegameAbout from "./SeeMousegameAbout.jsx"
+import "../../Styles/mouse.css"
 
 export default function SeeMiceBots(){
     const [simData,setSimData] = useState(null);
@@ -30,8 +31,7 @@ export default function SeeMiceBots(){
     const [directionFrames,setDirectionFrames] = useState(['anim-r'])
     const [frameIndex,setFrameIndex] = useState(0);
     const restartButtonRef = useRef(null);
-    const showBotRef = useRef(null);
-    const showProbabilitiesRef = useRef(null);
+    const [flashList,setFlashList] = useState([[],[],[],[],[]])
 
     useEffect(()=>{
         async function fetchGameList(){
@@ -93,6 +93,7 @@ export default function SeeMiceBots(){
                     player_path: responsedata.playerdata.player_path,
                     player_length: responsedata.playerdata.player_path.length,
                     result: responsedata.playerdata.result,
+                    player_sensor_log: responsedata.playerdata.sensor_log,
                     simlength,
                 },
                 bot1: {
@@ -125,7 +126,7 @@ export default function SeeMiceBots(){
                     length: bot4path.length,
                 }
             }
-            
+            setFlashList([[],[],[],[],[]])
             setSimData(parseddata);
             setTurn(0);
 
@@ -181,6 +182,68 @@ export default function SeeMiceBots(){
         }
       }, [currentGame])
 
+      function handleFlashes(newTurn,simData){
+        const evidence = []
+        if(simData.game.player_sensor_log[newTurn-1]){
+          evidence.push([4,simData.game.player_sensor_log[newTurn-1].beep ? 1 : 0])
+        }
+        if(simData.bot1.evidence[newTurn-1]){
+          evidence.push([0,simData.bot1.evidence[newTurn-1][1]])
+        }
+        if(simData.bot2.evidence[newTurn-1]){
+          evidence.push([1,simData.bot2.evidence[newTurn-1][1]])
+        }
+        if(simData.bot3.evidence[newTurn-1]){
+          evidence.push([2,simData.bot3.evidence[newTurn-1][1]])
+        }
+        if(simData.bot4.evidence[newTurn-1]){
+          evidence.push([3,simData.bot4.evidence[newTurn-1][1]])
+        }
+        const botobjs = []
+        const flashpositions = [{top:"-6px",left:"-6px"},
+                              {top:"-6px",left:"14px"},
+                              {top:"14px",left:"-6px"},
+                              {top:"14px",left:"14px"}
+                              ,{top:"4px",left:"4px"}]
+        for(let i=0;i<evidence.length; i++){
+          if(evidence[i][1]!==2){
+            const botobj = { id: `flash-${newTurn}-${evidence[i][0]}`, 
+                            flashPosition: flashpositions[evidence[i][0]], 
+                            bot: evidence[i][0], 
+                            color: evidence[i][1]===1 ? 'bg-green-400' : 'bg-red-400' }
+            botobjs.push(botobj)
+          }
+        };
+        setFlashList((prev) => {
+          const newprev = [...prev];
+          for(let i=0;i<newprev.length;i++){
+            for(let j=0;j<botobjs.length;j++){
+              if(botobjs[j].bot===i){
+                newprev[i] = [...prev[i],botobjs[j]]
+                break;
+              }
+            }
+          }
+          return newprev
+        });
+        setTimeout(()=>{
+            //setFlashList([[],[],[],[],[]])
+          setFlashList(prev=>{
+            const newprev = [...prev]
+            for(let j=0;j<newprev.length;j++){
+              for(let i=0;i<botobjs.length;i++){
+                const len = newprev[j].length;
+                newprev[j] = prev[j].filter(f=> f.id !== botobjs[i].id)
+                if(newprev[j].length<len){
+                  break;
+                }
+              }
+            }
+            return newprev
+          })
+        },300)
+      }
+
     useEffect(() => {
         const handleKeyDown = (e) => {
           if(simData){
@@ -188,13 +251,16 @@ export default function SeeMiceBots(){
             if(e.code === 'ArrowRight'){
                 setTurn((prev)=>{
                 const newTurn = Math.min(simlength+1, prev + 1);
+                handleFlashes(newTurn,simData)
                 return newTurn
                 });
+                  
             } else if (e.code === 'ArrowLeft'){
                 setTurn((prev) => {
                 const newTurn = Math.max(0,prev-1)
                 return newTurn
-                })
+                });
+                setFlashList([[],[],[],[],[]])
             } else if (e.code === 'Space'){
                 if(!play){
                 setTurn((prev)=>{
@@ -213,16 +279,17 @@ export default function SeeMiceBots(){
           window.removeEventListener('keydown',handleKeyDown);
         }
       }, [simData]);
+    
 
     useEffect(()=>{
         if(play){
         intervalRef.current = setInterval(()=>{
-        setTurn(prev => {
-            const simlength = simData.game.simlength;
-            const newTurn = Math.min(simlength+1, prev + 1);
-            return newTurn
-        })
-        },250)
+          setTurn(prev => {
+              const simlength = simData.game.simlength;
+              const newTurn = Math.min(simlength+1, prev + 1);
+              handleFlashes(newTurn,simData);
+              return newTurn
+          })},250)
         return () => clearInterval(intervalRef.current)
         }
     },[play])
@@ -263,8 +330,7 @@ export default function SeeMiceBots(){
         }
     },[showGameSelection])
 
-    const optionarray = ["1", "2", "3", "4", username]
-    const optionarray2 = ["1", "2", "3", "4"]
+    
     let bot1index,bot2index,bot3index,bot4index,player_index,mouse_index;
     if(simData){ 
       
@@ -283,7 +349,7 @@ export default function SeeMiceBots(){
           bot2index = bot2path[Math.min(turn-1,bot2path.length-1)]
           bot3index = bot3path[Math.min(turn-1,bot3path.length-1)]
           bot4index = bot4path[Math.min(turn-1,bot4path.length-1)]
-          player_index = simData.game.player_path[Math.min(turn-1,simData.game.player_path.length-1)]
+          player_index = simData.game.player_path[Math.min(turn,simData.game.player_path.length-1)]
       }
       else{
           bot4index = simData.game.bot_starting_index;
@@ -291,11 +357,24 @@ export default function SeeMiceBots(){
           mouse_index = simData.game.mouse_starting_index;
       }
     }
+    let b1length,b2length,b3length,b4length;
+    if(simData){
+      b1length = simData.bot1.length;
+      b2length = simData.bot2.length;
+      b3length = simData.bot3.length;
+      b4length = simData.bot4.length;
+    }else{
+      b1length = b2length = b3length = b4length = 0;
+    }
+
+    const optionarray = ["1", "2", "3", "4",username]
+    const optionarray2 = ["1", "2", "3", "4"]
+
   return (
     <div>
         <div className="min-h-screen bg-black text-cyan-200 font-mono">
         <NavBar/>
-        <div className='grid grid-cols-[1fr_auto_1fr]'>
+        {simData && <div className=' mousegame-div grid grid-cols-[1fr_auto_1fr]'>
         <div>
         <div className="flex fixed">
         </div>
@@ -312,10 +391,14 @@ export default function SeeMiceBots(){
         {showInstructions && 
                     <SeeMousegameInstructions setShowInstructions={setShowInstructions}/>}
         {showToMousegame && <div className='fixed z-20'><ToMousegame setShowToMousegame={setShowToMousegame}/></div>}
+        
         {simData&&<RenderGridSeeMouseBots
             grid = {simData.game.grid}
             plans = {[simData.bot1.plans[turn],simData.bot2.plans[turn],simData.bot3.plans[turn],simData.bot4.plans[turn]]}
-            states = {[null,simData.bot1.states[turn],simData.bot2.states[turn],simData.bot3.states[turn],simData.bot4.states[turn]]}
+            states = {[null,simData.bot1.states[Math.min(turn,b1length-1)],
+                            simData.bot2.states[Math.min(turn,b2length-1)],
+                            simData.bot3.states[Math.min(turn,b3length-1)],
+                            simData.bot4.states[Math.min(turn,b4length-1)]]}
             simlengths = {[simData.bot1.length,simData.bot2.length,simData.bot3.length,simData.bot4.length,simData.game.player_length]}
             paths = {[simData.bot1.path,simData.bot2.path,simData.bot3.path,simData.bot4.path]}
             indices = {[bot1index,bot2index,bot3index,bot4index,player_index,mouse_index]}
@@ -330,6 +413,7 @@ export default function SeeMiceBots(){
             player_path = {simData.game.player_path}
             stoch = {simData.game.stoch}
             result = {simData.game.result}
+            flashList = {flashList}
             />}
         <div className='flex justify-between'>
             <button className='hover:underline' onClick={()=>setShowGameSelection(prev=>!prev)}>Visualize new game</button>
@@ -337,7 +421,7 @@ export default function SeeMiceBots(){
             <button className="hover:underline" ref={restartButtonRef} onClick={(e)=>{
                 if(restartButtonRef.current){
                     restartButtonRef.current.blur()
-                }; setTurn(0);}}>Restart</button>
+                }; setTurn(0); setFlashList([[],[],[],[],[]])}}>Restart</button>
             <button className='hover:underline' onClick={()=>setShowInstructions(prev=>!prev)}>Instructions</button>
             <button className='hover:underline' onClick={()=>setShowAbout(prev=>!prev)}>About</button>
         </div></div>
@@ -352,15 +436,15 @@ export default function SeeMiceBots(){
                 <div>Turn: {turn}</div>
             </div>    
             <div className='bg-gray-800 border border-white m-8 p-2 rounded-md'><div>Show bot:</div><div className="ml-6 mr-6">
-            {optionarray.map((option,i)=><label className={i===4&&'text-xs'}><input type="checkbox" checked={showAgent[i]}
+            {optionarray.map((option,i)=><label key={i} className={i===4?'text-xs':''}><input type="checkbox" checked={showAgent[i]}
                                                 onChange={(e)=>setShowAgent(prev=>{
                                                     e.target.blur()
                                                     const updated = [...prev]
                                                     updated[i]=!prev[i];
                                                     return updated
                                                 })}/>{option}&nbsp;&nbsp;</label>)}</div>
-            <div>Show Probabilities:<div className="flex ml-6 mr-6">                                    
-            {optionarray2.map((option,i)=><label><input type="checkbox" checked={showProbabilities===i+1}
+            <div>Show probabilities:<div className="flex ml-6 mr-6">                                    
+            {optionarray2.map((option,i)=><label key={i}><input type="checkbox" checked={showProbabilities===i+1}
                                                 onChange={(e)=>{
                                                     if(showProbabilities===i+1){
                                                         setShowProbabilities(0);
@@ -371,11 +455,11 @@ export default function SeeMiceBots(){
             <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
             <div>Map {gameID.current} Leaderboard</div>
             <div className='border border-gray-500 p-4 rounded-2xl text-[14px]'>{leaderboard && leaderboard.length>0 ? leaderboard.map(([leader,turns],i)=>{
-            return <div className='flex flex-row justify-between'><div>{leader}</div>{<div className='ml-40'></div>}{i>0&&<div>{`${turns}`}</div>}</div>}) : <div>No winners yet</div>}</div>
+            return <div className='flex flex-row justify-between'><div>{leader}</div>{<div className='ml-40'></div>}{<div>{`${turns}`}</div>}</div>}) : <div>No winners yet</div>}</div>
         </div>
             
             </div>
-        </div>
+        </div>}
         </div>
     </div>
   )

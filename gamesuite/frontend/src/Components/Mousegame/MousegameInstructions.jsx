@@ -1,11 +1,12 @@
 import { USERNAME } from "../../constants";
+import "../../Styles/mouse.css"
 
 export default function MousegameInstructions(props){
     const stochoptions = ['stationary','stochastic']
     const username = localStorage.getItem(USERNAME);
 
     return(
-        <div className={props.stoch ? "border border-white rounded-md bg-gray-800/90" : "bg-black"}>
+        <div className={props.stoch ? "border border-white rounded-md bg-gray-800/90" : "mousegame-div bg-black"}>
             <div className="pr-8 pl-8 pb-12">
                 <p className="text-cyan-200 pt-12 pb-6">
                     You are in deep space aboard the ship Archaeopteryx,

@@ -16,7 +16,7 @@ export default function NavBar(props){
     }
 
     return(
-    <nav className='flex justify-between items-center pl-24 pt-3 pb-3 pr-24 border-gray-100 border-b-2 text-cyan-200 font-mono'>
+    <nav className='flex justify-between items-center pl-24 pt-3 pb-3 pr-24 border-gray-100 border-b-1 text-cyan-200 font-mono'>
         <div><a className="font-bold" href='/'>Path Games</a></div>
         {!props.logoOnly && <div className="">
             {isAuthorized && !loggingOut ? <div className="flex justify-between items-center space-x-8"><div>{username}</div>

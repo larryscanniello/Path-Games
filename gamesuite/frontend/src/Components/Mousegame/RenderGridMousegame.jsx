@@ -1,4 +1,5 @@
 import '../../Styles/mouse.css'
+import {motion,AnimatePresence} from 'framer-motion'
 
 export default function RenderGridMousegame(props){
     if(!props.grid) return <p>Loading...</p>
@@ -27,7 +28,7 @@ export default function RenderGridMousegame(props){
         }
     }
     if(props.hoverIndex){
-        grid[props.hoverIndex[0]][props.hoverIndex[1]]+=32
+        grid[props.hoverIndex[0][0]][props.hoverIndex[0][1]]+=32
     }
     return(
     <div className="grid bg-black grid-rows-25 grid-cols-25">
@@ -66,7 +67,9 @@ export default function RenderGridMousegame(props){
                                 frameIndex = {props.frameIndex}
                                 gameStatus = {props.gameStatus}
                                 bot4index = {props.bot4index}
-                                mouseIndex = {props.mouseIndex}/>}
+                                mouseIndex = {props.mouseIndex}
+                                flashState = {props.flashState}
+                                flashList = {props.flashList}/>}
                     </div>
                 </div>
                 )})
@@ -100,13 +103,30 @@ function BotSlot(props){
         botsInSpace.push({id: 6, className:'open-sq mouse-sprite anim-r'})
     }
 
-    return(<div className="relative w-full h-full z-30">
-        {(props.gameStatus!=='in_progress'&&props.mouseIndex[0]===props.i && props.mouseIndex[1]===props.j)}
+    return(<AnimatePresence><div className="relative w-full h-full z-30">
+        {(playerIndex[0] === props.i && playerIndex[1] === props.j) && props.flashList.map(flash=>
+                    <motion.div
+                        key={flash.id}
+                        className={`absolute inset-0 rounded-full ${flash.color} opacity-60 z-20`}
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 2, opacity: [0, 0.8, 0] }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }} 
+                    />
+                )}{/**/}
         {botsInSpace.map((bot,i)=>(
-            <div
-                key = {bot.id}
-                className={bot.className}
+            <motion.div
+            layoutId={'bot ' + bot.id.toString()}
+            key = {bot.id}
+            className={bot.className}
+            initial={{ opacity: .7 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ 
+                layout: { duration: .02 },
+                opacity: { duration: 1 }
+                }}
                 >
-            {(bot.id!==0&&bot.id!==6) && bot.id}</div>))}
-    </div>)
+            {(bot.id!==0&&bot.id!==6) && bot.id}</motion.div>))}
+    </div></AnimatePresence>)
 }

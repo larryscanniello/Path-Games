@@ -1,4 +1,5 @@
 import '../../Styles/flame.css'
+import { motion, AnimatePresence } from 'framer-motion'
 
 
 export default function RenderGridFiregame(props){
@@ -58,13 +59,21 @@ function BotSlot(props){
     const playerIndex = props.playerIndex
     const isPlayerHere = playerIndex[0] === props.i && playerIndex[1] === props.j;
 
-    return(<>
+    return(<AnimatePresence>
         {isPlayerHere && (
-        <div
-          className="smooth-player absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black z-10 "
-        />
-      )}
-    </>
+                <motion.div
+                    layoutId="player"
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black z-10"
+                    initial={{ opacity: .7 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ 
+                        layout: { duration: .01 },
+                        opacity: { duration: 1 }
+                    }}
+                />
+            )}
+    </AnimatePresence>
 
     )
 }
