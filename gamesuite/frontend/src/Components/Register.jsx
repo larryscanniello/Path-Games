@@ -43,9 +43,8 @@ function Register() {
 
   return (
     <div>
-        <div className='min-h-screen bg-black'>
+        <div className='min-h-screen bg-black font-sans text-black'>
           <div>
-          <NavBar/>
           <div className='flex flex-col items-center'>
           <div className='bg-white m-48 p-12 rounded-2xl'>
           <div className='flex flex-col items-center'>
@@ -94,7 +93,7 @@ function Register() {
                                             return prev;})}
                 placeholder="Re-enter password"
               />
-              <div className='pt-4'>Have an account? <button className='text-blue-400 hover:underline' onClick={()=>navigate('/login/')}> Login</button></div>
+              <div className='pt-4'>Have an account? <button className='text-blue-400 hover:underline' onClick={()=>navigate('/login/')}> Log in</button></div>
               <div className='text-red-400'>{error}</div>
               <div className='flex flex-col items-center'>
               <button className='mt-4 hover:bg-blue-200 bg-blue-300 rounded-3xl pl-4 pr-4 pt-2 pb-2 font-bold' type="submit">Register</button>

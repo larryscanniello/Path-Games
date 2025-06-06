@@ -218,9 +218,7 @@ export default function Firegame(){
 
     const levels = ['easy','medium','hard']
 
-    return <div className=''><div className='min-h-screen bg-black text-cyan-200 font-mono'> 
-        <div>
-        <NavBar/>
+    return <div className=''>
         {(showInstructionsatStart&&levelsLeft) && <div className= "fixed z-20 firegame-div">
                 <FiregameInstructionsatStart difficulty={difficulty}
                 showInstructionsatStart = {showInstructionsatStart} 
@@ -294,6 +292,6 @@ export default function Firegame(){
     
     
     </div>}
-    
-    </div></div></div>
+    </div>
+   
 }

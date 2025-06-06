@@ -328,9 +328,7 @@ export default function Mousegame(){
 
 
 
-    return <div><div className='min-h-screen bg-black text-cyan-200 font-mono'>
-    <div>
-    <NavBar/>
+    return <div>
     {(showInstructions && levelsLeft) &&
         <div className="fixed scale-85 transform flex justify-center items-center z-90">
             <MousegameInstructions  stoch={stoch} 
@@ -347,7 +345,7 @@ export default function Mousegame(){
                         gameID={gameID}
                         />
         </div>}
-    {stoch  && <div className='mousegame-div grid grid-cols-[1fr_auto_1fr]'>
+    {(stoch && gameData)  && <div className='mousegame-div grid grid-cols-[1fr_auto_1fr]'>
     <div className=''></div>
     {(gameData && stoch) && <div className='relative z-50'>
         {showNewGameMenu && <div className="fixed ml-52 mt-70 z-90">
@@ -418,5 +416,5 @@ export default function Mousegame(){
             return <div className='flex flex-row justify-between'><div>{leader}</div>{i>0 && <div className='ml-40'></div>}{i>0&&<div>{`+${plus}`}</div>}</div>}) : <div>No winners yet</div>}</div>
         </div>}
     </div>
-    </div>}</div></div></div>
+    </div>}</div>
 }

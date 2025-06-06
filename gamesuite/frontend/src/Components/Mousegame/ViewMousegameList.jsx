@@ -25,8 +25,8 @@ export default function ViewGameList(){
     },[])
     
     return (
-            gameList && <div className='min-h-screen bg-black text-cyan-200 font-mono'>
-              <NavBar/>
+            gameList && <div className=''>
+              
               <div className="m-24"></ div>
              <div className="pl-48 font-bold">Select a game: </div>{gameList.length>0 ? (
                 <ul className="pl-48 overflow-y-auto h-64">

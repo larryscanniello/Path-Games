@@ -14,48 +14,24 @@ import SeeOldMouseGames from './Components/Mousegame/SeeOldMouseGames';
 import ViewMousegameList from "./Components/Mousegame/ViewMousegameList";
 import NicknameRoute from './Components/Nicknameroute';
 import './index.css';
+import Layout from './Components/Layout';
 
 const router = createBrowserRouter([
-  {
-    path: "",
-    element: <Home/>,
-  },
-  {
-    path: "/firegame",
-    element: <ProtectedRoute><Firegame/></ProtectedRoute>,
-  },
-  {
-    path: "/seeoldfiregames/:username/:gameID/",
-    element: <ProtectedRoute><SeeOldFireGames/></ProtectedRoute>
-  },
-  {
-    path: "/seeoldfiregames/",
-    element: <ProtectedRoute><ViewFiregameList/></ProtectedRoute>
-  },
-  {
-    path: "/seeoldmousegames",
-    element: <ProtectedRoute><ViewMousegameList/></ProtectedRoute>
-  },
-  {
-    path: "/seeoldmousegames/:username/:gameID/",
-    element: <ProtectedRoute><SeeOldMouseGames/></ProtectedRoute>
-  },
-  {
-    path: "/mousegame",
-    element: <ProtectedRoute><Mousegame/></ProtectedRoute>
-  },
-  {
-    path: "/login",
-    element: <Login/>
-  },
-  {
-    path: "/register",
-    element: <Register/>
-  },
-  {
-    path: "/nickname",
-    element: <NicknameRoute/>
-  }
+    {
+      element: <Layout />,
+      children: [
+        { path: "/", element: <Home /> },
+        { path: "/firegame", element: <ProtectedRoute><Firegame /></ProtectedRoute> },
+        { path: "/seeoldfiregames/:username/:gameID/", element: <ProtectedRoute><SeeOldFireGames /></ProtectedRoute> },
+        { path: "/seeoldfiregames/", element: <ProtectedRoute><ViewFiregameList /></ProtectedRoute> },
+        { path: "/seeoldmousegames", element: <ProtectedRoute><ViewMousegameList /></ProtectedRoute> },
+        { path: "/seeoldmousegames/:username/:gameID/", element: <ProtectedRoute><SeeOldMouseGames /></ProtectedRoute> },
+        { path: "/mousegame", element: <ProtectedRoute><Mousegame /></ProtectedRoute> },
+        { path: "/login", element: <Login /> },
+        { path: "/register", element: <Register /> },
+        { path: "/nickname", element: <NicknameRoute /> },
+          ]
+        }
 ])
 
 

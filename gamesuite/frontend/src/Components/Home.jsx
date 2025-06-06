@@ -23,8 +23,7 @@ export default function Home() {
     }
 
   return (
-    <div className='min-h-screen bg-black text-cyan-200 font-mono'>
-        <NavBar/>
+    <div>
           <div className='m-24'></div>
           <ul className='pl-48'>
             <li className='mb-3 hover:underline'><Link to="/firegame">Play Firegame</Link></li>

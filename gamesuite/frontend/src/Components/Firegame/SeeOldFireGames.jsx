@@ -190,9 +190,7 @@ function SeeFireBots() {
     }
   }
   return (
-    <div><div className='min-h-screen bg-black text-cyan-200 font-mono'>
     <div>
-    <NavBar/>
     {data && <div className='firegame-div grid grid-cols-[1fr_auto_1fr]'>
     <div>
     {showAbout && <div className='fixed z-20 mt-40 text-sm'><SeeFiregameAbout setShowAbout={setShowAbout}/></div>}
@@ -245,7 +243,7 @@ function SeeFireBots() {
 
       </div>}
     </div></div>   
-    </div>}</div></div></div>
+    </div>}</div>
   )
 }
 function GameSelection(props){

@@ -28,9 +28,7 @@ export default function ViewGameList(){
     }
       
     else{
-    return (
-        <div className='min-h-screen bg-black text-cyan-200 font-mono'>
-          <NavBar/>
+    return (<div>
           <div className="m-24"></ div>
          <div className="pl-48 font-bold">Select a game: </div>{gameList.length>0 ? (
             <ul className="pl-48 overflow-y-auto h-64">
@@ -49,7 +47,6 @@ export default function ViewGameList(){
               ))}
             </ul>
           ) : <div className="pl-48">No games yet. Play a firegame and come back.</div>}
-        
-        </div>
+      </div>
       );}
 }

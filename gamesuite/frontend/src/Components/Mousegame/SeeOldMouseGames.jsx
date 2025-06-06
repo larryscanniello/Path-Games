@@ -372,8 +372,7 @@ export default function SeeMiceBots(){
 
   return (
     <div>
-        <div className="min-h-screen bg-black text-cyan-200 font-mono">
-        <NavBar/>
+        <div>
         {simData && <div className=' mousegame-div grid grid-cols-[1fr_auto_1fr]'>
         <div>
         <div className="flex fixed">
