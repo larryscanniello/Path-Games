@@ -206,7 +206,8 @@ def get_firegame_leaderboard(request):
     for game in FiregameGame.objects.all():
         user = game.user
         difficulty = game.firegame_map.difficulty
-        scores[user] += score_map.get(difficulty, 0)
+        if(game.result == 'win'):
+            scores[user] += score_map.get(difficulty, 0)
     top_users = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:5]
     return Response({'leaderboard':[[user.username, score] for user, score in top_users],
                      'userscore':scores[User.objects.get(username=request.data['username'])]})

@@ -7,7 +7,7 @@ export default function FiregameInstructions(props){
     const username = localStorage.getItem(USERNAME);
 
     return(
-        <div className="border border-gray-300 bg-gray-800/90 mt-24 ml-24 mr-24 z-10 rounded-md text-sm">
+        <div className="relative border border-gray-300 bg-gray-800/90 mt-24 ml-24 mr-24 z-10 rounded-md text-sm">
             <div className="pr-8 pl-8 pb-12">
                 <p className="text-cyan-200 pt-12 pb-12">
                     You are in deep hibernation on an intergalactic voyage on the space ship Archaeopteryx

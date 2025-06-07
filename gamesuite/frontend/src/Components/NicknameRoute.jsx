@@ -43,9 +43,8 @@ function NicknameRoute() {
 
   return (
     <div>
-        <div className='min-h-screen bg-black font-mono'>
+        <div className=''>
           <div>
-          <NavBar/>
           <div className='flex flex-col items-center text-cyan-200 bg-black'>
           <div className= ' m-36 p-12 rounded-2xl w-188 h-64'>
           <div className='flex flex-col items-center'>

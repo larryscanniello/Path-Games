@@ -36,13 +36,13 @@ export default function RenderGridMousegame(props){
                 row.map((g,j) => {
                     let bgColor = '';
                     if(g==0||g>1){
-                       bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]"
+                       bgColor = "bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]"
                     }
                     if(g==1){
-                        bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/glass.png')]"
+                        bgColor = "bg-[url('/space_tiles_hyptosis/glass.png')]"
                     }
                     if(g&2){
-                        bgColor = "w-8 h-8 border border-gray-400 bg-amber-100"
+                        bgColor = "border border-gray-400 bg-amber-100"
                     }
                     if(g&16 && props.showSenses){
                         bgColor = colors[i][j]

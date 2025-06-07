@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import SeeMousegameInstructions from "./SeeMouseGameInstructions.jsx";
 import SeeMousegameAbout from "./SeeMousegameAbout.jsx"
+import { useWindowSize } from "../useWindowSize.jsx";
 import "../../Styles/mouse.css"
 
 export default function SeeMiceBots(){
@@ -32,6 +33,7 @@ export default function SeeMiceBots(){
     const [frameIndex,setFrameIndex] = useState(0);
     const restartButtonRef = useRef(null);
     const [flashList,setFlashList] = useState([[],[],[],[],[]])
+    const [width,height] = useWindowSize()
 
     useEffect(()=>{
         async function fetchGameList(){

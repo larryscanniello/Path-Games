@@ -1,10 +1,38 @@
 import '../../Styles/flame.css'
 import { AnimatePresence,motion } from 'framer-motion'
+import {useWindowSize} from "../useWindowSize"
 
 export default function RenderGridSeeBots(props){
     const currentTurn = props.currentTurn
     const grid = props.fireGrid.map(row=>[...row])
     const indices = props.indices
+    const [width,height] = useWindowSize();
+
+    const getTileSize = () => {
+      if(width<1000||height<785) return "w-6 h-6"
+      if(width<1100||height<900) return "w-7 h-7";
+      return "w-8 h-8"
+    }
+
+    const getBackgroundSize = () => {
+      if(width<1000||height<785) return "24px 24px";
+      if(width<1100||height<900) return "28px 28px";
+      return "32px 32px"
+    }
+
+    const getFireSprite = () => {
+      if(width<1000||height<785) return 'fire-sprite-2'
+      if(width<1100||height<900) return 'fire-sprite-1'
+      return "fire-sprite-0"
+    }
+
+    const getFireSqBackground = () => {
+      if(width<1000||height<785) return 'open-sq-2'
+      if(width<1100||height<900) return 'open-sq-1'
+      return "open-sq-0"
+    }
+
+
     for(let i=0;i<indices.length;i++){
       if(indices[i]){
         grid[indices[i][0]][indices[i][1]] += 2 ** (3+i)
@@ -18,20 +46,20 @@ export default function RenderGridSeeBots(props){
                 row.map((g,j) => {
                 let bgColor = '';
                 if(g===0||g>=8){
-                    bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/wool_colored_white.png')] "
+                    bgColor = "bg-[url('/space_tiles_hyptosis/wool_colored_white.png')] "
                   }
                   if(g===1){
-                    bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/glass.png')]"
+                    bgColor = "bg-[url('/space_tiles_hyptosis/glass.png')]"
                   }
                   if(g&4){
-                    bgColor = "w-8 h-8 bg-[url('/suppresor2.png')]"
+                    bgColor = "bg-[url('/suppresor2.png')]"
                   }
                   
                     return (<>
                         {!(g&2) ? <div
                           key={i*25+j}
-                          className={`w-8 h-8 relative flex items-center justify-center ${bgColor}`}
-                          style={{backgroundSize: '32px 32px'}}>
+                          className={`${getTileSize()} relative flex items-center justify-center ${bgColor}`}
+                          style={{backgroundSize: `${getBackgroundSize()}`}}>
                           {!!((g&8)||(g&16)||(g&32)||(g&64)||(g&128)||(g&256)) && <BotSlot
                             indices = {props.indices}
                             difficulty = {props.difficulty}
@@ -44,7 +72,7 @@ export default function RenderGridSeeBots(props){
                         </div>
                         : <div className='container'><div
                           key={i*25+j}
-                          className={`open-sq`}
+                          className={`${getFireSqBackground()}`}
                         >
                           {!!((g&8)||(g&16)||(g&32)||(g&64)||(g&128)||(g&256)) && <BotSlot
                             check = {0}
@@ -55,7 +83,7 @@ export default function RenderGridSeeBots(props){
                             i={i}
                             j={j}
                           />}
-                        </div><div className='fire-sprite'></div></div>}
+                        </div><div className={`${getFireSprite()}`}></div></div>}
                         </>
                       );})
         ))}
@@ -67,7 +95,7 @@ function BotSlot(props){
     const botsInSpace = []
     if(props.result!=='forfeit'){
       if(playerindex[0]==props.i&& playerindex[1]==props.j){
-        botsInSpace.push({id: 0, className:"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black z-10"})
+        botsInSpace.push({id: 0, className:"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black z-20"})
     }
     }
     

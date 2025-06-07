@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import SeeFiregameInstructions from "./SeeFiregameInstructions.jsx"
 import SeeFiregameAbout from "./SeeFiregameAbout.jsx"
+import {useWindowSize} from '../useWindowSize'
 
 
 function SeeFireBots() {
@@ -29,6 +30,7 @@ function SeeFireBots() {
   const [winRate,setWinRate] = useState(null);
   const [leaderboard,setLeaderboard] = useState(null);
   const [result,setResult] = useState(null);
+  const [width,height] = useWindowSize();
 
   useEffect(()=>{
       async function fetchGameList(){
@@ -189,6 +191,12 @@ function SeeFireBots() {
         bot1index = bot2index = bot3index = bot4index = playerindex = successpossibleindex
     }
   }
+  if(width<900||height<695){
+    return <div className='flex flex-col items-center'>
+              <div className='mt-12'>Window size too small; not supported.</div>
+              <div>If you had a game in progress, make the window bigger to resume.</div>
+          </div>
+  }
   return (
     <div>
     {data && <div className='firegame-div grid grid-cols-[1fr_auto_1fr]'>
@@ -239,7 +247,7 @@ function SeeFireBots() {
       </div>}
       {leaderboard && <div className="text-cyan-100 flex flex-col p-4 rounded-md">
                 <div>Leaderboard</div>
-                <div className=' rounded-2xl'>{leaderboard.leaderboard.map(([user,score])=><div className='flex justify-between'><div>{user}</div><div className=''></div> <div>{score}</div></div>)}</div>
+                <div className=' rounded-2xl'>{leaderboard.leaderboard.map(([user,score])=><div className='flex justify-between text-[13px]'><div>{user}</div><div className='ml-3'></div> <div>{score}</div></div>)}</div>
 
       </div>}
     </div></div>   

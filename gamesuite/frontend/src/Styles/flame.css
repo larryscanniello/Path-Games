@@ -1,7 +1,18 @@
-@keyframes fire-animate {
+@keyframes fire-animate-0 {
     from { background-position: 0 0; }
     to   { background-position: -144px 0; } /* 6 frames × 24px = 144px wide */
   }
+
+  @keyframes fire-animate-1 {
+    from { background-position: 0 0; }
+    to   { background-position: -126px 0; } /* 6 frames × 24px = 144px wide */
+  }
+
+  @keyframes fire-animate-2 {
+    from { background-position: 0 0; }
+    to   { background-position: -108px 0; } /* 6 frames × 24px = 144px wide */
+  }
+  
   
   .container {
     position: relative;
@@ -9,7 +20,7 @@
     height: 8px;
 }
 
-.open-sq {
+.open-sq-0 {
     position: absolute;
     top: 0;
     left: 0;
@@ -20,7 +31,29 @@
     background-position: center;
 }
 
-.fire-sprite {
+.open-sq-1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 28px;
+    height: 28px;
+    background-image: url('space_tiles_hyptosis/wool_colored_white.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.open-sq-2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 24px;
+    height: 24px;
+    background-image: url('space_tiles_hyptosis/wool_colored_white.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.fire-sprite-0 {
     position: absolute;
     width: 24px;
     height: 24px;
@@ -30,7 +63,33 @@
     background-repeat: no-repeat;
     background-position: 0 0;
     
-    animation: fire-animate 0.6s steps(6) infinite, fade-in .07s ease-in;
+    animation: fire-animate-0 0.6s steps(6) infinite, fade-in .07s ease-in;
+}
+
+.fire-sprite-1 {
+    position: absolute;
+    width: 21px;
+    height: 21px;
+    margin: 3.5px;
+    background-image: url('/fire_sheet.png');
+    background-size: 126px 21px;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    
+    animation: fire-animate-1 0.6s steps(6) infinite, fade-in .07s ease-in;
+}
+
+.fire-sprite-2 {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    margin: 3px;
+    background-image: url('/fire_sheet.png');
+    background-size: 108px 18px;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    
+    animation: fire-animate-2 0.6s steps(6) infinite, fade-in .07s ease-in;
 }
 
 .firegame-div{

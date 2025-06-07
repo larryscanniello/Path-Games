@@ -2,6 +2,7 @@ import { USERNAME } from "../../constants"
 import '../../Styles/mouse.css'
 import {motion, AnimatePresence} from 'framer-motion'
 import React from "react"
+import { useWindowSize } from "../useWindowSize"
 
 
 export default function RenderGridSeeBots(props){
@@ -10,6 +11,9 @@ export default function RenderGridSeeBots(props){
     const turn = props.turn    
     const showProbabilities = props.showProbabilities
     const username = localStorage.getItem(USERNAME)
+    const [width,height] = useWindowSize()
+    
+
 
     function roundTo4DecimalPlaces(number) {
         const factor = Math.pow(10, 4);

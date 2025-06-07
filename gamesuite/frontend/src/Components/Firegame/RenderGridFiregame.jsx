@@ -12,20 +12,20 @@ export default function RenderGridFiregame(props){
                 let bgColor = '';
                 const mod = cell % 10;
                 if(mod===0){
-                  bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]"
+                  bgColor = "bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]"
                 }
                 if(mod===1){
-                  bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/glass.png')]"
+                  bgColor = "bg-[url('/space_tiles_hyptosis/glass.png')]"
                 }
                 if(mod===5){
-                  bgColor = "w-8 h-8 border-green-300 bg-[url('/suppresor2.png')]"
+                  bgColor = "border-green-300 bg-[url('/suppresor2.png')]"
                 }
                 
                 return (<div key={`${i},${j}`}>
                   {mod!==2 ? <div
                     key={i*25+j}
                     className={`w-8 h-8 relative flex items-center justify-center ${bgColor}`}
-                    style={{backgroundSize: '32px 32px'}}
+                    style={{backgroundSize: `32px 32px`}}
                   >
                     <BotSlot
                       data={props.data}

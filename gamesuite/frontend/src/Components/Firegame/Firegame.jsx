@@ -219,6 +219,8 @@ export default function Firegame(){
     const levels = ['easy','medium','hard']
 
     return <div className=''>
+        <div className="">
+        <div className="">
         {(showInstructionsatStart&&levelsLeft) && <div className= "fixed z-20 firegame-div">
                 <FiregameInstructionsatStart difficulty={difficulty}
                 showInstructionsatStart = {showInstructionsatStart} 
@@ -237,7 +239,7 @@ export default function Firegame(){
                     />
         </div>}
         <div>{showInstructions && 
-                <div className= "fixed z-20">
+                <div className= "fixed z-2">
                 <FiregameInstructions difficulty={difficulty} 
                 setDifficulty={setDifficulty} 
                 setShowInstructions={setShowInstructions}/></div>}
@@ -257,7 +259,8 @@ export default function Firegame(){
         
         {showAbout && <div className='fixed z-20'><FiregameAbout setShowAbout={setShowAbout}/></div>}
 
-        {gameData && <RenderGridFiregame 
+        {gameData && 
+        <RenderGridFiregame 
                         fireGrid = {gameData.fireGrids[gameState.turn]} 
                         turn={gameState.turn} 
                         playerIndex={gameState.playerIndex ? gameState.playerIndex : gameData.playerIndex}/>}
@@ -268,7 +271,7 @@ export default function Firegame(){
     </div>}
     
         </div>
-    {!showInstructionsatStart && <div>
+    {!showInstructionsatStart && <div className=''>
     <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
                 <div>Firegame, Map: {gameID.current}</div>
                 <div>Difficulty: {difficulty}</div>    
@@ -292,6 +295,6 @@ export default function Firegame(){
     
     
     </div>}
-    </div>
+    </div></div></div>
    
 }

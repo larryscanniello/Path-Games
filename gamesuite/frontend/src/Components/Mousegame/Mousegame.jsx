@@ -89,6 +89,9 @@ export default function Mousegame(){
                         path: bot4path,
                     }
                 }
+                if(!responsedata.game.stochastic){
+                    setSeePath(true);
+                }
                 setGameData(parseddata);
                 const playerIndex = parseddata.game.botStartingIndex;
                 const mouseIndex = parseddata.game.mouseStartingIndex;
