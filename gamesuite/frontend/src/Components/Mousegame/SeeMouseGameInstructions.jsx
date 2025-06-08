@@ -1,7 +1,7 @@
 
 export default function SeeMousegameInstructions(props) {
     return (
-        <div className="fixed z-20 border border-gray-300 bg-gray-800/90 mt-18 ml-29 mr-24 rounded-md">
+        <div className="fixed z-20 bg-gray-800/90 ml-29 mr-24 rounded-md">
             <div className="pt-12 pr-8 pl-8 pb-12">
                 <p className="text-red-200">This is a replay of a game you played, where you can
                     </p>

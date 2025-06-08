@@ -2,7 +2,7 @@
 
 export default function SeeMousegameAbout(props) {
     return (
-        <div className="fixed z-20 border border-gray-300 bg-gray-800/90 mt-24 ml-24 mr-24 text-sm rounded-md">
+        <div className="fixed z-20 bg-gray-800/90 max-h-[100vh] overflow-y-auto ml-24 mr-24 text-sm rounded-md">
             <div className="pt-12 pr-8 pl-8 pb-12 text-indigo-100">
                 <p className="pb-4">The key feature of the bots is that they each maintain their own belief array.
                     For a given bot, each number in its array at a point in time represents the probability of the mouse
@@ -17,7 +17,7 @@ export default function SeeMousegameAbout(props) {
                     Bot 2 alternates sensing and moving, and at each step replans its path to the new highest probability space.
                     </p> 
                 <p className="pb-4">
-                    My task when given this project was to make a better bot than bot 1 and bot 2. 
+                    My goal was to make a better bot than bot 1 and bot 2. 
                     My first attempt was bot 3.
                     Bot 3 alternates sensing and moving, and plans 5 steps at a time and sticks with the plan.
                     Where the other bots use a simpler breadth-first-search to find their paths,
@@ -41,7 +41,7 @@ export default function SeeMousegameAbout(props) {
                     Bots 3 and 4 perform about the same on average, and they perform significantly better on average
                     than bots 1 and 2.
                 </p>
-                <div className="flex flex-col items-center"><button onClick={()=>props.setShowAbout(false)} className="text-white hover:underline content-center">Close</button></div>
+                <div className="flex flex-col items-center"><button onClick={()=>props.setShowAbout(false)} className="text-white hover:underline content-center pb-8">Close</button></div>
 
             </div>
         </div>

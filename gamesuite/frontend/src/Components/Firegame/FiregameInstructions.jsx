@@ -7,7 +7,7 @@ export default function FiregameInstructions(props){
     const username = localStorage.getItem(USERNAME);
 
     return(
-        <div className="relative border border-gray-300 bg-gray-800/90 mt-24 ml-24 mr-24 z-10 rounded-md text-sm">
+        <div className="relative bg-gray-800/90 max-h-[100vh] border-gray-300 z-10 rounded-md overflow-y-auto">
             <div className="pr-8 pl-8 pb-12">
                 <p className="text-cyan-200 pt-12 pb-12">
                     You are in deep hibernation on an intergalactic voyage on the space ship Archaeopteryx
@@ -63,7 +63,7 @@ export function FiregameInstructionsatStart(props){
     const levels = ['easy','medium','hard']
 
     return(
-        <div className=" border-gray-300 bg-black mt-12 ml-24 mr-24 z-10 rounded-md">
+        <div className="max-h-[90vh] border-gray-300 bg-black mt-6 z-10 rounded-md overflow-y-auto">
             <div className="pr-8 pl-8 pb-12">
             <p className="text-cyan-200 pt-12 pb-12">
                     You are in deep hibernation on an intergalactic voyage on the space ship Archaeopteryx
@@ -76,7 +76,7 @@ export function FiregameInstructionsatStart(props){
                 <div className="flex flex-col items-center">
                 <div>
                 <div className="flex items-center gap-2 mb-2">
-                    <div className=" w-3 h-3 rounded-full bg-purple-600 border border-black"></div>
+                    <div className="relative w-8 h-8"><div className="absolute w-3 h-3 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-600 border border-black"></div></div>
                     <div className="text-white">{username}</div>
                 </div>
                 <div className="flex items-center gap-2 mb-2">

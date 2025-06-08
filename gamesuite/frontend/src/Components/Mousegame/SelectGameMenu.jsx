@@ -1,6 +1,6 @@
 
 export default function SelectGameMenu(props){
-    return(<div className="fixed border border-gray-300 bg-gray-800/90 mt-30 ml-17 mr-24 mb-12 z-10 rounded-md">
+    return(<div className="fixed bg-gray-800/90 ml-17 mr-24 mb-12 z-10 rounded-md">
         <div className="m-6">Select game to watch:</div>
         <div ref={props.showGameRef} className="flex flex-col items-center overflow-y-auto h-96 pr-8 pl-8 pb-6 text-white">
           <ul>

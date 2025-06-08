@@ -342,7 +342,7 @@ export default function Mousegame(){
       }
     return <div>
     {(showInstructions && levelsLeft) &&
-        <div className="fixed scale-85 transform flex justify-center items-center z-90">
+        <div className="fixed transform flex justify-center items-center z-90">
             <MousegameInstructions  stoch={stoch} 
                                     setStoch={setStoch} 
                                     setShowInstructions={setShowInstructions}
@@ -361,7 +361,7 @@ export default function Mousegame(){
     <div className=''></div>
     {(gameData && stoch) && <div className='relative z-50'>
         {showNewGameMenu && <div className="fixed ml-52 mt-70 z-90">
-            <div className="relative border border-gray-300 bg-gray-800/90 z-10 rounded-md flex flex-col items-center p-7">
+            <div className="relative bg-gray-800/90 z-10 rounded-md flex flex-col items-center p-7">
             {stochoptions.map((stochvar,i)=>
                     {return levelsLeft[i]>0 ? <button className='hover:underline pb-4 text-white' 
                                             onClick={()=>{setStoch(stochvar);
@@ -416,7 +416,7 @@ export default function Mousegame(){
                 <div>Turn: {gameState.turn}</div>
             </div>
 
-            <div className="flex flex-col items-center p-4">
+            <div className="flex flex-col items-center p-2">
                 <div className=" border-white rounded-md w-full">
                 <SensorInfoBox 
                     sensorLog={gameState.sensorLog} 

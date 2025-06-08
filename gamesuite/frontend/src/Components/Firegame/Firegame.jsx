@@ -233,14 +233,16 @@ export default function Firegame(){
     return <div className=''>
         <div className="">
         <div className="">
-        {(showInstructionsatStart&&levelsLeft) && <div className= "fixed z-20 firegame-div">
+        {(showInstructionsatStart&&levelsLeft) && <div className= "z-20 firegame-div">
                 <FiregameInstructionsatStart difficulty={difficulty}
                 showInstructionsatStart = {showInstructionsatStart} 
                 setDifficulty={setDifficulty} 
                 setShowInstructionsatStart={setShowInstructionsatStart}
                 levelsLeft={levelsLeft}/>                
-                </div>}  
+                </div>}
+        <div className='flex flex-col items-center'>{showAbout && <div className='fixed z-20'><FiregameAbout setShowAbout={setShowAbout}/></div>}</div>
         {difficulty&&gameData.grid && <div className='firegame-div grid grid-cols-[1fr_auto_1fr]'> 
+        <div className='w-4'>
         {gameState.gameStatus!=='in_progress'&& <div className='fixed z-20 m-8'><GameOverMenu
                     gameState={gameState}
                     setGameState={setGameState}
@@ -251,16 +253,17 @@ export default function Firegame(){
                     />
         </div>}
         <div>{showInstructions && 
-                <div className= "fixed z-2">
+                <div className= "fixed z-20">
                 <FiregameInstructions difficulty={difficulty} 
                 setDifficulty={setDifficulty} 
                 setShowInstructions={setShowInstructions}/></div>}
               
-                </div>       
+                </div>   
+        </div>    
         <div>
         {gameData.firelist && <div>
         {(showDifficultyMenu&&levelsLeft) && <div className='fixed z-20'>
-            <div className='flex p-6 ml-61 mt-68 flex-col border border-gray-300 bg-gray-800/90 text-white rounded-md'>
+            <div className='flex p-6 ml-61 mt-68 flex-col bg-gray-800/90 text-white rounded-md'>
             {levels.map((dif,i)=>{
             return levelsLeft[i]>0 ? <button className='p-3 hover:underline' onClick={()=>{setDifficulty(dif);
                                     setDifficultyCount(prev=> prev+1);
@@ -269,7 +272,7 @@ export default function Firegame(){
                                     : <button className='opacity-70 p-3'>No more {dif} levels</button>                   
             })}<button onClick={()=>setShowDifficultyMenu(false)} className='pt-3 text-white hover:underline'>Close</button></div></div>}
         
-        {showAbout && <div className='fixed z-20'><FiregameAbout setShowAbout={setShowAbout}/></div>}
+        
 
         {gameData && 
         <RenderGridFiregame 

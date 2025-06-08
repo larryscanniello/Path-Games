@@ -5,7 +5,7 @@ import FiregameDifficultyMenu from "./FiregameDifficultyMenu"
 export default function FiregameAbout(props){
 
     return(
-        <div className=" border border-gray-300 bg-gray-800/90 mt-30 ml-4 mr-24 z-10 text-sm rounded-md">
+        <div className="relative inset-0 bg-gray-800/90 max-h-[100vh] border-gray-300 z-10 rounded-md overflow-y-auto">
             <div className="pr-8 pl-8 pb-12 text-purple-300 ">
             <p className="pt-12 ">
                     Each map has a fixed fire progression that was traversed by four bots.

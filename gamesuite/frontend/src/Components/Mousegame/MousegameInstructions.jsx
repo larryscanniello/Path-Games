@@ -6,7 +6,7 @@ export default function MousegameInstructions(props){
     const username = localStorage.getItem(USERNAME);
 
     return(
-        <div className={props.stoch ? "border border-white rounded-md bg-gray-800/90" : "mousegame-div bg-black"}>
+        <div className={props.stoch ? "max-h-[100vh] overflow-y-auto rounded-md bg-gray-800/90" : "mousegame-div bg-black max-h-[100vh] z-10 rounded-md overflow-y-auto"}>
             <div className="pr-8 pl-8 pb-12">
                 <p className="text-cyan-200 pt-12 pb-6">
                     You are in deep space aboard the ship Archaeopteryx,
@@ -91,7 +91,7 @@ export default function MousegameInstructions(props){
                                         >New {stochvar} mouse game ({props.levelsLeft[i]} left)</button></li> 
                                 : <li key={i} className="opacity-60">No {stochvar} levels left</li>})}</ul></div>}
                 {props.stoch && <div className="flex flex-col items-center">
-                                    <button onClick={() => props.setShowInstructions(false)} className="text-white hover:underline">
+                                    <button onClick={() => props.setShowInstructions(false)} className="pb-4 text-white hover:underline">
                                         Close
                                     </button>
                                 </div> } 

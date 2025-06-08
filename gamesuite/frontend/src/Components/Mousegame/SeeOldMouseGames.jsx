@@ -480,7 +480,7 @@ export default function SeeMiceBots(){
             </div>
             </div>
             <div className="text-cyan-100 flex flex-col p-4 rounded-md">
-            <div>Map {gameID.current} Leaderboard</div>
+            <div>Map {currentGame} Leaderboard</div>
             <div className='border border-gray-500 p-4 rounded-2xl text-[14px]'>{leaderboard && leaderboard.length>0 ? leaderboard.map(([leader,turns],i)=>{
             return <div className='flex flex-row justify-between'><div>{leader}</div>{<div className='ml-3'></div>}{<div>{`${turns-1}`}</div>}</div>}) : <div>No winners yet</div>}</div>
         </div>
@@ -495,7 +495,7 @@ export default function SeeMiceBots(){
 
 function ToMousegame(props){
     return(
-      <div className="border border-gray-300 bg-gray-800/90 mt-80 ml-68 mr-24 mb-12 rounded-md">
+      <div className="bg-gray-800/90 mt-80 ml-68 mr-24 mb-12 rounded-md">
         <div className="flex flex-col items-center pr-8 pl-8 pb-6">
           <Link className="hover:underline pt-6 text-white" to="/mousegame">Proceed To Mousegame</Link>
           <div className="pt-3"><button onClick={()=>props.setShowToMousegame(false)} className="text-white hover:underline content-center">Close</button></div>

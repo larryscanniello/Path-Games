@@ -6,7 +6,7 @@ import { USERNAME } from "../../constants";
 export default function SeeFiregameInstructions(props) {
     const username = localStorage.getItem(USERNAME);
     return (
-        <div className="border border-gray-300 bg-gray-800/90 mt-12 ml-29 mr-24 rounded-md">
+        <div className="bg-gray-800/90 ml-29 mr-24 rounded-md">
             <div className="pt-12 pr-8 pl-8 pb-12">
                 <p className="text-red-200">This is a replay of a game you played, where you can
                     </p>

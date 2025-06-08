@@ -202,9 +202,9 @@ function SeeFireBots() {
   }
   return (
     <div>
+    {showAbout && <div className='fixed z-30 text-sm'><SeeFiregameAbout setShowAbout={setShowAbout}/></div>}
     {data && <div className='firegame-div grid grid-cols-[1fr_auto_1fr]'>
-    <div>
-    {showAbout && <div className='fixed z-20 mt-40 text-sm'><SeeFiregameAbout setShowAbout={setShowAbout}/></div>}
+    <div className='ml-4'>
     </div>
     
     <div>
@@ -213,7 +213,7 @@ function SeeFireBots() {
             <SeeFiregameInstructions setShowInstructions={setShowInstructions}/></div>}
         
         {showToFiregame && <div className='fixed z-20 ml-45 mt-80'><ToFiregame setShowToFiregame={setShowToFiregame}/></div>}
-        {showGameSelection && <div className='fixed border border-gray-300 bg-gray-800/90 mt-30 ml-44 mr-24 mb-12 z-20 rounded-md'>
+        {showGameSelection && <div className='fixed bg-gray-800/90 ml-44 mr-24 mb-12 z-30 rounded-md'>
         <GameSelection setCurrentGame={setCurrentGame} 
                       gameList={gameList} 
                       setShowGameSelection={setShowGameSelection}
@@ -290,7 +290,7 @@ function GameSelection(props){
 
 function ToFiregame(props){
   return(
-    <div className="border border-gray-300 bg-gray-800/90 mt-12 ml-24 mr-24 mb-12 z-10 rounded-md">
+    <div className="bg-gray-800/90 mt-12 ml-24 mr-24 mb-12 z-10 rounded-md">
       <div className="flex flex-col items-center pr-8 pl-8 pb-6">
         <Link className="hover:underline pt-6 text-white" to="/firegame">Proceed To Firegame</Link>
         <div className="pt-3"><button onClick={()=>props.setShowToFiregame(false)} className="text-white hover:underline content-center">Close</button></div>
