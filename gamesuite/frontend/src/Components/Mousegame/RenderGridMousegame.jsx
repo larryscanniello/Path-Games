@@ -1,5 +1,7 @@
 import '../../Styles/mouse.css'
 import {motion,AnimatePresence} from 'framer-motion'
+import { useWindowSize } from '../useWindowSize'
+import '../../Styles/mouse.css'
 
 export default function RenderGridMousegame(props){
     if(!props.grid) return <p>Loading...</p>
@@ -12,6 +14,33 @@ export default function RenderGridMousegame(props){
     const playerPath = props.playerPath;
     const sensorLog = props.sensorLog;
     const colors = props.colors;
+    const [width,height] = useWindowSize();
+
+    const getTileSize = () => {
+        if(width<1000||height<785) return "w-6 h-6"
+        if(width<1100||height<900) return "w-7 h-7";
+        return "w-8 h-8"
+      }
+  
+      const getBackgroundSize = () => {
+        if(width<1000||height<785) return "24px 24px";
+        if(width<1100||height<900) return "28px 28px";
+        return "32px 32px"
+      }
+
+      const getMouseSprites = () => {
+        if(width<1000||height<785) return "mouse-sprite-2";
+        if(width<1100||height<900) return "mouse-sprite-1";
+        return "mouse-sprite-0"
+      }
+
+    const getMouseWindowNumber = () => {
+        if(width<1000||height<785) return "2";
+        if(width<1100||height<900) return "1";
+        return "0"
+        }
+    
+
     if(props.seePath){
         for(let i=0;i<playerPath.length;i++){
             grid[playerPath[i][0]][playerPath[i][1]]= 2
@@ -49,14 +78,14 @@ export default function RenderGridMousegame(props){
                     }
                     if(props.hoverIndex){
                         if(g&32){
-                            bgColor = props.hoverIndex[1] ? 'bg-green-500' : 'bg-red-500';
+                            bgColor = props.hoverIndex[1] ? 'border border-gray bg-green-500' : 'border border-gray bg-red-500';
                     }}
                     
                 return (<div key={i*25 +j} 
-                    className= {`w-8 h-8 ${bgColor}`}
-                    style={{ backgroundSize: "32px 32px" }}
+                    className= {`${getTileSize()} ${bgColor}`}
+                    style={{ backgroundSize: `${getBackgroundSize()}` }}
                     >
-                    <div className=" w-8 h-8 top-0 left-0">
+                    <div className={`${getTileSize()} top-0 left-0`}>
                         <div className="text-black text-[9px] fixed">{(sensorcounts[i][j][1]!==0&&props.showSenses)&&`${sensorcounts[i][j][0]}/${sensorcounts[i][j][1]}`}</div>
                         {!!(g&4||g&8||g&64) && <BotSlot
                                 data={props.data} 
@@ -69,7 +98,9 @@ export default function RenderGridMousegame(props){
                                 bot4index = {props.bot4index}
                                 mouseIndex = {props.mouseIndex}
                                 flashState = {props.flashState}
-                                flashList = {props.flashList}/>}
+                                flashList = {props.flashList}
+                                width={width}
+                                height={height}/>}
                     </div>
                 </div>
                 )})
@@ -80,7 +111,22 @@ export default function RenderGridMousegame(props){
 function BotSlot(props){
     const playerIndex = props.playerIndex
     const bot4index = props.bot4index
+    const width = props.width
+    const height = props.height
+    const mouseIndex = props.mouseIndex
     let botsInSpace = [] 
+
+    const getMouseSprites = () => {
+        if(width<1000||height<785) return "mouse-sprite-2";
+        if(width<1100||height<900) return "mouse-sprite-1";
+        return "mouse-sprite-0"
+      }
+
+    const getMouseWindowNumber = () => {
+        if(width<1000||height<785) return "2";
+        if(width<1100||height<900) return "1";
+        return "0"
+    }
 
     if(bot4index[0]===props.i && bot4index[1]===props.j){
         if(playerIndex[0]===props.i && playerIndex[1]===props.j){
@@ -94,7 +140,7 @@ function BotSlot(props){
         }
     }
     if(playerIndex[0]===props.i && playerIndex[1]===props.j&&!(bot4index[0]===props.i && bot4index[1]===props.j)){
-        const playerobj = {id: 0, className:"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black z-30"}
+        const playerobj = {id: 0, className:"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black"}
         botsInSpace.push(playerobj)
     }
 
@@ -116,8 +162,9 @@ function BotSlot(props){
                 )}{/**/}
         {botsInSpace.map((bot,i)=>(
             <motion.div
+            layout
             layoutId={'bot ' + bot.id.toString()}
-            key = {bot.id}
+            key = {'bot ' + bot.id.toString()}
             className={bot.className}
             initial={{ opacity: .7 }}
             animate={{ opacity: 1 }}
@@ -128,5 +175,6 @@ function BotSlot(props){
                 }}
                 >
             {(bot.id!==0&&bot.id!==6) && bot.id}</motion.div>))}
+            {(props.gameStatus!=='in_progress' && props.i==mouseIndex[0] && props.j==mouseIndex[1]) && <div className={`open-sq ${getMouseSprites()} anim-r-${getMouseWindowNumber()}`}></div>}
     </div></AnimatePresence>)
 }

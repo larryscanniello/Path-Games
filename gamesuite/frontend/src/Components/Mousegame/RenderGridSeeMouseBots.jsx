@@ -13,7 +13,17 @@ export default function RenderGridSeeBots(props){
     const username = localStorage.getItem(USERNAME)
     const [width,height] = useWindowSize()
     
-
+    const getTileSize = () => {
+        if(width<1000||height<785) return "w-6 h-6"
+        if(width<1100||height<900) return "w-7 h-7";
+        return "w-8 h-8"
+      }
+  
+      const getBackgroundSize = () => {
+        if(width<1000||height<785) return "24px 24px";
+        if(width<1100||height<900) return "28px 28px";
+        return "32px 32px"
+      }
 
     function roundTo4DecimalPlaces(number) {
         const factor = Math.pow(10, 4);
@@ -48,10 +58,10 @@ export default function RenderGridSeeBots(props){
                 {row.map((g,j) => {
                     let bgColor = '';
                     if(g==0||g>1){
-                        bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]"
+                        bgColor = "bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]"
                     }
                     if(g==1){
-                        bgColor = "w-8 h-8 bg-[url('/space_tiles_hyptosis/glass.png')]"
+                        bgColor = "bg-[url('/space_tiles_hyptosis/glass.png')]"
                     }
 
                     if(g&2**1 && showAgent[0]&&turn<=props.simlengths[0]-1){
@@ -76,10 +86,10 @@ export default function RenderGridSeeBots(props){
 
                     return (<><div 
                     key={j} 
-                    className={`w-8 h-8 relative ${bgColor}`}
+                    className={`${getTileSize()} relative ${bgColor}`}
                     style={{
                         fontSize: "8px",
-                        backgroundSize: '32px 32px'
+                        backgroundSize: getBackgroundSize()
                     }}
                     >
                     {!!showProbabilities&& <div className="text-black fixed"> {roundTo4DecimalPlaces(states[showProbabilities][i][j])}</div>}
@@ -102,6 +112,8 @@ export default function RenderGridSeeBots(props){
                             result = {props.result}
                             simlengths = {props.simlengths}
                             flashList = {props.flashList}
+                            width = {width}
+                            height = {height}
                             />}
                     </div>
                     </>
@@ -116,6 +128,20 @@ function BotSlot(props){
     const g = props.g;
     const flashList = props.flashList;
     const simlengths = props.simlengths
+    const width = props.width;
+    const height = props.height;
+
+    const getMouseSprites = () => {
+        if(width<1000||height<785) return "mouse-sprite-2";
+        if(width<1100||height<900) return "mouse-sprite-1";
+        return "mouse-sprite-0"
+      }
+
+    const getMouseWindowNumber = () => {
+        if(width<1000||height<785) return "2";
+        if(width<1100||height<900) return "1";
+        return "0"
+    }
     
     const botsInSpace = []
     if(g&2**5 &&showAgent[0]){
@@ -201,6 +227,6 @@ function BotSlot(props){
                 key={bot.id}
                 >
                 </div>})}
-            {!!(g&2**10) && <div className={"open-sq mouse-sprite "+ props.directionFrames}></div>}
+                {!!(g & 2**10) && <div className={`open-sq ${getMouseSprites()} ${props.directionFrames}-${getMouseWindowNumber()}`}></div>}
     </AnimatePresence>
 }

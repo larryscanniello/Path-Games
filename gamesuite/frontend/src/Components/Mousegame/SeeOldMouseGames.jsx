@@ -60,6 +60,11 @@ export default function SeeMiceBots(){
             .catch((e)=>{throw new Error("Error fetching game.")});
             const responsedata = res.data;
             setLeaderboard(responsedata.leaderboard)
+            console.log('gl',gameList)
+            console.log('cg',currentGame)
+            console.log('glf',gameList.find(([id,result,stoch,date,rate])=>id==currentGame))
+            
+            winRateRef.current = gameList.find(([id,result,stoch,date,rate])=>id==currentGame)[4]
             const bot3evidence = JSON.parse(responsedata.bots[2].evidence);
             bot3evidence[0] = bot3evidence[1];
             const bot1path = JSON.parse(responsedata.bots[0].evidence).slice(1).map(([t,type,[i,j]])=> [i,j]);
@@ -132,8 +137,7 @@ export default function SeeMiceBots(){
             setSimData(parseddata);
             setTurn(0);
 
-
-            function processFromFlatIndexBot4(botplans, t) {
+        function processFromFlatIndexBot4(botplans, t) {
         let count = 0;
         for (let i = 0; i < botplans.length; i++) {
             const row = botplans[i];
@@ -179,10 +183,10 @@ export default function SeeMiceBots(){
           setError(err.message)
           }
         }
-        if(currentGame){
+        if(currentGame&&gameList){
             fetchGame();
         }
-      }, [currentGame])
+      }, [currentGame,gameList])
 
       function handleFlashes(newTurn,simData){
         const evidence = []
@@ -202,11 +206,22 @@ export default function SeeMiceBots(){
           evidence.push([3,simData.bot4.evidence[newTurn-1][1]])
         }
         const botobjs = []
-        const flashpositions = [{top:"-6px",left:"-6px"},
-                              {top:"-6px",left:"14px"},
-                              {top:"14px",left:"-6px"},
-                              {top:"14px",left:"14px"}
-                              ,{top:"4px",left:"4px"}]
+        const flashpositions = (width<1000||height<785) ? [{top:"-6px",left:"-6px"},
+                                                          {top:"-7px",left:"6px"},
+                                                          {top:"6px",left:"-6px"},
+                                                          {top:"7px",left:"7px"},
+                                                          {top:"0px",left:"0px"}]
+                                                        : (width<1100||height<900) ?
+                                                        [{top:"-7px",left:"-7px"},
+                                                          {top:"-7px",left:"9px"},
+                                                          {top:"9px",left:"-7px"},
+                                                          {top:"9.5px",left:"9.5px"},
+                                                          {top:"1.25px",left:"1.25px"}]
+                                                        : [{top:"-6px",left:"-6px"},
+                                                          {top:"-6px",left:"14px"},
+                                                          {top:"14px",left:"-6px"},
+                                                          {top:"14px",left:"14px"},
+                                                          {top:"4px",left:"4.5px"}]
         for(let i=0;i<evidence.length; i++){
           if(evidence[i][1]!==2){
             const botobj = { id: `flash-${newTurn}-${evidence[i][0]}`, 
@@ -288,13 +303,14 @@ export default function SeeMiceBots(){
         intervalRef.current = setInterval(()=>{
           setTurn(prev => {
               const simlength = simData.game.simlength;
+              
               const newTurn = Math.min(simlength+1, prev + 1);
               handleFlashes(newTurn,simData);
               return newTurn
           })},250)
         return () => clearInterval(intervalRef.current)
         }
-    },[play])
+    },[play,showAgent])
 
     useEffect(()=>{
       if(play){
@@ -371,7 +387,15 @@ export default function SeeMiceBots(){
 
     const optionarray = ["1", "2", "3", "4",username]
     const optionarray2 = ["1", "2", "3", "4"]
-
+    if (width < 900 || height < 695) {
+      return (
+        <div className="flex flex-col justify-center items-center h-screen px-4 text-center text-cyan-100">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4">Window Too Small</h2>
+          <p className="mb-2">The content can’t fit in a window this small.</p>
+          <p>If you had something in progress, increase screen height or width to resume.</p>
+        </div>
+      );
+    }
   return (
     <div>
         <div>
@@ -426,25 +450,27 @@ export default function SeeMiceBots(){
             <button className='hover:underline' onClick={()=>setShowInstructions(prev=>!prev)}>Instructions</button>
             <button className='hover:underline' onClick={()=>setShowAbout(prev=>!prev)}>About</button>
         </div></div>
-        <div>
-        <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
-                <div>Mousegame Visualizer, Map {currentGame}</div>
-                {simData && <div>Mode: {simData.game.stoch ? 'Stochastic' : 'Stationary'} mouse</div>}
-                {simData && <div>Result: {simData.game.result}</div>}                                    
-                <div className="">Map win rate: {Math.round(winRateRef.current*100)}%</div>
+        {<div className="pt-8 pl-10 pr-10 backdrop-blur-md">
+          <div className='border-2 border-cyan-400/30 rounded-md shadow-[0_0_6px_rgba(0,255,255,0.15)] backdrop-blur-xl bg-black/60 text-cyan-100'>
+        <div className="flex flex-col text-cyan-100 p-4">
+                <div className="text-[18px] font-bold">Mousegame Visualizer, Map {currentGame}</div>
+                {simData && <div className="text-[13px]">Mode: {simData.game.stoch ? 'Stochastic' : 'Stationary'} mouse</div>}
+                {simData && <div className="text-[13px]">Result: {simData.game.result}</div>}                                    
+                <div className="text-[13px]">Map win rate: {Math.round(winRateRef.current*100)}%</div>
             </div> 
-            <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
+            <div className="flex flex-col p-4 rounded-md text-cyan-100">
                 <div>Turn: {turn}</div>
             </div>    
-            <div className='bg-gray-800 border border-white m-8 p-2 rounded-md'><div>Show bot:</div><div className="ml-6 mr-6">
-            {optionarray.map((option,i)=><label key={i} className={i===4?'text-xs':''}><input type="checkbox" checked={showAgent[i]}
+            <div className='p-4'><div>Show bot:</div><div className="">
+            {optionarray.map((option,i)=><label key={i} className={i===4?'text-xs':''}><div className="inline-flex items-center">
+            <input type="checkbox" checked={showAgent[i]}
                                                 onChange={(e)=>setShowAgent(prev=>{
                                                     e.target.blur()
                                                     const updated = [...prev]
                                                     updated[i]=!prev[i];
                                                     return updated
-                                                })}/>{option}&nbsp;&nbsp;</label>)}</div>
-            <div>Show probabilities:<div className="flex ml-6 mr-6">                                    
+                                                })}/>{option}&nbsp;&nbsp;</div></label>)}</div>
+            <div>Show probabilities:<div className="">                                    
             {optionarray2.map((option,i)=><label key={i}><input type="checkbox" checked={showProbabilities===i+1}
                                                 onChange={(e)=>{
                                                     if(showProbabilities===i+1){
@@ -453,13 +479,13 @@ export default function SeeMiceBots(){
                                                     e.target.blur()}}/>{option}&nbsp;&nbsp;</label>)}</div>      
             </div>
             </div>
-            <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
+            <div className="text-cyan-100 flex flex-col p-4 rounded-md">
             <div>Map {gameID.current} Leaderboard</div>
             <div className='border border-gray-500 p-4 rounded-2xl text-[14px]'>{leaderboard && leaderboard.length>0 ? leaderboard.map(([leader,turns],i)=>{
-            return <div className='flex flex-row justify-between'><div>{leader}</div>{<div className='ml-40'></div>}{<div>{`${turns}`}</div>}</div>}) : <div>No winners yet</div>}</div>
+            return <div className='flex flex-row justify-between'><div>{leader}</div>{<div className='ml-3'></div>}{<div>{`${turns-1}`}</div>}</div>}) : <div>No winners yet</div>}</div>
         </div>
-            
             </div>
+            </div>}
         </div>}
         </div>
     </div>

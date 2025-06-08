@@ -1,74 +1,121 @@
-@keyframes mouse-animate-t {
+@keyframes mouse-animate-t-0 {
     from { background-position: 0 0; }
     to   { background-position: -96px 0; }
-  }
-
-@keyframes mouse-animate-r {
-from { background-position: 0 -32px; }
-to   { background-position: -96px -32px; }
 }
-
-@keyframes mouse-animate-b{
+@keyframes mouse-animate-r-0 {
+    from { background-position: 0 -32px; }
+    to   { background-position: -96px -32px; }
+}
+@keyframes mouse-animate-b-0 {
     from { background-position: 0 -64px; }
     to   { background-position: -96px -64px; }
 }
-
-@keyframes mouse-animate-l{
+@keyframes mouse-animate-l-0 {
     from { background-position: 0 -96px; }
     to   { background-position: -96px -96px; }
 }
 
-  .container {
-    position: relative;
-    width: 8px;
-    height: 8px;
+@keyframes mouse-animate-t-1{
+    from { background-position: 0 0; }
+    to   { background-position: -84px 0; }
+}
+@keyframes mouse-animate-r-1 {
+    from { background-position: 0 -28px; }
+    to   { background-position: -84px -28px; }
+}
+@keyframes mouse-animate-b-1 {
+    from { background-position: 0 -56px; }
+    to   { background-position: -84px -56px; }
+}
+@keyframes mouse-animate-l-1 {
+    from { background-position: 0 -84px; }
+    to   { background-position: -84px -84px; }
 }
 
-.open-sq {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 32px;
-    height: 32px;
-    background-image: url('space_tiles_hyptosis/wool_colored_white.png');
-    background-size: cover;
-    background-position: center;
+@keyframes mouse-animate-t-2 {
+    from { background-position: 0 0; }
+    to   { background-position: -72px 0; }
+}
+@keyframes mouse-animate-r-2 {
+    from { background-position: 0 -24px; }
+    to   { background-position: -72px -24px; }
+}
+@keyframes mouse-animate-b-2 {
+    from { background-position: 0 -48px; }
+    to   { background-position: -72px -48px; }
+}
+@keyframes mouse-animate-l-2 {
+    from { background-position: 0 -72px; }
+    to   { background-position: -72px -72px; }
 }
 
-.mouse-sprite{
+.mouse-sprite-0{
     position: absolute;
     width: 32px;
     height: 32px;
-    margin: 0px;
     background-image: url('/mouse.png');
     background-size: 96px 128px;
     background-repeat: no-repeat;
-    background-position: 0 0;
-    
-    
 }
 
-.anim-l{
-    animation: mouse-animate-l 0.4s steps(3) infinite;
+.mouse-sprite-1 {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    background-image: url('/mouse.png');
+    background-size: 84px 112px;
+    background-repeat: no-repeat;
 }
 
-.anim-r{
-    animation: mouse-animate-r 0.4s steps(3) infinite;
+.mouse-sprite-2 {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background-image: url('/mouse.png');
+    background-size: 72px 96px;
+    background-repeat: no-repeat;
 }
 
-.anim-t{
-    animation: mouse-animate-t 0.4s steps(3) infinite;
+.anim-l-0 {
+    animation: mouse-animate-l-0 0.4s steps(3) infinite;
+}
+.anim-r-0 {
+    animation: mouse-animate-r-0 0.4s steps(3) infinite;
+}
+.anim-t-0 {
+    animation: mouse-animate-t-0 0.4s steps(3) infinite;
+}
+.anim-b-0 {
+    animation: mouse-animate-b-0 0.4s steps(3) infinite;
 }
 
-.anim-b{
-    animation: mouse-animate-b 0.4s steps(3) infinite;
+.anim-l-1 {
+    animation: mouse-animate-l-1 0.4s steps(3) infinite;
+}
+.anim-r-1 {
+    animation: mouse-animate-r-1 0.4s steps(3) infinite;
+}
+.anim-t-1 {
+    animation: mouse-animate-t-1 0.4s steps(3) infinite;
+}
+.anim-b-1 {
+    animation: mouse-animate-b-1 0.4s steps(3) infinite;
 }
 
-@keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.anim-l-2 {
+    animation: mouse-animate-l-2 0.4s steps(3) infinite;
+}
+.anim-r-2 {
+    animation: mouse-animate-r-2 0.4s steps(3) infinite;
+}
+.anim-t-2 {
+    animation: mouse-animate-t-2 0.4s steps(3) infinite;
+}
+.anim-b-2 {
+    animation: mouse-animate-b-2 0.4s steps(3) infinite;
 }
 
-.mousegame-div{
-    animation: fade-in .05s ease-in;
+
+.mousegame-div {
+    animation: fade-in 0.05s ease-in;
 }

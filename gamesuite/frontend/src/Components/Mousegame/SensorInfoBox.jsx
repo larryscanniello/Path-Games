@@ -19,8 +19,7 @@ export default function SensorInfoBox(props){
             }}>
             </input>See Path</span>
         </div>
-        <div className="flex justify-center items-center pt-2"><span className="font-bold">Sensor Log</span></div>
-        
+        <div className="flex flex-col justify-center items-center pt-2"><span className="font-bold">Sensor Log</span>
         <div className="w-64 h-48 relative table-container">
         <table className="table-fixed text-center text-cyan-200 border-collapse transform scale-75">
             <thead>
@@ -43,6 +42,7 @@ export default function SensorInfoBox(props){
               ))}
               </tbody>
           </table>
+        </div>
         </div>
         </div>
       </div>

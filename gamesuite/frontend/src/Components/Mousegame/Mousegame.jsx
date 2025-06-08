@@ -9,7 +9,7 @@ import MousegameInstructions from './MousegameInstructions';
 import MousegameAbout from './MousegameAbout'
 import GameOverMenu from './GameOverMenu';
 import '../../Styles/mouse.css'
-
+import { useWindowSize } from '../useWindowSize';
 
 const GRID_SIZE = 25;
 
@@ -43,6 +43,7 @@ export default function Mousegame(){
     const [gridColors,setGridColors] = useState(null);
     const [flashState,setFlashState] = useState({show:false,color:''});    
     const [flashList,setFlashList] = useState([]);
+    const [width,height] = useWindowSize();
 
     useEffect(() => {
         async function fetchGame(){
@@ -330,7 +331,15 @@ export default function Mousegame(){
 
 
 
-
+    if (width < 900 || height < 695) {
+        return (
+          <div className="flex flex-col justify-center items-center h-screen px-4 text-center text-cyan-100">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4">Window Too Small</h2>
+            <p className="mb-2">The content can’t fit in a window this small.</p>
+            <p>If you had something in progress, increase screen height or width to resume.</p>
+          </div>
+        );
+      }
     return <div>
     {(showInstructions && levelsLeft) &&
         <div className="fixed scale-85 transform flex justify-center items-center z-90">
@@ -379,7 +388,9 @@ export default function Mousegame(){
             setSensorCounts={setSensorCounts}
             colors={gridColors}
             flashState={flashState}
-            flashList={flashList}/>
+            flashList={flashList}
+            width={width}
+            height={height}/>
             
         <div className='flex justify-between'>
             <button className='hover:underline' onClick={()=>setShowNewGameMenu(prev=>!prev)}>New game</button>
@@ -392,32 +403,56 @@ export default function Mousegame(){
     </div></div>}
     
     
-    <div className=''>
-        {stoch&&<div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
-            <div>Mousegame, Map: {gameID.current}</div>
-            <div>Mode: {stoch} mouse</div>    
-        </div>}
-        {stoch&& <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
-            <div>Turn: {gameState.turn}</div>   
-        </div>}
-        {stoch && <div className='bg-gray-800 border border-white m-8 rounded-md flex flex-col items-center'>
-            <SensorInfoBox 
-            sensorLog={gameState.sensorLog} 
-            boxRef={boxRef} 
-            showSenses={showSenses} 
-            setShowSenses={setShowSenses}
-            hoverIndex={hoverIndex}
-            setHoverIndex={setHoverIndex}
-            seePath = {seePath}
-            setSeePath = {setSeePath}/></div>}
+    <div className="pt-8 pl-10 pr-10 backdrop-blur-md">
+        {stoch && (
+            <div className="border-2 border-cyan-400/30 rounded-md shadow-[0_0_6px_rgba(0,255,255,0.15)] backdrop-blur-xl bg-black/60 text-cyan-100">
+            
+            <div className="flex flex-col text-cyan-100 p-4">
+                <div className="text-[18px] font-bold">Mousegame, Map {gameID.current}</div>
+                <div className="text-[13px]">Mode: {stoch} mouse</div>
+            </div>
 
-    
-        {stoch&&<div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
-            <div>Map {gameID.current} Leaderboard</div>
-            <div className='border border-gray-500 p-4 rounded-2xl text-[14px]'>{leaderboard.current && leaderboard.current.length>0 ? leaderboard.current.map(([leader,turns],i)=>{
-            const plus = turns - leaderboard.current[0][1]
-            return <div className='flex flex-row justify-between'><div>{leader}</div>{i>0 && <div className='ml-40'></div>}{i>0&&<div>{`+${plus}`}</div>}</div>}) : <div>No winners yet</div>}</div>
-        </div>}
-    </div>
+            <div className="flex flex-col p-4 text-cyan-100">
+                <div>Turn: {gameState.turn}</div>
+            </div>
+
+            <div className="flex flex-col items-center p-4">
+                <div className=" border-white rounded-md w-full">
+                <SensorInfoBox 
+                    sensorLog={gameState.sensorLog} 
+                    boxRef={boxRef} 
+                    showSenses={showSenses} 
+                    setShowSenses={setShowSenses}
+                    hoverIndex={hoverIndex}
+                    setHoverIndex={setHoverIndex}
+                    seePath={seePath}
+                    setSeePath={setSeePath}
+                />
+                </div>
+            </div>
+
+            <div className="text-cyan-100 flex flex-col p-4">
+                <div className="text-[15px] font-semibold">Map {gameID.current} Leaderboard</div>
+                <div className="border border-gray-500 p-4 rounded-2xl text-[14px]">
+                {leaderboard.current && leaderboard.current.length > 0 ? (
+                    leaderboard.current.map(([leader, turns], i) => {
+                    const plus = turns - leaderboard.current[0][1];
+                    return (
+                        <div key={i} className="flex flex-row justify-between">
+                        <div>{leader}</div>
+                        <div>{i > 0 ? `+${plus}` : null}</div>
+                        </div>
+                    );
+                    })
+                ) : (
+                    <div>No winners yet</div>
+                )}
+                </div>
+            </div>
+
+            </div>
+        )}
+</div>
+
     </div>}</div>
 }

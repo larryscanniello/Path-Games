@@ -9,6 +9,7 @@ import FiregameDifficultyMenu from './FiregameDifficultyMenu';
 import FiregameAbout from './FiregameAbout';
 import { FiregameInstructionsatStart } from './FiregameInstructions';
 import '../../Styles/flame.css'
+import { useWindowSize } from '../useWindowSize';
 
 const GRID_SIZE = 25;
 
@@ -35,6 +36,7 @@ export default function Firegame(){
     const [levelsLeft,setLevelsLeft] = useState(null);
     const [winRate,setWinRate] = useState(null);
     const [leaderboard,setLeaderboard] = useState(null);
+    const [width,height] = useWindowSize();
 
     useEffect(() => {
         async function fetchGame(){
@@ -216,7 +218,17 @@ export default function Firegame(){
                 .catch(e=>{console.log('Check handleGameOver',e)})
     }
 
+
     const levels = ['easy','medium','hard']
+    if (width < 900 || height < 695) {
+        return (
+          <div className="flex flex-col justify-center items-center h-screen px-4 text-center text-cyan-100">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4">Window Too Small</h2>
+            <p className="mb-2">The content can’t fit in a window this small.</p>
+            <p>If you had something in progress, increase screen height or width to resume.</p>
+          </div>
+        );
+      }
 
     return <div className=''>
         <div className="">
@@ -271,26 +283,45 @@ export default function Firegame(){
     </div>}
     
         </div>
-    {!showInstructionsatStart && <div className=''>
-    <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
-                <div>Firegame, Map: {gameID.current}</div>
-                <div>Difficulty: {difficulty}</div>    
-                <div className="">Map win rate: {Math.round(winRate*100)}%</div>                                
-            </div>
-            <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
-                {/*bg-gray-800/90*/}
-                <div>Turn: {gameState.turn}</div>   
-    </div>
-    <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
-                <div>Score: {leaderboard.userscore}</div>
-                
-      </div>
-      <div className="flex flex-col items-center border border-gray-300 bg-gray-800/90 m-8 p-4 rounded-md">
-                <div>Leaderboard</div>
-                <div className='border border-gray-500 p-4 rounded-2xl'>{leaderboard.leaderboard.map(([user,score])=><div key={user} className='flex justify-between'><div>{user}</div><div className='ml-40'></div> <div>{score}</div></div>)}</div>
+        {!showInstructionsatStart && 
+  <div className="pt-8 pl-10 pr-10 backdrop-blur-md">
+    <div className='border-2 border-cyan-400/30 rounded-md shadow-[0_0_6px_rgba(0,255,255,0.15)] backdrop-blur-xl bg-black/60 text-cyan-100'>
 
+      <div className="flex flex-col text-cyan-100 p-4">
+        <div className="text-[18px] font-bold">Firegame, Map {gameID.current}</div>
+        <div className="text-[13px]">Difficulty: {difficulty}</div>
+        <div className="text-[13px]">Map win rate: {Math.round(winRate * 100)}%</div>
       </div>
-    </div> }
+
+      <div className="flex flex-col p-4 rounded-md text-cyan-100">
+        <div>Turn: {gameState.turn}</div>
+      </div>
+
+      <div className="flex flex-col p-4 rounded-md text-cyan-100">
+        <div>Score: {leaderboard.userscore}</div>
+      </div>
+
+      <div className="text-cyan-100 flex flex-col p-4 rounded-md">
+        <div className="text-[15px] font-semibold">Firegame Leaderboard</div>
+        <div className='border border-gray-500 p-4 rounded-2xl text-[14px]'>
+          {leaderboard.leaderboard && leaderboard.leaderboard.length > 0 ? (
+            leaderboard.leaderboard.map(([user, score]) => (
+              <div key={user} className='flex flex-row justify-between'>
+                <div>{user}</div>
+                <div className='ml-3'></div>
+                <div>{score}</div>
+              </div>
+            ))
+          ) : (
+            <div>No winners yet</div>
+          )}
+        </div>
+      </div>
+
+    </div>
+  </div>
+}
+
     
     
     

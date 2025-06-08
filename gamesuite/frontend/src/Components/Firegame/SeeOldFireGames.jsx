@@ -191,11 +191,14 @@ function SeeFireBots() {
         bot1index = bot2index = bot3index = bot4index = playerindex = successpossibleindex
     }
   }
-  if(width<900||height<695){
-    return <div className='flex flex-col items-center'>
-              <div className='mt-12'>Window size too small; not supported.</div>
-              <div>If you had a game in progress, make the window bigger to resume.</div>
-          </div>
+  if (width < 900 || height < 695) {
+    return (
+      <div className="flex flex-col justify-center items-center h-screen px-4 text-center text-cyan-100">
+        <h2 className="text-xl sm:text-2xl font-semibold mb-4">Window Too Small</h2>
+        <p className="mb-2">The content can’t fit in a window this small.</p>
+        <p>If you had something in progress, increase screen height or width to resume.</p>
+      </div>
+    );
   }
   return (
     <div>
@@ -246,8 +249,8 @@ function SeeFireBots() {
                 
       </div>}
       {leaderboard && <div className="text-cyan-100 flex flex-col p-4 rounded-md">
-                <div>Leaderboard</div>
-                <div className=' rounded-2xl'>{leaderboard.leaderboard.map(([user,score])=><div className='flex justify-between text-[13px]'><div>{user}</div><div className='ml-3'></div> <div>{score}</div></div>)}</div>
+                <div>Firegame Leaderboard</div>
+                <div className='border border-gray-500 rounded-2xl p-4'>{leaderboard.leaderboard.map(([user,score])=><div className='flex justify-between text-[13px]'><div>{user}</div><div className='ml-3'></div> <div>{score}</div></div>)}</div>
 
       </div>}
     </div></div>   

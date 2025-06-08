@@ -19,7 +19,6 @@ export default function ViewGameList(){
             const date = new Date(datetime);
             return [id,result,stoch,date];
         }));
-        console.log(gameList)
     }
     fetchGameList();
     },[])
