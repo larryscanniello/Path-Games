@@ -22,7 +22,7 @@ export default function SeeMousegameAbout(props) {
                     Bot 3 alternates sensing and moving, and plans 5 steps at a time and sticks with the plan.
                     Where the other bots use a simpler breadth-first-search to find their paths,
                     bot 3 uses a uniform cost search to find a path that maximizes the probability 
-                    that the mouse will be on it. When the mouse is stochastic, it uses a prediction algorithm
+                    that the mouse will be on it. In moving mouse mode, it uses a prediction algorithm
                     to predict where the mouse will be in the future.
                 </p>
                 <p className="pb-4">
@@ -35,7 +35,7 @@ export default function SeeMousegameAbout(props) {
                     Both bots 3 and 4 have a second mode. Once there is a 7x7 grid
                     where the sum of probabilities in that grid is over .5, the bots shift gears.
                     If the mouse is stationary, the bots revert to the bot 1 strategy.
-                    If the mouse is stochastic, the bots revert to the bot 3 strategy.
+                    If the mouse is moving, the bots revert to the bot 3 strategy.
                 </p>
                 <p className="pb-4">
                     Bots 3 and 4 perform about the same on average, and they perform significantly better on average

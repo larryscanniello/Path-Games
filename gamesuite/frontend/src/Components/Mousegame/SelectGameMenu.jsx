@@ -11,7 +11,7 @@ export default function SelectGameMenu(props){
                       props.setShowGameSelection(false);
                       props.winRateRef.current = winrate
                     }}>
-                      {`${i+1}. ${result}, Map ID: ${id}, ${stoch ? 'stochastic mouse':'stationary mouse'}, ${date.toLocaleString('en-US', {
+                      {`${i+1}. ${result}, Map ID: ${id}, ${stoch ? 'moving mouse':'stationary mouse'}, ${date.toLocaleString('en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric',

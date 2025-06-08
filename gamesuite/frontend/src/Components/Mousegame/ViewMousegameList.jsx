@@ -32,7 +32,7 @@ export default function ViewGameList(){
                   {gameList.map(([id, result, stoch, date], i) => (
                     <li key={id}>
                       <button className="hover:underline" onClick={() => navigate(username+'/'+id.toString()+'/')}>
-                        {`${i+1}. ${result}, ${stoch ? 'stochastic mouse' : 'stationary mouse'}, ${date.toLocaleString('en-US', {
+                        {`${i+1}. ${result}, ${stoch ? 'moving mouse' : 'stationary mouse'}, ${date.toLocaleString('en-US', {
                           year: 'numeric',
                           month: 'short',
                           day: 'numeric',

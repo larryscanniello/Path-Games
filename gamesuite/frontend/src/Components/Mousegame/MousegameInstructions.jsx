@@ -6,7 +6,7 @@ export default function MousegameInstructions(props){
     const username = localStorage.getItem(USERNAME);
 
     return(
-        <div className={props.stoch ? "max-h-[100vh] overflow-y-auto rounded-md bg-gray-800/90" : "mousegame-div bg-black max-h-[100vh] z-10 rounded-md overflow-y-auto"}>
+        <div className={props.stoch ? "max-h-[100vh] overflow-y-auto rounded-md bg-gray-800/90" : "mousegame-div bg-black max-h-[100vh] z-10 rounded-md overflow-y-auto text-sm"}>
             <div className="pr-8 pl-8 pb-12">
                 <p className="text-cyan-200 pt-12 pb-6">
                     You are in deep space aboard the ship Archaeopteryx,
@@ -35,7 +35,8 @@ export default function MousegameInstructions(props){
                     At every time step, you can either move or sense.
                     You move with the arrow keys and sense with the space bar.
                     In stationary mode, the mouse stays still for the entire game,
-                    and in stochastic mode, the mouse moves to an adjacent space or stays still randomly.
+                    and in moving mouse mode, at any turn the mouse has equal chance of 
+                    (up, down, left, right, stay still) to an open square.
                     The mouse is hidden, but when you or Jeff enter its square, the game is over.
                     If you both enter the mouse's square at the same time, you lose.
                 </p>
@@ -52,43 +53,51 @@ export default function MousegameInstructions(props){
         <tr>
             <th className="px-4 border-b-2 border-gray-700 bg-gray-700/50">Distance from Mouse</th>
             <th className="px-4 py-2 border-b-2 border-gray-700 bg-gray-700/50">Probability of Beep</th>
+            <th className="px-4 py-2 border-b-2 border-gray-700 bg-gray-700/50">Expected Beeps out of 5</th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <td className="px-4 py-1 border-b border-gray-700">1</td>
             <td className="px-4 py-1 border-b border-gray-700">100%</td>
+            <td className="px-4 py-1 border-b border-gray-700">5</td>
         </tr>
         <tr >
             <td className="px-4 py-1 border-b border-gray-700">2</td>
             <td className="px-4 py-1 border-b border-gray-700">89%</td>
+            <td className="px-4 py-1 border-b border-gray-700">4.45</td>
         </tr>
         <tr >
             <td className="px-4 py-1 border-b border-gray-700">5</td>
             <td className="px-4 py-1 border-b border-gray-700">63%</td>
+            <td className="px-4 py-1 border-b border-gray-700">3.15</td>
+
         </tr>
         <tr>
             <td className="px-4 py-1 border-b border-gray-700">10</td>
             <td className="px-4 py-1 border-b border-gray-700">35%</td>
+            <td className="px-4 py-1 border-b border-gray-700">1.75</td>
         </tr>
         <tr >
             <td className="px-4 py-1 border-b border-gray-700">20</td>
             <td className="px-4 py-1 border-b border-gray-700">11%</td>
+            <td className="px-4 py-1 border-b border-gray-700">0.55</td>
         </tr>
         <tr >
             <td className="px-4 py-1 border-b border-gray-700">30</td>
             <td className="px-4 py-1 border-b border-gray-700">3%</td>
+            <td className="px-4 py-1 border-b border-gray-700">0.15</td>
         </tr>
     </tbody>
 </table>
 </div>
-   
+   {!props.stoch && <p className="text-red-400 py-4">Warning: Moving mouse mode is challenging, and the games may be long. Try stationary first.</p>}
                 {!props.stoch && <div className='text-center text-white'>
                     <ul>{stochoptions.map((stochvar,i)=>
                     {return props.levelsLeft[i]>0 ? <li key={i}><button className='hover:underline' 
                                             onClick={()=>{props.setStoch(stochvar);
                                             props.setShowInstructions(false);}}
-                                        >New {stochvar} mouse game ({props.levelsLeft[i]} left)</button></li> 
+                                        >New {stochvar==='stochastic'?'moving':'stationary'} mouse game ({props.levelsLeft[i]} left)</button></li> 
                                 : <li key={i} className="opacity-60">No {stochvar} levels left</li>})}</ul></div>}
                 {props.stoch && <div className="flex flex-col items-center">
                                     <button onClick={() => props.setShowInstructions(false)} className="pb-4 text-white hover:underline">

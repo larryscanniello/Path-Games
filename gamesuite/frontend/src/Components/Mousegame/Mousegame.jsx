@@ -328,9 +328,6 @@ export default function Mousegame(){
             bot4index = gameData.game.botStartingIndex;
         }
     }
-
-
-
     if (width < 900 || height < 695) {
         return (
           <div className="flex flex-col justify-center items-center h-screen px-4 text-center text-cyan-100">
@@ -357,7 +354,7 @@ export default function Mousegame(){
                         gameID={gameID}
                         />
         </div>}
-    {(stoch && gameData)  && <div className='mousegame-div grid grid-cols-[1fr_auto_1fr]'>
+    {(gameData && stoch)  && <div className='mousegame-div grid grid-cols-[1fr_auto_1fr]'>
     <div className=''></div>
     {(gameData && stoch) && <div className='relative z-50'>
         {showNewGameMenu && <div className="fixed ml-52 mt-70 z-90">
@@ -366,7 +363,7 @@ export default function Mousegame(){
                     {return levelsLeft[i]>0 ? <button className='hover:underline pb-4 text-white' 
                                             onClick={()=>{setStoch(stochvar);
                                             setShowNewGameMenu(false);}}
-                                        >New {stochvar} mouse game ({levelsLeft[i]} left)</button> 
+                                        >New {stochvar==='stochastic' ? 'moving' : 'stationary'} mouse game ({levelsLeft[i]} left)</button> 
                                 : <div className="opacity-60 pb-4 text-white">No {stochvar} levels left</div>})}
                 <button className='hover:underline text-white' onClick={()=>setShowNewGameMenu(false)}>Close</button>
             </div></div>}
@@ -409,7 +406,7 @@ export default function Mousegame(){
             
             <div className="flex flex-col text-cyan-100 p-4">
                 <div className="text-[18px] font-bold">Mousegame, Map {gameID.current}</div>
-                <div className="text-[13px]">Mode: {stoch} mouse</div>
+                <div className="text-[13px]">Mode: {stoch==='stochastic' ? 'moving' : 'stationary'} mouse</div>
             </div>
 
             <div className="flex flex-col p-4 text-cyan-100">
