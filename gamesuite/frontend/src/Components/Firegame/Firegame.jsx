@@ -1,7 +1,7 @@
 import {useState, useEffect, useRef} from 'react'
 import RenderGridFiregame from './RenderGridFiregame';
 import api from '../../api';
-import { USERNAME } from '../../constants';
+import { ACCESS_TOKEN, USERNAME } from '../../constants';
 import GameOverMenu from './GameOverMenu';
 import NavBar from '../NavBar';
 import FiregameInstructions from './FiregameInstructions';
@@ -42,13 +42,11 @@ export default function Firegame(){
         async function fetchGame(){
             try{
             const res = await api.post('firegame/',{
-                username: localStorage.getItem(USERNAME),
-                difficulty: difficulty})
+                difficulty: difficulty,
+                })
             .catch((e)=>{throw new Error("Error fetching game.")});
             const responsedata = res.data.game;
-            const leaderboardres = await api.post('getfiregameleaderboard/',{
-                username: localStorage.getItem(USERNAME),
-            })
+            const leaderboardres = await api.post('getfiregameleaderboard/',{})
             .catch((e)=>{throw new Error("Error fetching leaderboard.")});
             setLeaderboard(leaderboardres.data)
             
@@ -156,8 +154,8 @@ export default function Firegame(){
                 handleFirstTurn()
             }
             async function handleFirstTurn(){
-                const username = localStorage.getItem(USERNAME);
-                const obj = {username,id:gameID.current}
+                const access = localStorage.getItem(ACCESS_TOKEN);
+                const obj = {id:gameID.current,access}
                 const res = api.post('/handle_first_turn_firegame/',obj)
                 .catch(e=>{console.log('Check handleFirstTurn',e)})
             }

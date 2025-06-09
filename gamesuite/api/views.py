@@ -16,11 +16,10 @@ from collections import defaultdict
 import json
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
-@authentication_classes([])
+@permission_classes([IsAuthenticated])
 def firegame(request):
     difficulty = request.data['difficulty']
-    userid = User.objects.get(username=request.data['username'])
+    userid = User.objects.get(username=request.user)
     played_map_ids = FiregameGame.objects.filter(user=userid).values_list('firegame_map',flat=True)
 
     difficulties = ['easy','medium','hard']
@@ -41,11 +40,10 @@ def firegame(request):
     return Response({'success': False,'levels_left':levels_left})
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
-@authentication_classes([])
+@permission_classes([IsAuthenticated])
 def get_mousegame_by_id(request):
     id = request.data['id']
-    username = request.data['username']
+    username = request.user
     map = MousegameMap.objects.get(id=id)
     game = get_object_or_404(MousegameGame,user__username=username,mousegame_map__id=id)
     bots = BotData.objects.filter(mousegame_map = id).order_by('bot')
@@ -60,12 +58,11 @@ def get_mousegame_by_id(request):
     })
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
-@authentication_classes([])
+@permission_classes([IsAuthenticated])
 def get_firegame_by_id(request):
     print('check')
     id = request.data['id']
-    username = request.data['username']
+    username = request.user
     map = FiregameMap.objects.get(id=id)
     game = get_object_or_404(FiregameGame,user__username=username,firegame_map__id=id)
     map_serializer = FiregameSerializer(map)
@@ -75,14 +72,13 @@ def get_firegame_by_id(request):
         'playerdata': game_serializer.data,
     })
 
-   
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
-@authentication_classes([])
 def handle_game_over_mousegame(request):
     try:
         data = json.loads(request.body.decode('utf-8'))
+        
     except json.JSONDecodeError:
         return Response({'error': 'Invalid JSON'}, status=400)
     username,id = data['username'],data['id']
@@ -94,11 +90,9 @@ def handle_game_over_mousegame(request):
     return Response({'hell':'yeah'})
 
 
-
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
-@authentication_classes([])
 def handle_game_over_firegame(request):
     try:
         data = json.loads(request.body.decode('utf-8'))
@@ -112,26 +106,22 @@ def handle_game_over_firegame(request):
     return Response({'hell':'yeah'})
     
 
-@csrf_exempt
 @api_view(['POST'])
-@permission_classes([AllowAny])
-@authentication_classes([])
+@permission_classes([IsAuthenticated])
 def handle_first_turn_firegame(request):
     game = FiregameGame()
-    game.user = User.objects.get(username = request.data['username'])
+    game.user = User.objects.get(username = request.user)
     game.firegame_map = FiregameMap.objects.get(id=request.data['id'])
     game.player_path = []
     game.result = 'forfeit'
     game.save()
     return Response({'hell':'yeah'})
 
-@csrf_exempt
 @api_view(['POST'])
-@permission_classes([AllowAny])
-@authentication_classes([])
+@permission_classes([IsAuthenticated])
 def handle_first_turn_mousegame(request):
     game = MousegameGame()
-    game.user = User.objects.get(username = request.data['username'])
+    game.user = User.objects.get(username = request.user)
     game.mousegame_map = MousegameMap.objects.get(id=request.data['id'])
     game.player_path = []
     game.sensor_log = []
@@ -139,15 +129,13 @@ def handle_first_turn_mousegame(request):
     game.save()
     return Response({'hell':'yeah'})
     
-@csrf_exempt
 @api_view(['POST'])
-@permission_classes([AllowAny])
-@authentication_classes([])
+@permission_classes([IsAuthenticated])
 def mousegame(request):
     stoch = True
     if request.data['stoch']=='stationary':
         stoch = False
-    userid = User.objects.get(username=request.data['username'])
+    userid = User.objects.get(username=request.user)
     played_map_ids = MousegameGame.objects.filter(user=userid).values_list('mousegame_map', flat=True)
     unplayed_maps = MousegameMap.objects.filter(stochastic=stoch).exclude(id__in=played_map_ids)
 
@@ -172,30 +160,24 @@ def mousegame(request):
 
 
 
-@csrf_exempt
 @api_view(['POST'])
-@permission_classes([AllowAny])
-@authentication_classes([])
+@permission_classes([IsAuthenticated])
 def get_mousegame_list(request):
-    userid = User.objects.get(username=request.data['username'])
+    userid = User.objects.get(username=request.user)
     games = MousegameGame.objects.filter(user=userid).order_by('datetime')
     gamestrs = [[game.mousegame_map.id,game.result,game.mousegame_map.stochastic,game.datetime,game.mousegame_map.win_rate()] for game in games]
     return Response(gamestrs)
 
-@csrf_exempt
 @api_view(['POST'])
-@permission_classes([AllowAny])
-@authentication_classes([])
+@permission_classes([IsAuthenticated])
 def get_firegame_list(request):
-    userid = User.objects.get(username=request.data['username'])
+    userid = User.objects.get(username=request.user)
     games = FiregameGame.objects.filter(user=userid).order_by('datetime')
     gamestrs = [[game.firegame_map.id,game.result,game.firegame_map.difficulty,game.datetime,game.firegame_map.win_rate()] for game in games]
     return Response(gamestrs)
 
-@csrf_exempt
 @api_view(['POST'])
-@permission_classes([AllowAny])
-@authentication_classes([])
+@permission_classes([IsAuthenticated])
 def get_firegame_leaderboard(request):
     score_map = {
             'easy': 50,
@@ -210,14 +192,15 @@ def get_firegame_leaderboard(request):
             scores[user] += score_map.get(difficulty, 0)
     top_users = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:5]
     return Response({'leaderboard':[[user.username, score] for user, score in top_users],
-                     'userscore':scores[User.objects.get(username=request.data['username'])]})
+                     'userscore':scores[User.objects.get(username=request.user)]})
 
+@permission_classes([IsAuthenticated])
 def get_mousegame_map_leaderboard(request):
     id = request.data['id']
     stoch = True
     if request.data['stoch']=='stationary':
         stoch = False
-    userid = User.objects.get(username=request.data['username'])
+    userid = User.objects.get(username=request.user)
     played_map_ids = MousegameGame.objects.filter(user=userid).values_list('mousegame_map', flat=True)
     unplayed_maps = MousegameMap.objects.filter(stochastic=stoch).exclude(id__in=played_map_ids)
     if unplayed_maps.exists():

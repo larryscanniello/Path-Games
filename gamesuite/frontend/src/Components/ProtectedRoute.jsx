@@ -6,6 +6,7 @@ import { useState, useEffect,useContext } from "react";
 import { AuthContext } from './AuthProvider'
 
 
+
 function ProtectedRoute({ children }) {
     const [isAuthorized, setIsAuthorized] = useContext(AuthContext);
 
@@ -42,7 +43,8 @@ function ProtectedRoute({ children }) {
         const now = Date.now() / 1000; //so date is in seconds not milliseconds
 
         if (tokenExpiration < now) {
-            await refreshToken();
+            const refreshed = await refreshToken();
+
         } else {
             setIsAuthorized(true);
         }

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ACCESS_TOKEN } from "./constants";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "./constants";
 
 const apiUrl = "/choreo-apis/awbo/backend/rest-api-be2/v1.0";
 
@@ -23,5 +23,32 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+api.interceptors.response.use(
+  response => response,
+  async error => {
+    const originalRequest = error.config;
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      const refreshToken = localStorage.getItem(REFRESH_TOKEN);
+      try {
+        const res = await api.post("token/refresh/", { refresh: refreshToken });
+        const newAccessToken = res.data.access;
+        localStorage.setItem(ACCESS_TOKEN, newAccessToken);
+
+        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+
+        return api(originalRequest); // retry the original request
+      } catch (refreshError) {
+        // Refresh failed, force logout or redirect
+        localStorage.removeItem(ACCESS_TOKEN);
+        localStorage.removeItem(REFRESH_TOKEN);
+        window.location.href = "/login"; // or however you redirect to login
+        return Promise.reject(refreshError);
+      }
+    }
+  }
+)
 
 export default api;
