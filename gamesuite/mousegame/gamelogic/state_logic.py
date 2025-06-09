@@ -2,16 +2,22 @@ import numpy as np
 import math
 from . import get_adj_indices
 
-def get_initial_dist(grid):
-    openlist = []
-    for i in range(len(grid)):
-        for j in range(len(grid)):
-            if grid[(i,j)]==0 or grid[(i,j)]==2:
-                openlist.append((i,j))
-    initial_dist = np.zeros((len(grid),len(grid)))
-    for item in openlist:
-        initial_dist[item] = 1/len(openlist)
-    return initial_dist
+def get_initial_dist(grid,stoch,mouseindex):
+    if True:
+        openlist = []
+        for i in range(len(grid)):
+            for j in range(len(grid)):
+                if grid[(i,j)]==0 or grid[(i,j)]==2:
+                    openlist.append((i,j))
+        initial_dist = np.zeros((len(grid),len(grid)))
+        for item in openlist:
+            initial_dist[item] = 1/len(openlist)
+        return initial_dist
+    else:
+        initial_dist = np.zeros((len(grid),len(grid)))
+        initial_dist[mouseindex] += 1
+        return initial_dist
+
 
 def filtering(filterstate,stoch,filterevidence,t,grid,a):
     #First we find P(X_t|e_{t-1},...,e_1), the prediction of the new state from old evidence

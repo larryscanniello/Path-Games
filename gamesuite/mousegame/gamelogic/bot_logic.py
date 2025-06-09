@@ -193,28 +193,24 @@ def bot_4(grid,bot4index,turn,plan,bot4evidence,mouseindex,a,bot4state,stoch,mod
         newevidence = (turn,0,bot4index)
         bot4evidence.append(newevidence)
     bot4state = state_logic.filtering(bot4state.copy(),stoch,bot4evidence,turn,grid,a)
-    if mode==0:
-        kernel = np.ones((7, 7))
-        block_sums = convolve2d(bot4state, kernel, mode='valid')
-        if not np.any(block_sums > 0.5):
-            information_gain_array = state_logic.calculate_expected_entropy_reduction(bot4state,stoch,grid,a,bot4index)
-            destinationindex = np.unravel_index(information_gain_array.argmax(), information_gain_array.shape)
-            if bot4index == destinationindex:
-                information_gain_array[bot4index]-=10000
-                destinationindex = np.unravel_index(information_gain_array.argmax(), bot4state.shape)
-            plan = bot_3_dynamic_UFCS(grid,bot4index,destinationindex,bot4state,4,stoch,bot4evidence,turn)
-            return grid,bot4index,bot4evidence,plan,bot4state,mode
-        else:
-            mode=1
-            return grid,bot4index,bot4evidence,plan,bot4state,mode
-    #at this point mode=1
-    bot4state = state_logic.filtering(bot4state.copy(),stoch,bot4evidence.copy(),turn,grid.copy(),a)
-    destinationindex = np.unravel_index(bot4state.argmax(), bot4state.shape)
-    if stoch:
-        plan = bot_3_dynamic_UFCS(grid,bot4index,destinationindex,bot4state,3,stoch,bot4evidence,turn)
+    kernel = np.ones((7, 7))
+    block_sums = convolve2d(bot4state, kernel, mode='valid')
+    if not np.any(block_sums > 0.5):
+        information_gain_array = state_logic.calculate_expected_entropy_reduction(bot4state,stoch,grid,a,bot4index)
+        destinationindex = np.unravel_index(information_gain_array.argmax(), information_gain_array.shape)
+        if bot4index == destinationindex:
+            information_gain_array[bot4index]-=10000
+            destinationindex = np.unravel_index(information_gain_array.argmax(), bot4state.shape)
+        plan = bot_3_dynamic_UFCS(grid,bot4index,destinationindex,bot4state,4,stoch,bot4evidence,turn)
+        return grid,bot4index,bot4evidence,plan,bot4state,mode
     else:
-        plan = bot_3_dynamic_UFCS(grid,bot4index,destinationindex,bot4state,1,stoch,bot4evidence,turn)
-    return grid,bot4index,bot4evidence,plan,bot4state,mode
+        bot4state = state_logic.filtering(bot4state.copy(),stoch,bot4evidence.copy(),turn,grid.copy(),a)
+        destinationindex = np.unravel_index(bot4state.argmax(), bot4state.shape)
+        if stoch:
+            plan = bot_3_dynamic_UFCS(grid,bot4index,destinationindex,bot4state,3,stoch,bot4evidence,turn)
+        else:
+            plan = bot_3_dynamic_UFCS(grid,bot4index,destinationindex,bot4state,1,stoch,bot4evidence,turn)
+        return grid,bot4index,bot4evidence,plan,bot4state,mode
     
     
     """kernel = np.ones((7, 7))

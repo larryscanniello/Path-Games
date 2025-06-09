@@ -58,7 +58,7 @@ class Command(BaseCommand):
         while(simcount<num):
             grid,botindex,mouseindex= create_grid.place_initial_positions(create_grid.create_grid(grid_size))
             bot1index,bot2index,bot3index,bot4index = botindex,botindex,botindex,botindex
-            originalstate = state_logic.get_initial_dist(grid)
+            originalstate = state_logic.get_initial_dist(grid,stoch,mouseindex)
             bot1state,bot2state,bot3state,bot4state = originalstate.copy(),originalstate.copy(),originalstate.copy(),originalstate.copy()
             bot1evidence,bot2evidence,bot3evidence,bot4evidence = [None],[None],[None],[None]
             bot1plan,bot2plan,bot3plan,bot4plan = [],[],[],[]

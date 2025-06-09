@@ -16,7 +16,7 @@ export default function SeeMiceBots(){
     const [turn, setTurn] = useState(0);
     const [error, setError] = useState(null);
     const [play, setPlay] = useState(false);
-    const [showProbabilities,setShowProbabilities] = useState(0);
+    const [showProbabilities,setShowProbabilities] = useState(false);
     const [showGameSelection,setShowGameSelection] = useState(null);
     const intervalRef = useRef(null);
     const [gameList,setGameList] = useState(null);
@@ -60,9 +60,6 @@ export default function SeeMiceBots(){
             .catch((e)=>{throw new Error("Error fetching game.")});
             const responsedata = res.data;
             setLeaderboard(responsedata.leaderboard)
-            console.log('gl',gameList)
-            console.log('cg',currentGame)
-            console.log('glf',gameList.find(([id,result,stoch,date,rate])=>id==currentGame))
             
             winRateRef.current = gameList.find(([id,result,stoch,date,rate])=>id==currentGame)[4]
             const bot3evidence = JSON.parse(responsedata.bots[2].evidence);
@@ -105,21 +102,18 @@ export default function SeeMiceBots(){
                 },
                 bot1: {
                     evidence: JSON.parse(responsedata.bots[0].evidence).slice(1),
-                    states: JSON.parse(responsedata.bots[0].states),
                     path: bot1path,
                     plans: bot1plansprocessed,
                     length: bot1path.length,
                 },
                 bot2: {
                     evidence: JSON.parse(responsedata.bots[1].evidence).slice(1),
-                    states: JSON.parse(responsedata.bots[1].states),
                     path: bot2path,
                     plans: bot2plans,
                     length: bot2path.length,
                 },
                 bot3: {
                     evidence: JSON.parse(responsedata.bots[2].evidence).slice(1),
-                    states: JSON.parse(responsedata.bots[2].states),
                     path: bot3path,
                     plans: bot3plansprocessed,
                     length: bot3path.length,
@@ -303,7 +297,6 @@ export default function SeeMiceBots(){
         intervalRef.current = setInterval(()=>{
           setTurn(prev => {
               const simlength = simData.game.simlength;
-              
               const newTurn = Math.min(simlength+1, prev + 1);
               handleFlashes(newTurn,simData);
               return newTurn
@@ -420,10 +413,7 @@ export default function SeeMiceBots(){
         {simData&&<RenderGridSeeMouseBots
             grid = {simData.game.grid}
             plans = {[simData.bot1.plans[turn],simData.bot2.plans[turn],simData.bot3.plans[turn],simData.bot4.plans[turn]]}
-            states = {[null,simData.bot1.states[Math.min(turn,b1length-1)],
-                            simData.bot2.states[Math.min(turn,b2length-1)],
-                            simData.bot3.states[Math.min(turn,b3length-1)],
-                            simData.bot4.states[Math.min(turn,b4length-1)]]}
+            state = {simData.bot4.states[Math.min(turn,b4length-1)]}
             simlengths = {[simData.bot1.length,simData.bot2.length,simData.bot3.length,simData.bot4.length,simData.game.player_length]}
             paths = {[simData.bot1.path,simData.bot2.path,simData.bot3.path,simData.bot4.path]}
             indices = {[bot1index,bot2index,bot3index,bot4index,player_index,mouse_index]}
@@ -470,14 +460,17 @@ export default function SeeMiceBots(){
                                                     updated[i]=!prev[i];
                                                     return updated
                                                 })}/>{option}&nbsp;&nbsp;</div></label>)}</div>
-            <div>Show probabilities:<div className="">                                    
-            {optionarray2.map((option,i)=><label key={i}><input type="checkbox" checked={showProbabilities===i+1}
+                                          
+            {<button className="mt-4 px-4 py-2 bg-gray-700/90 hover:bg-gray-600/90 rounded-xl text-[14px] shadow-md" 
+                    onClick={()=>setShowProbabilities(prev=>!prev)}>
+                      {showProbabilities ? 'Hide Bot 4 Probabilities' : 'Show Bot 4 Probabilities'}
+                      </button>}     
+            {/*optionarray2.map((option,i)=><label key={i}><input type="checkbox" checked={showProbabilities===i+1}
                                                 onChange={(e)=>{
                                                     if(showProbabilities===i+1){
                                                         setShowProbabilities(0);
                                                     }else setShowProbabilities(i+1);
-                                                    e.target.blur()}}/>{option}&nbsp;&nbsp;</label>)}</div>      
-            </div>
+                                                    e.target.blur()}}/>{option}&nbsp;&nbsp;</label>)*/}
             </div>
             <div className="text-cyan-100 flex flex-col p-4 rounded-md">
             <div>Map {currentGame} Leaderboard</div>

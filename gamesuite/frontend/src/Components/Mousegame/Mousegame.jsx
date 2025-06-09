@@ -49,7 +49,6 @@ export default function Mousegame(){
         async function fetchGame(){
             try{
             const res = await api.post('mousegame/',{
-                username: localStorage.getItem(USERNAME),
                 stoch,                
             })
             .catch((e)=>{throw new Error("Error fetching game.")});
@@ -57,10 +56,12 @@ export default function Mousegame(){
             if(!responsedata.success){
                 setLevelsLeft(responsedata.levels_left);          
             }else{
+
                 setLevelsLeft(responsedata.levels_left);
                 gameID.current = responsedata.game.id
                 winRateRef.current = responsedata.win_rate
                 leaderboard.current = responsedata.leaderboard
+                console.log('resdata',responsedata)
                 const bot4evidence = JSON.parse(responsedata.bots[3].evidence).slice(1);
                 const bot4path = bot4evidence.map(([t,type,[i,j]])=> [i,j])
                 const grid = JSON.parse(responsedata.game.grid)
@@ -74,19 +75,15 @@ export default function Mousegame(){
                     },
                     bot1: {
                         evidence: JSON.parse(responsedata.bots[0].evidence).slice(1),
-                        states: JSON.parse(responsedata.bots[0].states)
                     },
                     bot2: {
                         evidence: JSON.parse(responsedata.bots[1].evidence).slice(1),
-                        states: JSON.parse(responsedata.bots[1].states)
                     },
                     bot3: {
                         evidence: JSON.parse(responsedata.bots[2].evidence).slice(1),
-                        states: JSON.parse(responsedata.bots[2].states)
                     },
                     bot4: {
                         evidence: bot4evidence,
-                        states: JSON.parse(responsedata.bots[3].states),
                         path: bot4path,
                     }
                 }

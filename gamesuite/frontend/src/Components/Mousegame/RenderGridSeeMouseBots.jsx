@@ -49,7 +49,7 @@ export default function RenderGridSeeBots(props){
             }
         }    
     }
-    const states = props.states
+    const state = props.state
     const showAgent = props.showAgent
 
     return(
@@ -92,7 +92,7 @@ export default function RenderGridSeeBots(props){
                         backgroundSize: getBackgroundSize()
                     }}
                     >
-                    {!!showProbabilities&& <div className="text-black fixed"> {roundTo4DecimalPlaces(states[showProbabilities][i][j])}</div>}
+                    {showProbabilities&& <div className="text-black fixed"> {roundTo4DecimalPlaces(state[i][j])}</div>}
                     {(condition0||condition1||condition2||condition3||condition4)&&<BotSlot 
                             g={g}
                             stoch = {props.stoch}

@@ -29,6 +29,6 @@ class BotData(models.Model):
     mousegame_map = models.ForeignKey(MousegameMap,on_delete=models.CASCADE)
     plans = models.JSONField(null=True)
     evidence = models.JSONField()
-    states = models.JSONField()
+    states = models.JSONField(null=True)
     modechange = models.IntegerField(null=True)
     bot = models.SmallIntegerField()

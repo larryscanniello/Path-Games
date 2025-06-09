@@ -280,7 +280,6 @@ function GameSelection(props){
                 </li>
               ))}
         </ul>
-        
       </div>
       <div className="flex flex-col items-center"><div className="pt-4 pb-4"><button onClick={()=>props.setShowGameSelection(false)} className="text-white hover:underline content-center">Close</button></div></div>
     </div>
