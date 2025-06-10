@@ -1,6 +1,6 @@
 from django.shortcuts import render,HttpResponse
 from django.http import JsonResponse
-from .gamelogic import FireBots,create_grid,fire_step
+from .gamelogic import create_grid,fire_step
 from .models import FiregameMap
 import random
 import json

@@ -27,6 +27,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   response => response,
   async error => {
+    if(error.request.responseURL=="http://localhost:8000/api/token/refresh/"){
+      return
+    }
     const originalRequest = error.config;
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -42,6 +45,7 @@ api.interceptors.response.use(
         return api(originalRequest); // retry the original request
       } catch (refreshError) {
         // Refresh failed, force logout or redirect
+        console.log('check12401')
         localStorage.removeItem(ACCESS_TOKEN);
         localStorage.removeItem(REFRESH_TOKEN);
         window.location.href = "/login"; // or however you redirect to login
