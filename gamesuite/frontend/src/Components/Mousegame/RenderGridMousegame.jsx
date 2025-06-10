@@ -114,6 +114,7 @@ function BotSlot(props){
     const width = props.width
     const height = props.height
     const mouseIndex = props.mouseIndex
+    const turn = props.turn;
     let botsInSpace = [] 
 
     const getMouseSprites = () => {

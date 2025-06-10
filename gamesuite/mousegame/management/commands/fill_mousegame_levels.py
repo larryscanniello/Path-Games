@@ -50,9 +50,10 @@ class Command(BaseCommand):
             newmap.sensor_sensitivity = sensor_sensitivity
             originalstate = state_logic.get_initial_dist(grid,stoch,mouseindex)
             bot1state,bot2state,bot3state,bot4state = originalstate.copy(),originalstate.copy(),originalstate.copy(),originalstate.copy()
-            bot1states,bot2states,bot3states,bot4states = [bot1state.tolist()],[bot2state.tolist()],[bot3state.tolist()],[bot4state.tolist()]
+            bot1states,bot2states,bot3states,bot4states = [bot1state.tolist()],[bot2state.tolist()],[bot3state.tolist()],[np.round(1000*bot4state).astype(np.uint16).tolist()]
             bot1evidence,bot2evidence,bot3evidence,bot4evidence = [None],[None],[None],[None]
-            bot1plan,bot2plan,bot3plan,bot4plan = [],[],[],[None,None,None,None,None]
+            bot1plan,bot2plan,bot3plan = [],[],[]
+            bot4plan = [None,None,None,None,None]
             bot1plans,bot2plans,bot3plans,bot4plans = [],[],[],[bot4plan]
             b1done,b2done,b3done,b4done = False,False,False,False
             alpha = -math.log(0.5)/(sensor_sensitivity-1)
@@ -87,7 +88,7 @@ class Command(BaseCommand):
                     bot4modeprev = bot4mode
                     if plantempbot4 == []:
                         bot4plans.append(bot4plan.copy())
-                    bot4states.append(bot4state.tolist())
+                    bot4states.append(np.round(1000*bot4state).astype(np.uint16).tolist())
                 if stoch:
                     grid,mouseindex = bot_logic.move_mouse(grid,mouseindex)
                     mousepath.append(mouseindex)
@@ -115,7 +116,7 @@ class Command(BaseCommand):
                 bot1data.mousegame_map,bot2data.mousegame_map,bot3data.mousegame_map,bot4data.mousegame_map = newmap,newmap,newmap,newmap
                 bot1data.evidence,bot2data.evidence,bot3data.evidence,bot4data.evidence = json.dumps(bot1evidence),json.dumps(bot2evidence),json.dumps(bot3evidence),json.dumps(bot4evidence)
                 #bot1data.states,bot2data.states,bot3data.states = json.dumps(bot1states),json.dumps(bot2states),json.dumps(bot3states)
-                bot4data.states = json.dumps(bot4states)
+                bot4data.states = bot4states
                 bot1data.bot,bot2data.bot,bot3data.bot,bot4data.bot = 1,2,3,4
                 bot4data.modechange = bot4modeturn
                 bot1data.plans,bot2data.plans,bot3data.plans,bot4data.plans = bot1plans,bot2plans,bot3plans,bot4plans

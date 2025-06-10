@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
 class MousegameMap(models.Model):
     grid = models.JSONField()
@@ -29,6 +30,14 @@ class BotData(models.Model):
     mousegame_map = models.ForeignKey(MousegameMap,on_delete=models.CASCADE)
     plans = models.JSONField(null=True)
     evidence = models.JSONField()
-    states = models.JSONField(null=True)
+    states = ArrayField(
+        ArrayField(
+            ArrayField(
+                models.PositiveSmallIntegerField(),
+            )
+            
+        ),
+        null=True
+    )
     modechange = models.IntegerField(null=True)
     bot = models.SmallIntegerField()

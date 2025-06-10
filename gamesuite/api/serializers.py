@@ -10,9 +10,6 @@ class FiregameSerializer(serializers.ModelSerializer):
         model = FiregameMap
         fields = '__all__'
         
-        """('id','initial_board','fire_progression','bot_index','fire_index','ext_index,'
-                  'difficulty','created_at','successpossiblepath','bot1path','bot2path',
-                  'bot3path','bot4path')"""
 class MousegameSerializer(serializers.ModelSerializer):
     class Meta:
         model = MousegameMap

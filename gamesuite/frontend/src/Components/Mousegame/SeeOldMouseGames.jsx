@@ -60,7 +60,6 @@ export default function SeeMiceBots(){
             .catch((e)=>{throw new Error("Error fetching game.")});
             const responsedata = res.data;
             setLeaderboard(responsedata.leaderboard)
-            
             winRateRef.current = gameList.find(([id,result,stoch,date,rate])=>id==currentGame)[4]
             const bot3evidence = JSON.parse(responsedata.bots[2].evidence);
             bot3evidence[0] = bot3evidence[1];
@@ -77,7 +76,6 @@ export default function SeeMiceBots(){
             const bot1plansprocessed = [];
             const bot3plansprocessed = [];
             const bot4plansprocessed = [];
-            
             for(let i=0;i<bot1path.length;i++){
               bot1plansprocessed.push(processFromFlatIndexBot3(bot1plans,i-1))
             }
@@ -120,7 +118,7 @@ export default function SeeMiceBots(){
                 },
                 bot4: {
                     evidence: JSON.parse(responsedata.bots[3].evidence).slice(1),
-                    states: JSON.parse(responsedata.bots[3].states),
+                    states: responsedata.bots[3].states,
                     plans: bot4plansprocessed,
                     modechange: responsedata.bots[3].modechange,
                     path: bot4path,
@@ -461,10 +459,13 @@ export default function SeeMiceBots(){
                                                     return updated
                                                 })}/>{option}&nbsp;&nbsp;</div></label>)}</div>
                                           
-            {<button className="mt-4 px-4 py-2 bg-gray-700/90 hover:bg-gray-600/90 rounded-xl text-[14px] shadow-md" 
+            {<button className="mt-4 px-4 py-2 bg-gray-700/90 hover:bg-gray-600/90 rounded-2xl text-[12px] shadow-md" 
                     onClick={()=>setShowProbabilities(prev=>!prev)}>
                       {showProbabilities ? 'Hide Bot 4 Probabilities' : 'Show Bot 4 Probabilities'}
-                      </button>}     
+                      </button>}
+            {<button  
+          onClick={()=>setShowProbabilities(prev=>!prev)}>
+            </button>}         
             {/*optionarray2.map((option,i)=><label key={i}><input type="checkbox" checked={showProbabilities===i+1}
                                                 onChange={(e)=>{
                                                     if(showProbabilities===i+1){

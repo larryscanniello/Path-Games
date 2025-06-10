@@ -57,6 +57,7 @@ export default function RenderGridSeeBots(props){
         {grid.map((row,i)=>(<React.Fragment key={i}>
                 {row.map((g,j) => {
                     let bgColor = '';
+                    const prob = roundTo4DecimalPlaces(state[i][j])/1000
                     if(g==0||g>1){
                         bgColor = "bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]"
                     }
@@ -92,7 +93,8 @@ export default function RenderGridSeeBots(props){
                         backgroundSize: getBackgroundSize()
                     }}
                     >
-                    {showProbabilities&& <div className="text-black fixed"> {roundTo4DecimalPlaces(state[i][j])}</div>}
+                    {showProbabilities&& <div className="text-black fixed"> 
+                        {prob}</div>}
                     {(condition0||condition1||condition2||condition3||condition4)&&<BotSlot 
                             g={g}
                             stoch = {props.stoch}
