@@ -1,0 +1,22 @@
+{% extends "application/base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div>
+        {% for game in games %}
+            <div>
+                <a href="{% url 'load_game' game.id %}">{{ game.created_at }}</a>
+                <hr>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+{% endblock %}
+</html>
