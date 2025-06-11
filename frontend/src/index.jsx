@@ -12,7 +12,7 @@ import { AuthProvider } from './Components/AuthProvider';
 import ViewFiregameList from './Components/Firegame/ViewFiregameList';
 import SeeOldMouseGames from './Components/Mousegame/SeeOldMouseGames';
 import ViewMousegameList from "./Components/Mousegame/ViewMousegameList";
-import NicknameRoute from './Components/Nicknameroute';
+import NicknameRoute from './Components/NicknameRoute';
 import './index.css';
 import Layout from './Components/Layout';
 
