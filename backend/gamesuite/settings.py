@@ -1,5 +1,7 @@
 import os
 from dotenv import load_dotenv, dotenv_values 
+from django_ratelimit.decorators import ratelimit
+
 
 """
 Django settings for gamesuite project.
@@ -69,6 +71,14 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'api.throttles.PathGamesGlobalThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'path_games_global':'500/d',
+        'create_user_throttle':'30/d'
+    }
+    
 }
 
 from datetime import timedelta

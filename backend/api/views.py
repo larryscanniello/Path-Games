@@ -14,6 +14,9 @@ from rest_framework.decorators import authentication_classes
 from django.shortcuts import get_object_or_404
 from collections import defaultdict
 import json
+from django_ratelimit.decorators import ratelimit
+from .throttles import PathGamesGlobalThrottle,UserCreationThrottle
+from rest_framework.decorators import throttle_classes
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -38,6 +41,40 @@ def firegame(request):
                          'win_rate': map_to_send.win_rate(),
                          'levels_left': levels_left})
     return Response({'success': False,'levels_left':levels_left})
+
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mousegame(request):
+    stoch = True
+    if request.data['stoch']=='stationary':
+        stoch = False
+    userid = User.objects.get(username=request.user)
+    played_map_ids = MousegameGame.objects.filter(user=userid).values_list('mousegame_map', flat=True)
+    unplayed_maps = MousegameMap.objects.filter(stochastic=stoch).exclude(id__in=played_map_ids)
+
+    stochoptions = [False,True]
+    levels_left = []
+    for i in range(len(stochoptions)):
+        unplayed = MousegameMap.objects.filter(stochastic=stochoptions[i]).exclude(id__in=played_map_ids)
+        levels_left.append(len(unplayed))
+
+    if unplayed_maps.exists():
+        map_to_send = unplayed_maps.first()
+        serialized_map = MousegameSerializer(map_to_send)
+        bots = BotData.objects.filter(mousegame_map=map_to_send.id)
+        bot_serializer = BotDataSerializer(bots, many=True)
+        return Response({'success': True, 
+                         'game': serialized_map.data,
+                         'bots':bot_serializer.data,
+                         'win_rate':map_to_send.win_rate(),
+                         'leaderboard':map_to_send.leaderboard(),
+                         'levels_left':levels_left})
+    return Response({'success': False,'levels_left':levels_left})
+
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -129,34 +166,6 @@ def handle_first_turn_mousegame(request):
     game.save()
     return Response({'hell':'yeah'})
     
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def mousegame(request):
-    stoch = True
-    if request.data['stoch']=='stationary':
-        stoch = False
-    userid = User.objects.get(username=request.user)
-    played_map_ids = MousegameGame.objects.filter(user=userid).values_list('mousegame_map', flat=True)
-    unplayed_maps = MousegameMap.objects.filter(stochastic=stoch).exclude(id__in=played_map_ids)
-
-    stochoptions = [False,True]
-    levels_left = []
-    for i in range(len(stochoptions)):
-        unplayed = MousegameMap.objects.filter(stochastic=stochoptions[i]).exclude(id__in=played_map_ids)
-        levels_left.append(len(unplayed))
-
-    if unplayed_maps.exists():
-        map_to_send = unplayed_maps.first()
-        serialized_map = MousegameSerializer(map_to_send)
-        bots = BotData.objects.filter(mousegame_map=map_to_send.id)
-        bot_serializer = BotDataSerializer(bots, many=True)
-        return Response({'success': True, 
-                         'game': serialized_map.data,
-                         'bots':bot_serializer.data,
-                         'win_rate':map_to_send.win_rate(),
-                         'leaderboard':map_to_send.leaderboard(),
-                         'levels_left':levels_left})
-    return Response({'success': False,'levels_left':levels_left})
 
 
 
@@ -215,7 +224,7 @@ def get_mousegame_map_leaderboard(request):
                          'leaderboard':map_to_send.leaderboard()})
     return Response({'success': False})
 
-
+@throttle_classes([UserCreationThrottle])
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
