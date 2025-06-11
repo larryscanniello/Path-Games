@@ -17,6 +17,10 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    const secretCode = localStorage.getItem("SECRET_CODE");
+    if (secretCode) {
+      config.headers["X-Employer-API-Key"] = secretCode;
+    }
     return config;
   },
   (error) => {
