@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv, dotenv_values 
 from django_ratelimit.decorators import ratelimit
-
+import dj_database_url 
 
 """
 Django settings for gamesuite project.
@@ -114,14 +114,10 @@ WSGI_APPLICATION = 'gamesuite.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get("DB_NAME"),
-        'USER': os.environ.get("DB_USER"),
-        'PASSWORD': os.environ.get("DB_PASSWORD"),
-        'HOST': os.environ.get("DB_HOST"),
-        'PORT': os.environ.get("DB_PORT"),  # default PostgreSQL port
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),
+        conn_max_age=0
+    )
 }
 
 
