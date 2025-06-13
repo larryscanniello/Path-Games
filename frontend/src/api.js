@@ -31,7 +31,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   response => response,
   async error => {
-    if(error.request.responseURL=="http://localhost:8000/api/token/refresh/"){
+    if(error.request.responseURL==VITE_API_URL + "token/refresh/"){
       return
     }
     const originalRequest = error.config;
