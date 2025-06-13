@@ -17,6 +17,8 @@ import json
 from django_ratelimit.decorators import ratelimit
 from .throttles import PathGamesGlobalThrottle,UserCreationThrottle
 from rest_framework.decorators import throttle_classes
+import random
+from rest_framework_simplejwt.tokens import RefreshToken
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -97,7 +99,6 @@ def get_mousegame_by_id(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def get_firegame_by_id(request):
-    print('check')
     id = request.data['id']
     username = request.user
     map = FiregameMap.objects.get(id=id)
@@ -224,10 +225,36 @@ def get_mousegame_map_leaderboard(request):
                          'leaderboard':map_to_send.leaderboard()})
     return Response({'success': False})
 
-@throttle_classes([UserCreationThrottle])
+def generate_unique_username():
+        while True:
+            username = f"User{random.randint(1, 999999)}"
+            if not User.objects.filter(username=username).exists():
+                return username
+
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
-
-
+    throttle_classes = [UserCreationThrottle]
+    def perform_create(self, serializer):
+        username = self.request.data.get('username')
+        password = self.request.data.get('password')
+        if username=='5019292':
+            username = generate_unique_username()
+        if password=='5019292':
+            password = username  # default password is the username
+        serializer.save(username=username, password=password)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        user = serializer.instance
+        refresh = RefreshToken.for_user(user)
+        access_token = refresh.access_token
+        response_data = {
+            'refresh': str(refresh),
+            'access': str(access_token),
+            'username': user.username
+        }
+        response = Response(response_data, status=status.HTTP_201_CREATED)
+        return response

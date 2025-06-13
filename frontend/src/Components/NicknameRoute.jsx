@@ -29,9 +29,8 @@ function NicknameRoute() {
         return
       }
       // 2. Log the user in to get tokens
-      const loginResponse = await api.post('token/',{username,password:username})
+      const loginResponse = await api.post('token/',{username:registerResponse.data.username,password:username})
       .catch((error)=> {throw new Error('Login failed after registration')});
-      console.log(loginResponse)
       localStorage.setItem(ACCESS_TOKEN, loginResponse.data.access);
       localStorage.setItem(REFRESH_TOKEN, loginResponse.data.refresh);
       localStorage.setItem(USERNAME,username);
@@ -40,6 +39,35 @@ function NicknameRoute() {
       alert(err.message || 'Registration or login failed');
     }
   };
+
+  const handleSubmitAnon = async e => {
+    e.preventDefault();
+    setError('')
+    try {
+      // 1. Register the user
+      const registerResponse = await api.post('user/register/',{username:'5019292',password:'5019292'})
+                                .catch((error)=>{setError('Username taken or something went wrong. Try a different username.'); return null;});
+      if(!registerResponse){
+        return
+      }
+      // 2. Log the user in to get tokens
+      const userpass = registerResponse.data.username
+      setUsername(userpass)
+      const loginResponse = await api.post('token/',{username:userpass,password:userpass})
+      .catch((error)=> {throw new Error('Login failed after registration')});
+      
+      localStorage.setItem(ACCESS_TOKEN, loginResponse.data.access);
+      localStorage.setItem(REFRESH_TOKEN, loginResponse.data.refresh);
+      localStorage.setItem(USERNAME,userpass);
+      setIsAuthorized(true);
+    } catch (err) {
+      alert(err.message || 'Registration or login failed');
+    }
+  };
+  
+  
+
+
 
   return (
     <div>
@@ -66,8 +94,8 @@ function NicknameRoute() {
               />
               <button className='mt-4 bg-gray-800 rounded-sm pl-4 pr-4 pt-2 pb-2 font-bold hover:bg-gray-600' type="submit">Submit</button>
               <div className='mt-4'>(your nickname may be displayed on leaderboards)</div>
-              
-              <div className='pt-4'>Have an account? <button className='text-white hover:underline' onClick={()=>navigate('/login/')}> Log in</button></div>
+              <div className='mt-4'>Click <button className="text-white hover:underline" onClick={handleSubmitAnon}>here</button> to proceed without a nickname</div>
+              <div className='pt-4'>Played before? <button className='text-white hover:underline' onClick={()=>navigate('/login/')}> Log in</button></div>
               <div className='text-red-400 mt-4'>{error}</div>
               <div className='flex flex-col items-center'>
               </div>

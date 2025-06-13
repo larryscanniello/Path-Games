@@ -17,10 +17,6 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    const secretCode = localStorage.getItem("SECRET_CODE");
-    if (secretCode) {
-      config.headers["X-Employer-API-Key"] = secretCode;
-    }
     return config;
   },
   (error) => {
@@ -49,7 +45,6 @@ api.interceptors.response.use(
         return api(originalRequest); // retry the original request
       } catch (refreshError) {
         // Refresh failed, force logout or redirect
-        console.log('check12401')
         localStorage.removeItem(ACCESS_TOKEN);
         localStorage.removeItem(REFRESH_TOKEN);
         window.location.href = "/login"; // or however you redirect to login

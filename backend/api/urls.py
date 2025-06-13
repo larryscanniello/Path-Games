@@ -14,7 +14,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(),name='refresh'),
     path('api-auth/',include('rest_framework.urls')),
     path('handle_game_over_mousegame/',views.handle_game_over_mousegame,name='handle_game_over'),
-
     path('handle_game_over_firegame/',views.handle_game_over_firegame,name='handle_game_over_firegame'),
     path('mousegame/',views.mousegame,name='mousegame'),
     path('getmousegamelist/',views.get_mousegame_list,name='get_game_list'),
