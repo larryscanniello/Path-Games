@@ -27,6 +27,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   response => response,
   async error => {
+    const VITE_API_URL = import.meta.env.VITE_API_URL
     if(error.request.responseURL==VITE_API_URL + "token/refresh/"){
       return
     }
