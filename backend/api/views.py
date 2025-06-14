@@ -63,6 +63,9 @@ def mousegame(request):
         unplayed = MousegameMap.objects.filter(stochastic=stochoptions[i]).exclude(id__in=played_map_ids)
         levels_left.append(len(unplayed))
 
+    if request.data['stoch']==None:
+        return Response({'success': False,'levels_left':levels_left})
+
     if unplayed_maps.exists():
         map_to_send = unplayed_maps.first()
         serialized_map = MousegameSerializer(map_to_send)

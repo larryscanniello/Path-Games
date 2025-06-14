@@ -53,10 +53,11 @@ export default function Mousegame(){
             })
             .catch((e)=>{throw new Error("Error fetching game.")});
             const responsedata = res.data;
+            console.log(responsedata.success)
             if(!responsedata.success){
+                console.log('check-1')
                 setLevelsLeft(responsedata.levels_left);          
-            }else{
-
+            }else if(stoch){
                 setLevelsLeft(responsedata.levels_left);
                 gameID.current = responsedata.game.id
                 winRateRef.current = responsedata.win_rate
