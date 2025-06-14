@@ -61,7 +61,6 @@ export default function Mousegame(){
                 gameID.current = responsedata.game.id
                 winRateRef.current = responsedata.win_rate
                 leaderboard.current = responsedata.leaderboard
-                console.log('resdata',responsedata)
                 const bot4evidence = JSON.parse(responsedata.bots[3].evidence).slice(1);
                 const bot4path = bot4evidence.map(([t,type,[i,j]])=> [i,j])
                 const grid = JSON.parse(responsedata.game.grid)
@@ -189,6 +188,15 @@ export default function Mousegame(){
                 case('Space'):
                     const mouseIndex = prev.mouseIndex;
                     const playerIndex = prev.playerIndex;
+                    let bot4index;
+                    if(gameData){
+                        if(newTurn-1!==0){
+                            bot4index = gameData.bot4.path[Math.min(newTurn-1,gameData.bot4.path.length-1)];
+                        }
+                        else{
+                            bot4index = gameData.game.botStartingIndex;
+                        }
+                    }
                     const manhattanDistance = Math.abs(mouseIndex[0]-playerIndex[0])+Math.abs(mouseIndex[1]-playerIndex[1]);
                     const beep = Math.random()< Math.exp(-.1155*(manhattanDistance-1));
                     if(beep){
@@ -198,7 +206,30 @@ export default function Mousegame(){
                         sensorLogObj = {position: playerIndex, turn:prev.turn+1, beep: false}
                     }
                     const color = beep ? 'bg-green-400' : 'bg-red-400';
-                    const flash = { id: Date.now(), color };
+                    let flashPosition;
+                    if(bot4index[0]===playerIndex[0]&&bot4index[1]===playerIndex[1]){
+                        if(width<1000||height<785){
+                            flashPosition = {top:"1px",left:"5px"}
+                        }
+                        else if(width<1100||height<900){
+                            flashPosition = {top:"2px",left:"8px"}
+                        }
+                        else{
+                            flashPosition = {top:"4px",left:"11px"};
+                        }
+                        
+                    }else{
+                        if(width<1000||height<785){
+                            flashPosition = {top:".2px",left:".2px"}
+                        }
+                        else if(width<1100||height<900){
+                            flashPosition = {top:"1.25px",left:"1.3px"}
+                        }
+                        else{
+                            flashPosition = {top:"4px",left:"4px"};
+                        }
+                    }
+                    const flash = { id: Date.now(),  color, flashPosition };
                     setFlashList(prev => [...prev, flash]);
                     setTimeout(() => {
                         setFlashList(prev => prev.filter(f => f.id !== flash.id));
@@ -246,7 +277,7 @@ export default function Mousegame(){
         return () => {
           window.removeEventListener('keydown',handleKeyDown);
         }
-      }, [gameData]); 
+      }, [gameData,width,height]); 
 
 
       useEffect(()=>{

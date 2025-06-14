@@ -35,7 +35,10 @@ export default function RenderGridSeeBots(props){
 
 
     for(let i=0;i<6;i++){
-        grid[indices[i][0]][indices[i][1]] += 2 ** (i+5)
+        if(indices[i]){
+            grid[indices[i][0]][indices[i][1]] += 2 ** (i+5)
+        }
+        
     }
     
     for(let i=0;i<plans.length;i++){

@@ -180,7 +180,7 @@ export default function SeeMiceBots(){
         }
       }, [currentGame,gameList])
 
-      function handleFlashes(newTurn,simData){
+      function handleFlashes(newTurn,simData,width,height){
         const evidence = []
         if(simData.game.player_sensor_log[newTurn-1]){
           evidence.push([4,simData.game.player_sensor_log[newTurn-1].beep ? 1 : 0])
@@ -260,7 +260,7 @@ export default function SeeMiceBots(){
             if(e.code === 'ArrowRight'){
                 setTurn((prev)=>{
                 const newTurn = Math.min(simlength+1, prev + 1);
-                handleFlashes(newTurn,simData)
+                handleFlashes(newTurn,simData,width,height)
                 return newTurn
                 });
                   
@@ -287,7 +287,7 @@ export default function SeeMiceBots(){
         return () => {
           window.removeEventListener('keydown',handleKeyDown);
         }
-      }, [simData]);
+      }, [simData,width,height]);
     
 
     useEffect(()=>{
@@ -296,12 +296,12 @@ export default function SeeMiceBots(){
           setTurn(prev => {
               const simlength = simData.game.simlength;
               const newTurn = Math.min(simlength+1, prev + 1);
-              handleFlashes(newTurn,simData);
+              handleFlashes(newTurn,simData,width,height);
               return newTurn
           })},250)
         return () => clearInterval(intervalRef.current)
         }
-    },[play,showAgent])
+    },[play,showAgent,width,height])
 
     useEffect(()=>{
       if(play){
@@ -358,7 +358,9 @@ export default function SeeMiceBots(){
           bot2index = bot2path[Math.min(turn-1,bot2path.length-1)]
           bot3index = bot3path[Math.min(turn-1,bot3path.length-1)]
           bot4index = bot4path[Math.min(turn-1,bot4path.length-1)]
-          player_index = simData.game.player_path[Math.min(turn,simData.game.player_path.length-1)]
+          if(simData.game.player_path[Math.min(turn,simData.game.player_path.length-1)]){
+            player_index= simData.game.player_path[Math.min(turn,simData.game.player_path.length-1)]
+          }
       }
       else{
           bot4index = simData.game.bot_starting_index;

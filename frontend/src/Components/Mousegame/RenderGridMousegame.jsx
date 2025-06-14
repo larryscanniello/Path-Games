@@ -154,11 +154,18 @@ function BotSlot(props){
         {(playerIndex[0] === props.i && playerIndex[1] === props.j) && props.flashList.map(flash=>
                     <motion.div
                         key={flash.id}
-                        className={`absolute inset-0 rounded-full ${flash.color} opacity-60 z-20`}
+                        className={`absolute rounded-full ${flash.color} opacity-60 z-20`}
+                        style={{
+                            top: flash.flashPosition.top,
+                            left: flash.flashPosition.left,
+                            transform: "translate(-50%, -50%)", // centers the flash on that point
+                            width: '24px',
+                            height: '24px',
+                          }}
                         initial={{ scale: 0.5, opacity: 0 }}
                         animate={{ scale: 2, opacity: [0, 0.8, 0] }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }} 
+                        transition={{ duration: .3, ease: "easeOut" }} 
                     />
                 )}{/**/}
         {botsInSpace.map((bot,i)=>(
