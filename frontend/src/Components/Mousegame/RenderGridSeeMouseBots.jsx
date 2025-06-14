@@ -96,7 +96,7 @@ export default function RenderGridSeeBots(props){
                         backgroundSize: getBackgroundSize()
                     }}
                     >
-                    {showProbabilities&& <div className="text-black fixed"> 
+                    {showProbabilities&& <div className={width<1100||height<900 ? (width<1000||height<785) ? "text-black fixed text-[6px]" : "text-black fixed text-[8px]" : "text-black fixed"}> 
                         {prob}</div>}
                     {(condition0||condition1||condition2||condition3||condition4)&&<BotSlot 
                             g={g}
