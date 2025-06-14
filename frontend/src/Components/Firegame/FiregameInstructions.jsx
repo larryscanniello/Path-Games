@@ -20,7 +20,7 @@ export default function FiregameInstructions(props){
                 <div className="flex flex-col items-center">
                 <div>
                 <div className="flex items-center gap-2 mb-2">
-                    <div className=" w-3 h-3 rounded-full bg-purple-600 border border-black"></div>
+                    <div className="relative w-8 h-8"><div className="absolute w-3 h-3 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-600 border border-black"></div></div>
                     <div className="text-white">{username}</div>
                 </div>
                 <div className="flex items-center gap-2 mb-2">

@@ -21,16 +21,27 @@ export default function MousegameInstructions(props){
                 </p>
                 
                 <div className="flex flex-col items-center">
+                <div>
                 <div className="flex items-center gap-2 mb-2">
-                    <div className=" w-3 h-3 rounded-full bg-purple-600 border border-black"></div>
+                <div className="relative w-8 h-8"><div className="absolute w-3 h-3 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-600 border border-black"></div></div>
                     <div className="text-white">{username}</div>
                 </div>
                 <div className="flex items-center gap-2 mb-2">
-                <div className="w-3 h-3 rounded-full bg-orange-600 text-white text-xs flex items-center justify-center border border-black">4</div>
+                <div className="relative w-8 h-8"><div className="absolute w-3 h-3 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-600 text-white text-xs flex items-center justify-center border border-black">4</div></div>
                 <div className="text-white">Jeff (Bot 4)</div>
+                
+                </div>
+                <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 text-white text-xs flex items-center justify-center bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]" style={{backgroundSize: '32px 32px'}}></div>
+                <div className="text-white">Open square</div>
+                </div>
+                <div className="flex items-center gap-2 mb-6">
+                <div className="w-8 h-8 bg-black text-white text-xs flex items-center justify-center bg-[url('/space_tiles_hyptosis/glass.png')]" style={{backgroundSize: '32px 32px'}}></div>
+                <div className="text-white">Closed square</div>
                 </div>
                 </div>
-                <p className="text-red-200 pb-12">
+                </div>
+                <p className="text-red-200 pb-6">
                     Both you and Jeff have specially made space mouse sensors to aid you.
                     At every time step, you can either move or sense.
                     You move with the arrow keys and sense with the space bar.
@@ -91,8 +102,8 @@ export default function MousegameInstructions(props){
     </tbody>
 </table>
 </div>
-   {!props.stoch && <p className="text-red-400 py-4">Warning: Moving mouse mode is challenging, and the games may be long. Try stationary first.</p>}
-                {!props.stoch && <div className='text-center text-white'>
+   {!props.stoch && <div className="flex flex-col items-center"><p className="text-red-400 py-4">Warning: Moving mouse mode is challenging. Try stationary first.</p></div>}
+                {!props.stoch && <div className='text-center text-white pb-8'>
                     <ul>{stochoptions.map((stochvar,i)=>
                     {return props.levelsLeft[i]>0 ? <li key={i}><button className='hover:underline' 
                                             onClick={()=>{props.setStoch(stochvar);
