@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom"
 import { useState } from "react";
 import api from "../api";
+import { USERNAME } from "../constants";
 
 export default function Account(){
     const {username} = useParams();
@@ -32,6 +33,10 @@ export default function Account(){
         }
       };
 
+    const realusername = localStorage.getItem(USERNAME)
+    if(realusername!==username){
+        return <div className="flex flex-col items-center"><div className="mt-12">Not authorized</div></div>
+    }
     return <div>
           <div className='m-24'></div>
           <div className='pl-48 text-cyan-200'>

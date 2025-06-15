@@ -6,7 +6,6 @@ import { useState, useEffect,useContext } from "react";
 import { AuthContext } from './AuthProvider'
 
 
-
 function ProtectedRoute({ children }) {
     const [isAuthorized, setIsAuthorized] = useContext(AuthContext);
 

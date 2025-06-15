@@ -380,6 +380,12 @@ export default function SeeMiceBots(){
 
     const optionarray = ["1", "2", "3", "4",username]
     const optionarray2 = ["1", "2", "3", "4"]
+
+    const realusername = localStorage.getItem(USERNAME)
+    if(realusername!==username){
+        return <div className="flex flex-col items-center"><div className="mt-12">Not authorized</div></div>
+    }
+    
     if (width < 900 || height < 695) {
       return (
         <div className="flex flex-col justify-center items-center h-screen px-4 text-center text-cyan-100">
@@ -389,6 +395,7 @@ export default function SeeMiceBots(){
         </div>
       );
     }
+    
   return (
     <div>
         <div>

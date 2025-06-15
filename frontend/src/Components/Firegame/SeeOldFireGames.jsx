@@ -191,6 +191,10 @@ function SeeFireBots() {
         bot1index = bot2index = bot3index = bot4index = playerindex = successpossibleindex
     }
   }
+  const realusername = localStorage.getItem(USERNAME)
+    if(realusername!==username){
+        return <div className="flex flex-col items-center"><div className="mt-12">Not authorized</div></div>
+    }
   if (width < 900 || height < 695) {
     return (
       <div className="flex flex-col justify-center items-center h-screen px-4 text-center text-cyan-100">
