@@ -19,6 +19,7 @@ from .throttles import PathGamesGlobalThrottle,UserCreationThrottle
 from rest_framework.decorators import throttle_classes
 import random
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.views import APIView
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -261,3 +262,19 @@ class CreateUserView(generics.CreateAPIView):
         }
         response = Response(response_data, status=status.HTTP_201_CREATED)
         return response
+    
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        user = request.user
+        data = request.data
+        current_password = data.get("current_password")
+        new_password = data.get("new_password")
+        if not user.check_password(current_password):
+            return Response({"error": "Current password is incorrect."}, status=status.HTTP_200_OK)
+        if not new_password:
+            return Response({"error": "No new password entered."}, status=status.HTTP_200_OK)
+        user.set_password(new_password)
+        user.save()
+        return Response({"success": "Password changed successfully."}, status=status.HTTP_200_OK)
+    
