@@ -14,6 +14,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(ACCESS_TOKEN);
+    console.log(token)
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -32,7 +33,8 @@ api.interceptors.response.use(
       return
     }
     const originalRequest = error.config;
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    console.log('errURL',error.request.responseURL)
+    if (error.response && error.response.status === 401 && !originalRequest._retry && error.request.responseURL!==VITE_API_URL+"token/") {
       originalRequest._retry = true;
 
       const refreshToken = localStorage.getItem(REFRESH_TOKEN);

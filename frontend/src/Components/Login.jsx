@@ -16,25 +16,25 @@ function Login() {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      /*const response = await fetch('http://localhost:8000/api/token/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });*/
-      const response = await api.post('token/',{username,password})
-        .catch((error)=> {throw new Error('Login failed. Try a different username or password.')});
-
+      console.log('Check1');
+      console.log('Check2');
+      const response = await api.post('token/', { username, password });
+  
       localStorage.setItem(ACCESS_TOKEN, response.data.access);
       localStorage.setItem(REFRESH_TOKEN, response.data.refresh);
       localStorage.setItem(USERNAME, username);
-      setIsAuthorized(true)
+      setIsAuthorized(true);
       navigate('/');
     } catch (err) {
-      setError(err.message)
+      console.error('Login failed:', err);
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError('Login failed. Please try again.');
+      }
     }
-  };
+      
+    };
 
   return (<div>
     <div>
@@ -48,7 +48,6 @@ function Login() {
             className='mt-4 pt-1 pb-1 pl-1 border text-black border-gray-700 rounded-md bg-gray-100'
             value={username}
             onChange={e => setUsername((prev)=>{const value = e.target.value;
-              console.log(value.length); 
               if(!/^[a-zA-Z0-9]*$/.test(value)){
                 setError('Usernames have alphanumeric characters only.');
                 return prev;
