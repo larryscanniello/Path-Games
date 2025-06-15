@@ -246,7 +246,7 @@ class CreateUserView(generics.CreateAPIView):
         if username=='5019292':
             username = generate_unique_username()
         if password=='5019292':
-            password = username  # default password is the username
+            password = username 
         serializer.save(username=username, password=password)
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

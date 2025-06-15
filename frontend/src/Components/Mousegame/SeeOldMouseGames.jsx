@@ -260,8 +260,11 @@ export default function SeeMiceBots(){
             if(e.code === 'ArrowRight'){
                 setTurn((prev)=>{
                 const newTurn = Math.min(simlength+1, prev + 1);
+                if(getStopPoint(simData,newTurn)){
+                  return prev;
+                }
                 handleFlashes(newTurn,simData,width,height)
-                return newTurn
+                return newTurn;
                 });
                   
             } else if (e.code === 'ArrowLeft'){
@@ -274,6 +277,9 @@ export default function SeeMiceBots(){
                 if(!play){
                 setTurn((prev)=>{
                 const newTurn = Math.min(simlength+1, prev + 1);
+                if(getStopPoint(simData,newTurn)){
+                  return prev;
+                }
                 return newTurn
                 });
                 }
@@ -287,8 +293,19 @@ export default function SeeMiceBots(){
         return () => {
           window.removeEventListener('keydown',handleKeyDown);
         }
-      }, [simData,width,height]);
+      }, [simData,width,height,showAgent]);
     
+    function getStopPoint(simData,newTurn){
+        const currentMaxTurns = []
+        const maxTurnArr = [simData.bot1.length,simData.bot2.length,simData.bot3.length,simData.bot4.length,simData.game.player_length];
+        for(let i=0;i<showAgent.length;i++){
+          if(showAgent[i]){
+            currentMaxTurns.push(maxTurnArr[i])
+          }
+        }
+        const highestTurn = Math.max(...currentMaxTurns);
+        return highestTurn<newTurn
+    }
 
     useEffect(()=>{
         if(play){
@@ -305,13 +322,13 @@ export default function SeeMiceBots(){
 
     useEffect(()=>{
       if(play){
-        if(turn>simData.game.simlength){
+        if(getStopPoint(simData,turn+1)){
           setPlay(false);
           clearInterval(intervalRef.current);
         }
       }
       
-    },[turn])
+    },[turn,simData])
 
     useEffect(() => {
       if(simData){
