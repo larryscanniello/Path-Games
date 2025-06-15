@@ -3,7 +3,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from firegame.models import FiregameMap
 from mousegame.models import MousegameMap, BotData
-from api.models import MousegameGame, FiregameGame
+from api.models import MousegameGame, FiregameGame, Feedback
 from .serializers import FiregameSerializer, MousegameSerializer, BotDataSerializer, UserSerializer, MousegameGameSerializer, FiregameGameSerializer
 from rest_framework.decorators import api_view,permission_classes
 from django.contrib.auth.models import User
@@ -278,3 +278,10 @@ class ChangePasswordView(APIView):
         user.save()
         return Response({"success": "Password changed successfully."}, status=status.HTTP_200_OK)
     
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def feedback(request):
+    feedback = Feedback()
+    feedback.feedback = request.data['feedback']
+    feedback.save()
+    return Response({"hell":"yeah"})

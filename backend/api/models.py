@@ -29,3 +29,9 @@ class FiregameGame(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['firegame_map','user'],name='unique_firegame_map_user')
         ]
+
+class Feedback(models.Model):
+    feedback = models.CharField(max_length=3200)
+    datetime = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f'{self.feedback}'

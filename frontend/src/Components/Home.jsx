@@ -30,6 +30,7 @@ export default function Home() {
             <li className='mb-3 hover:underline' ><Link to="/seeoldfiregames">Firegame Visualizer</Link></li>
             <li className='mb-3 hover:underline'><Link to="/mousegame">Play Mousegame</Link></li>
             <li className='mb-3 hover:underline'><Link to="/seeoldmousegames">Mousegame Visualizer</Link></li>
+            <li className='mb-3 hover:underline'><Link to="/feedback">Submit Anonymous Feedback</Link></li>
           </ul>
       </div>
   );

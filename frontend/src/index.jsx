@@ -16,6 +16,7 @@ import NicknameRoute from './Components/NicknameRoute';
 import Account from './Components/Account';
 import './index.css';
 import Layout from './Components/Layout';
+import Feedback from './Components/Feedback';
 
 const router = createBrowserRouter([
     {
@@ -31,7 +32,8 @@ const router = createBrowserRouter([
         { path: "/login", element: <Login /> },
         { path: "/register", element: <Register /> },
         { path: "/nickname", element: <NicknameRoute /> },
-        { path: "/user/:username/", element: <ProtectedRoute><Account/></ProtectedRoute>}
+        { path: "/user/:username/", element: <ProtectedRoute><Account/></ProtectedRoute>},
+        { path: "/feedback", element: <Feedback/>,}
           ]
         }
 ])

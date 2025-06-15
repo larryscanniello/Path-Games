@@ -21,5 +21,6 @@ urlpatterns = [
     path('getfiregameleaderboard/',views.get_firegame_leaderboard,name='get_firegame_leaderboard'),
     path('handle_first_turn_firegame/',views.handle_first_turn_firegame),
     path('handle_first_turn_mousegame/',views.handle_first_turn_mousegame),
-    path('change_password/',views.ChangePasswordView.as_view())
+    path('change_password/',views.ChangePasswordView.as_view()),
+    path('feedback/',views.feedback)
 ]
