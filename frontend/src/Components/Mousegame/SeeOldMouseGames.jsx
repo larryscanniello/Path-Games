@@ -313,6 +313,9 @@ export default function SeeMiceBots(){
           setTurn(prev => {
               const simlength = simData.game.simlength;
               const newTurn = Math.min(simlength+1, prev + 1);
+              if(getStopPoint(simData,newTurn)){
+                return prev;
+              }
               handleFlashes(newTurn,simData,width,height);
               return newTurn
           })},250)
