@@ -216,3 +216,72 @@ def get_mousegame_map_leaderboard(request):
         stoch = False
     userid = User.objects.get(username=request.user)
     played_map_ids = MousegameGame.objects.filter(user=userid).values_list('mousegame_map', flat=True)
+    unplayed_maps = MousegameMap.objects.filter(stochastic=stoch).exclude(id__in=played_map_ids)
+    if unplayed_maps.exists():
+        map_to_send = unplayed_maps.first()
+        serialized_map = MousegameSerializer(map_to_send)
+        bots = BotData.objects.filter(mousegame_map=map_to_send.id)
+        bot_serializer = BotDataSerializer(bots, many=True)
+        return Response({'success': True, 
+                         'game': serialized_map.data,
+                         'bots':bot_serializer.data,
+                         'win_rate':map_to_send.win_rate(),
+                         'leaderboard':map_to_send.leaderboard()})
+    return Response({'success': False})
+
+def generate_unique_username():
+        while True:
+            username = f"User{random.randint(1, 999999)}"
+            if not User.objects.filter(username=username).exists():
+                return username
+
+class CreateUserView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]
+    throttle_classes = [UserCreationThrottle]
+    def perform_create(self, serializer):
+        username = self.request.data.get('username')
+        password = self.request.data.get('password')
+        if username=='5019292':
+            username = generate_unique_username()
+        if password=='5019292':
+            password = username 
+        serializer.save(username=username, password=password)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        user = serializer.instance
+        refresh = RefreshToken.for_user(user)
+        access_token = refresh.access_token
+        response_data = {
+            'refresh': str(refresh),
+            'access': str(access_token),
+            'username': user.username
+        }
+        response = Response(response_data, status=status.HTTP_201_CREATED)
+        return response
+    
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        user = request.user
+        data = request.data
+        current_password = data.get("current_password")
+        new_password = data.get("new_password")
+        if not user.check_password(current_password):
+            return Response({"error": "Current password is incorrect."}, status=status.HTTP_200_OK)
+        if not new_password:
+            return Response({"error": "No new password entered."}, status=status.HTTP_200_OK)
+        user.set_password(new_password)
+        user.save()
+        return Response({"success": "Password changed successfully."}, status=status.HTTP_200_OK)
+    
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def feedback(request):
+    feedback = Feedback()
+    feedback.feedback = request.data['feedback']
+    feedback.save()
+    return Response({"hell":"yeah"})
