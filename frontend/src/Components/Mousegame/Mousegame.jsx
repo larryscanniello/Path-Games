@@ -434,7 +434,7 @@ export default function Mousegame(){
             <div className="border-2 border-cyan-400/30 rounded-md shadow-[0_0_6px_rgba(0,255,255,0.15)] backdrop-blur-xl bg-black/60 text-cyan-100">
             
             <div className="flex flex-col text-cyan-100 p-4">
-                <div className="text-[18px] font-bold">Mousegame, Map {gameID.current}</div>
+                <div className="text-[18px] font-bold">Mouse Game, Map {gameID.current}</div>
                 <div className="text-[13px]">Mode: {stoch==='stochastic' ? 'moving' : 'stationary'} mouse</div>
             </div>
 

@@ -10,12 +10,11 @@ export default function FiregameInstructions(props){
         <div className="relative bg-gray-800/90">
             <div className="pr-8 pl-8 pb-12">
                 <p className="text-cyan-200 pt-12 pb-12">
-                    You are in deep hibernation on an intergalactic voyage on the space ship Archaeopteryx
-                    when suddenly, the fire alarm wakes you. 
-                    Your ship has a built-in fire suppression system that will douse the fire,
-                    but it needs to be activated. 
-                    You must avoid the fire and find a path through the ship
-                    to the switch to activate the system.
+                    You are in deep hibernation on the deep space vessel Archaeopteryx
+                    when suddenly, the system wakes you. 
+                    It is time for your regular 100000-year fire drill.
+                    The vessel has a fire suppression system that is activated by reaching a button.
+                    You must avoid the fire and find a path through the ship to find the button.
                 </p>
                 <div className="flex flex-col items-center">
                 <div>
@@ -66,12 +65,11 @@ export function FiregameInstructionsatStart(props){
         <div className="max-h-[90vh] border-gray-300 bg-black mt-6 z-10 rounded-md overflow-y-auto">
             <div className="pr-8 pl-8 pb-12">
             <p className="text-cyan-200 pt-12 pb-12">
-                    You are in deep hibernation on an intergalactic voyage on the space ship Archaeopteryx
-                    when suddenly, the fire alarm wakes you. 
-                    Your ship has a built-in fire suppression system that will douse the fire,
-                    but it needs to be activated. 
-                    You must avoid the fire and find a path through the ship
-                    to the switch to activate the system.
+                    You are in deep hibernation on the deep space vessel Archaeopteryx
+                    when suddenly, the system wakes you. 
+                    It is time for your regular 100000-year fire drill.
+                    The vessel has a fire suppression system that is activated by reaching a button.
+                    You must avoid the fire and find a path through the ship to activate the system.
                 </p>
                 <div className="flex flex-col items-center">
                 <div>

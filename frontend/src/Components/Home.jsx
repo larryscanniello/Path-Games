@@ -26,10 +26,10 @@ export default function Home() {
     <div>
           <div className='m-24'></div>
           <ul className='pl-48'>
-            <li className='mb-3 hover:underline'><Link to="/firegame">Play Firegame</Link></li>
-            <li className='mb-3 hover:underline' ><Link to="/seeoldfiregames">Firegame Visualizer</Link></li>
-            <li className='mb-3 hover:underline'><Link to="/mousegame">Play Mousegame</Link></li>
-            <li className='mb-3 hover:underline'><Link to="/seeoldmousegames">Mousegame Visualizer</Link></li>
+            <li className='mb-3 hover:underline'><Link to="/firegame">Play Fire Game</Link></li>
+            <li className='mb-3 hover:underline' ><Link to="/seeoldfiregames">Fire Game Visualizer</Link></li>
+            <li className='mb-3 hover:underline'><Link to="/mousegame">Play Mouse Game</Link></li>
+            <li className='mb-3 hover:underline'><Link to="/seeoldmousegames">Mouse Game Visualizer</Link></li>
             <li className='mb-3 hover:underline'><Link to="/feedback">Submit Anonymous Feedback</Link></li>
           </ul>
       </div>

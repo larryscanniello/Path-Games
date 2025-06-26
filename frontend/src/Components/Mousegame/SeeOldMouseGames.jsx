@@ -459,7 +459,7 @@ export default function SeeMiceBots(){
             />}
         <div className='flex justify-between'>
             <button className='hover:underline' onClick={()=>setShowGameSelection(prev=>!prev)}>Visualize new game</button>
-            <button className="hover:underline" onClick={()=>setShowToMousegame(prev=>!prev)}>Mousegame</button>
+            <button className="hover:underline" onClick={()=>setShowToMousegame(prev=>!prev)}>Mouse Game</button>
             <button className="hover:underline" ref={restartButtonRef} onClick={(e)=>{
                 if(restartButtonRef.current){
                     restartButtonRef.current.blur()
@@ -470,7 +470,7 @@ export default function SeeMiceBots(){
         {<div className="pt-8 pl-10 pr-10 backdrop-blur-md">
           <div className='border-2 border-cyan-400/30 rounded-md shadow-[0_0_6px_rgba(0,255,255,0.15)] backdrop-blur-xl bg-black/60 text-cyan-100'>
         <div className="flex flex-col text-cyan-100 p-4">
-                <div className="text-[18px] font-bold">Mousegame Visualizer, Map {currentGame}</div>
+                <div className="text-[18px] font-bold">Mouse Game Visualizer, Map {currentGame}</div>
                 {simData && <div className="text-[13px]">Mode: {simData.game.stoch ? 'Moving' : 'Stationary'} mouse</div>}
                 {simData && <div className="text-[13px]">Result: {simData.game.result}</div>}                                    
                 <div className="text-[13px]">Map win rate: {Math.round(winRateRef.current*100)}%</div>
@@ -520,7 +520,7 @@ function ToMousegame(props){
     return(
       <div className="bg-gray-800/90 mt-80 ml-68 mr-24 mb-12 rounded-md">
         <div className="flex flex-col items-center pr-8 pl-8 pb-6">
-          <Link className="hover:underline pt-6 text-white" to="/mousegame">Proceed To Mousegame</Link>
+          <Link className="hover:underline pt-6 text-white" to="/mousegame">Proceed To Mouse Game</Link>
           <div className="pt-3"><button onClick={()=>props.setShowToMousegame(false)} className="text-white hover:underline content-center">Close</button></div>
         </div>
       </div>

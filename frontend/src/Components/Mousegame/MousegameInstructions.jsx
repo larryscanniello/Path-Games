@@ -9,7 +9,7 @@ export default function MousegameInstructions(props){
         <div className={props.stoch ? "max-h-[100vh] overflow-y-auto rounded-md bg-gray-800/90" : "mousegame-div bg-black max-h-[100vh] z-10 rounded-md overflow-y-auto text-sm"}>
             <div className="pr-8 pl-8 pb-12">
                 <p className="text-cyan-200 pt-12 pb-6">
-                    You are in deep space aboard the ship Archaeopteryx,
+                    You are in deep space aboard the vessel Archaeopteryx,
                     when you receive a system alert: A space mouse has found its way aboard.
                     Space mice are friendly and curious creatures. Their natural habitat is the 
                     vacuum of space. 

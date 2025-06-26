@@ -231,7 +231,7 @@ function SeeFireBots() {
                       indices = {[bot1index,bot2index,bot3index,bot4index,successpossibleindex,playerindex]}/>}
     <div className='flex justify-between'>
         <button className='hover:underline' onClick={()=>setShowGameSelection(prev=>!prev)}>Select new simulation</button>
-        <button className='hover:underline' onClick={()=>setShowToFiregame(prev=>!prev)}>Firegame</button>
+        <button className='hover:underline' onClick={()=>setShowToFiregame(prev=>!prev)}>Fire Game</button>
         <button className='hover:underline' onClick={()=>setCurrentTurn(0)}>Restart</button>
         <button className='hover:underline' onClick={()=>setShowInstructions(prev=>!prev)}>Instructions</button>
         <button className='hover:underline' onClick={()=>setShowAbout(prev=>!prev)}>About</button>
@@ -240,7 +240,7 @@ function SeeFireBots() {
     <div className='pt-8 pl-10 pr-10 backdrop-blur-md' >
     <div className='border-2 border-cyan-400/30 rounded-md shadow-[0_0_6px_rgba(0,255,255,0.15)] backdrop-blur-xl bg-black/60'>
     <div className="flex flex-col text-cyan-100 p-4">
-                <div className='font-bold text-[18px]'>Firegame Visualizer, Map: {currentGame}</div>
+                <div className='font-bold text-[18px]'>Fire Game Visualizer, Map: {currentGame}</div>
                 <div className='text-[13px]'>Difficulty: {difficulty}</div>
                 <div className='text-[13px]'>Result: {result}</div>                                    
                 <div className="text-[13px]">Map win rate: {Math.round(winRate*100)}%</div>
@@ -253,7 +253,7 @@ function SeeFireBots() {
                 
       </div>}
       {leaderboard && <div className="text-cyan-100 flex flex-col p-4 rounded-md">
-                <div>Firegame Leaderboard</div>
+                <div>Fire Game Leaderboard</div>
                 <div className='border border-gray-500 rounded-2xl p-4'>{leaderboard.leaderboard.map(([user,score])=><div className='flex justify-between text-[13px]'><div>{user}</div><div className='ml-3'></div> <div>{score}</div></div>)}</div>
 
       </div>}
@@ -295,7 +295,7 @@ function ToFiregame(props){
   return(
     <div className="bg-gray-800/90 mt-12 ml-24 mr-24 mb-12 z-10 rounded-md">
       <div className="flex flex-col items-center pr-8 pl-8 pb-6">
-        <Link className="hover:underline pt-6 text-white" to="/firegame">Proceed To Firegame</Link>
+        <Link className="hover:underline pt-6 text-white" to="/firegame">Proceed To Fire Game</Link>
         <div className="pt-3"><button onClick={()=>props.setShowToFiregame(false)} className="text-white hover:underline content-center">Close</button></div>
       </div>
     </div>

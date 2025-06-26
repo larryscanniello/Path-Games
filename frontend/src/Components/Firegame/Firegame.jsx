@@ -289,7 +289,7 @@ export default function Firegame(){
     <div className='border-2 border-cyan-400/30 rounded-md shadow-[0_0_6px_rgba(0,255,255,0.15)] backdrop-blur-xl bg-black/60 text-cyan-100'>
 
       <div className="flex flex-col text-cyan-100 p-4">
-        <div className="text-[18px] font-bold">Firegame, Map {gameID.current}</div>
+        <div className="text-[18px] font-bold">Fire Game, Map {gameID.current}</div>
         <div className="text-[13px]">Difficulty: {difficulty}</div>
         <div className="text-[13px]">Map win rate: {Math.round(winRate * 100)}%</div>
       </div>
@@ -303,7 +303,7 @@ export default function Firegame(){
       </div>
 
       <div className="text-cyan-100 flex flex-col p-4 rounded-md">
-        <div className="text-[15px] font-semibold">Firegame Leaderboard</div>
+        <div className="text-[15px] font-semibold">Fire Game Leaderboard</div>
         <div className='border border-gray-500 p-4 rounded-2xl text-[14px]'>
           {leaderboard.leaderboard && leaderboard.leaderboard.length > 0 ? (
             leaderboard.leaderboard.map(([user, score]) => (
