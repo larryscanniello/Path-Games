@@ -13,6 +13,7 @@ import ViewFiregameList from './Components/Firegame/ViewFiregameList';
 import SeeOldMouseGames from './Components/Mousegame/SeeOldMouseGames';
 import ViewMousegameList from "./Components/Mousegame/ViewMousegameList";
 import NicknameRoute from './Components/NicknameRoute';
+import Credits from './Components/Credits';
 import Account from './Components/Account';
 import './index.css';
 import Layout from './Components/Layout';
@@ -35,7 +36,8 @@ const router = createBrowserRouter([
         { path: "/nickname", element: <NicknameRoute /> },
         { path: "/user/:username/", element: <ProtectedRoute><Account/></ProtectedRoute>},
         { path: "/feedback", element: <Feedback/>,},
-        { path: "/HLQAresume",element:<HLQAResume/>}
+        { path: "/HLQAresume",element:<HLQAResume/>},
+        { path: "/credits",element:<Credits/>},
           ]
         }
 ])
