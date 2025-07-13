@@ -3,6 +3,8 @@ import { useState } from "react";
 import api from "../api";
 import { USERNAME } from "../constants";
 
+//Account component. Later will have account info. For now, all that really happens here is the user can change their password
+
 export default function Account(){
     const {username} = useParams();
     const [changePassword, setChangePassword] = useState(false);
@@ -12,6 +14,7 @@ export default function Account(){
     const [passwordSuccess,setPasswordSuccess] = useState(false);
     const [error,setError] = useState('');
 
+    //Change password submission
     const handleSubmit = async e => {
         e.preventDefault();
         setError('')
@@ -33,6 +36,7 @@ export default function Account(){
         }
       };
 
+    //Make sure user can't go to another user's account page
     const realusername = localStorage.getItem(USERNAME)
     if(realusername!==username){
         return <div className="flex flex-col items-center"><div className="mt-12">Not authorized</div></div>

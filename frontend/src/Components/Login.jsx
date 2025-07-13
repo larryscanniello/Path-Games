@@ -16,10 +16,8 @@ function Login() {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      console.log('Check1');
-      console.log('Check2');
       const response = await api.post('token/', { username, password });
-  
+      //if login fails, it will go to the catch, and set an error, otherwise it will set tokens and set isAuthorized to true
       localStorage.setItem(ACCESS_TOKEN, response.data.access);
       localStorage.setItem(REFRESH_TOKEN, response.data.refresh);
       localStorage.setItem(USERNAME, username);

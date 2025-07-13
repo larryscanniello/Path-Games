@@ -14,6 +14,9 @@ function NicknameRoute() {
   const [isAuthorized,setIsAuthorized] = useContext(AuthContext);
   const navigate = useNavigate();
 
+  //This is the route that users take if they try and play a game before registering
+  //The user will choose a nickname, and an account will be created with username: nickname and password: nickname
+
   const handleSubmit = async e => {
     e.preventDefault();
     setError('')

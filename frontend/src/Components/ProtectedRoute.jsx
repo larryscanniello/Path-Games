@@ -5,14 +5,18 @@ import { REFRESH_TOKEN, ACCESS_TOKEN } from "../constants";
 import { useState, useEffect,useContext } from "react";
 import { AuthContext } from './AuthProvider'
 
+//This component wraps around any component that requires a login
+//so that account requirements to view a page are enforced
 
 function ProtectedRoute({ children }) {
     const [isAuthorized, setIsAuthorized] = useContext(AuthContext);
 
+    //When component is first loaded, calls auth() to check if user is authorized - sets isAuthorized to false if not
     useEffect(() => {
         auth().catch(() => setIsAuthorized(false))
     }, [])
 
+    //Gets a new access token using the refresh token
     const refreshToken = async () => {
         const refreshToken = localStorage.getItem(REFRESH_TOKEN);
         try {
@@ -31,6 +35,7 @@ function ProtectedRoute({ children }) {
         }
     };
 
+    //Checks access token to see if it is expired, calls refreshToken() if token is expired
     const auth = async () => {
         const token = localStorage.getItem(ACCESS_TOKEN);
         if (!token) {
