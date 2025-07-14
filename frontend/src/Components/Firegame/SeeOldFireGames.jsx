@@ -83,11 +83,14 @@ function SeeFireBots() {
       const successpossiblelength = successpossiblepath.length;
       const firelist = JSON.parse(responsedata.fire_progression)
       const simlength = Math.max(bot1length,bot2length,bot3length,bot4length,successpossiblelength,player_path.length);
-      //For the next code, I wanted to encoded the fire supressor as a 4 instead of a 5 
+      //For the next line of code, I wanted to encoded the fire supressor as a 4 instead of a 5, to fit with new encodings
       //and if a bot is encoded as a 10, I wanted to get rid of that completely
       const initial_board = JSON.parse(responsedata.initial_board).map(row=>row.map(cell=> cell===5 ? 4 : cell===10 ? 0 : cell))
       const fireGrids = [initial_board];
-
+      //Similarly to the game,
+      //firelist[t] is an array of tuples of the form [[a,b],[c,d],...,[e,f]] where each tuple is a space that catches on fire at time t
+      //fireGrids is an array of 25x25 arrays, where fireGrids[t][a][b]===2 if the space (a,b) is on fire at time t, 0 otherwise
+      //In the following code I make fireGrids from firelist, ensuring all of this is processed up front / at the beginning
       for (let t = 1; t <= firelist.length; t++) {
         const newGrid = fireGrids[t-1].map(row=>[...row]);
         for (let [x, y] of firelist[t-1] || []) {
@@ -118,6 +121,7 @@ function SeeFireBots() {
     }
   }, [currentGame,gameList])
 
+  //This effect sets an event listener, handles all keydowns
   useEffect(() => {
     const handleKeyDown = (e) => {
       if(data){
@@ -150,6 +154,7 @@ function SeeFireBots() {
     }
   }, [data]);
 
+  //This effect moves the turns along using a setInterval if the user hits the spacebar to play
   useEffect(()=>{
     if(play){
       intervalRef.current = setInterval(()=>{
@@ -162,6 +167,7 @@ function SeeFireBots() {
     }
   },[play])
 
+  //This effect just checks if the simulation is at its last turn, and if the simulation is being played, it stops it
   useEffect(()=>{
     if(play){
       if(currentTurn===data.simlength){
@@ -172,6 +178,7 @@ function SeeFireBots() {
     
   },[currentTurn])
 
+  //get all of the bot indices to be sent to the grid renderer
   let successpossibleindex,bot1index,bot2index,bot3index,bot4index,playerindex;
   if(data){
     if(currentTurn!==0){
@@ -193,6 +200,7 @@ function SeeFireBots() {
         bot1index = bot2index = bot3index = bot4index = playerindex = successpossibleindex
     }
   }
+  //Check to make sure user isn't doing anything funny and seeing a different user's games
   const realusername = localStorage.getItem(USERNAME)
     if(realusername!==username){
         return <div className="flex flex-col items-center"><div className="mt-12">Not authorized</div></div>

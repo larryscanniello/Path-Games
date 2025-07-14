@@ -35,6 +35,7 @@ export default function SeeMiceBots(){
     const [flashList,setFlashList] = useState([[],[],[],[],[]])
     const [width,height] = useWindowSize()
 
+    //This effect fetches the game list for users to select which game they want to visualize. Runs only when Mousegame Visualizer is first accessed
     useEffect(()=>{
         async function fetchGameList(){
             const res = await api.post('getmousegamelist/',{
@@ -49,6 +50,8 @@ export default function SeeMiceBots(){
         fetchGameList();
     },[])
 
+    //This effect loads the game when a game to be visualized has been selected
+    //A lot of processing here happens up-front
     useEffect(() => {
         async function fetchGame(){
           try{
@@ -63,11 +66,15 @@ export default function SeeMiceBots(){
             winRateRef.current = gameList.find(([id,result,stoch,date,rate])=>id==currentGame)[4]
             const bot3evidence = JSON.parse(responsedata.bots[2].evidence);
             bot3evidence[0] = bot3evidence[1];
+            //In the bot paths from the backend, the first index is junk and needs to be sliced for the purposes of this code
             const bot1path = JSON.parse(responsedata.bots[0].evidence).slice(1).map(([t,type,[i,j]])=> [i,j]);
             const bot2path = JSON.parse(responsedata.bots[1].evidence).slice(1).map(([t,type,[i,j]])=> [i,j]);
             const bot3path = bot3evidence.slice(1).map(([t,type,[i,j]])=> [i,j]);
             const bot4path = JSON.parse(responsedata.bots[3].evidence).slice(1).map(([t,type,[i,j]])=> [i,j]);
             const simlength = Math.max(bot1path.length,bot2path.length,bot3path.length,bot4path.length);
+            //Plans are the bot's projected path that won't necessarily be followed all the way. For bot2, this plan changes every turn
+            //so they are large files
+            
             const bot1plans = responsedata.bots[0].plans;
             const bot2plans = responsedata.bots[1].plans;
             bot2plans.unshift([null]);
@@ -76,6 +83,14 @@ export default function SeeMiceBots(){
             const bot1plansprocessed = [];
             const bot3plansprocessed = [];
             const bot4plansprocessed = [];
+            //The plans in their raw form need to processed. They arrive from the backend in the form of arrays of arrays of tuples
+            //For bots 1,3, and 4, well, their plan might an array whose entries are:
+            //[[1,2],[1,3],[1,4]],[[1,5],[2,6],[3,6]]
+            //and we need it to change it to something like:
+            //[[1,2],[1,3],[1,4]],[[1,3],[1,4]],[[1,4]],[[1,5],[2,6],[3,6]],[[2,6],[3,6]],[[3,6]]
+            //The only complication is the plans might have nulls, which represent when bots are supposed to sense
+            //The reason for pre-processing it this way is performance, and to get as much processing out of the way in the beginning
+            //Since bot 2's plan changes every turn, it doesn't need further processing as it is already in the correct form
             for(let i=0;i<bot1path.length;i++){
               bot1plansprocessed.push(processFromFlatIndexBot3(bot1plans,i-1))
             }
@@ -128,7 +143,8 @@ export default function SeeMiceBots(){
             setFlashList([[],[],[],[],[]])
             setSimData(parseddata);
             setTurn(0);
-
+        //These process functions are implementing the processing as described above
+        //Bot 3 and bot 4 are slightly different
         function processFromFlatIndexBot4(botplans, t) {
         let count = 0;
         for (let i = 0; i < botplans.length; i++) {
@@ -179,7 +195,11 @@ export default function SeeMiceBots(){
             fetchGame();
         }
       }, [currentGame,gameList])
-
+      //Unlike the Mouse Game where there was just one flash array,
+      //Now the flashList is a 2D array
+      //Again, the reason for doing this is performance
+      //When the turn changes, all of the flashes are processed in handleFlashes, then processed in the tile component
+      //This handleFlashes is only called in a different effect
       function handleFlashes(newTurn,simData,width,height){
         const evidence = []
         if(simData.game.player_sensor_log[newTurn-1]){
@@ -198,6 +218,7 @@ export default function SeeMiceBots(){
           evidence.push([3,simData.bot4.evidence[newTurn-1][1]])
         }
         const botobjs = []
+        //I hard coded bot positions for all different window sizes
         const flashpositions = (width<1000||height<785) ? [{top:"-6px",left:"-6px"},
                                                           {top:"-7px",left:"6px"},
                                                           {top:"6px",left:"-6px"},
@@ -236,7 +257,6 @@ export default function SeeMiceBots(){
           return newprev
         });
         setTimeout(()=>{
-            //setFlashList([[],[],[],[],[]])
           setFlashList(prev=>{
             const newprev = [...prev]
             for(let j=0;j<newprev.length;j++){
@@ -253,6 +273,7 @@ export default function SeeMiceBots(){
         },300)
       }
 
+      //This effect handles the keydown, mounts an event listener for keydowns, moves the sim forward, calls handleFlashes when necessary
     useEffect(() => {
         const handleKeyDown = (e) => {
           if(simData){
@@ -295,6 +316,7 @@ export default function SeeMiceBots(){
         }
       }, [simData,width,height,showAgent]);
     
+    //The simulation will not move forward if all of the bots on the screen are finished; this function returns true if the current turn is past the stop point
     function getStopPoint(simData,newTurn){
         const currentMaxTurns = []
         const maxTurnArr = [simData.bot1.length,simData.bot2.length,simData.bot3.length,simData.bot4.length,simData.game.player_length];
@@ -307,6 +329,7 @@ export default function SeeMiceBots(){
         return highestTurn<newTurn
     }
 
+    //This effect implements the interval that plays the simulation if the interval is pressed
     useEffect(()=>{
         if(play){
         intervalRef.current = setInterval(()=>{
@@ -323,6 +346,7 @@ export default function SeeMiceBots(){
         }
     },[play,showAgent,width,height])
 
+    //This effect stops the simulation if it is being played past the current stop point
     useEffect(()=>{
       if(play){
         if(getStopPoint(simData,turn+1)){
@@ -333,6 +357,7 @@ export default function SeeMiceBots(){
       
     },[turn,simData])
 
+    //This effect sets the direction frame of the mouse; sets mouse pointing up down left or right appropriately
     useEffect(() => {
       if(simData){
       const simlength = Math.max(simData.bot1.evidence.length,simData.bot2.evidence.length,simData.bot3.evidence.length,simData.bot4.evidence.length)
@@ -353,13 +378,14 @@ export default function SeeMiceBots(){
       }, [turn]);
 
 
+    //Sets scroller on the game selection list to the bottom
     useEffect(()=>{
         if(showGameRef.current&&simData){
             showGameRef.current.scrollTop = showGameRef.current.scrollHeight;
         }
     },[showGameSelection])
 
-    
+    //Get current bot indices
     let bot1index,bot2index,bot3index,bot4index,player_index,mouse_index;
     if(simData){ 
       
@@ -520,31 +546,9 @@ function ToMousegame(props){
     return(
       <div className="bg-gray-800/90 mt-80 ml-68 mr-24 mb-12 rounded-md">
         <div className="flex flex-col items-center pr-8 pl-8 pb-6">
-          <Link className="hover:underline pt-6 text-white" to="/mousegame">Proceed To Mouse Game</Link>
+          <Link className="hover:underline pt-6 text-white" to="/mousegame">Proceed To Mouse G2ame</Link>
           <div className="pt-3"><button onClick={()=>props.setShowToMousegame(false)} className="text-white hover:underline content-center">Close</button></div>
         </div>
       </div>
     )
   }
-
-/*
-{optionarray.map((option,i)=><label><input type="checkbox" checked={showAgent[i]}
-                                                onChange={()=>setShowAgent(prev=>{
-                                                    const updated = [...prev]
-                                                    updated[i]=!prev[i];
-                                                    return updated
-                                                })}/>Show {option}</label>)}
-    <div>Show Probabilities:                                          
-    {optionarray2.map((option,i)=><label><input type="checkbox" checked={showProbabilities===i+1}
-                                        onChange={()=>{
-                                            if(showProbabilities===i+1){
-                                                setShowProbabilities(0);
-                                            }else setShowProbabilities(i+1)}}/>
-                                        {option}</label>)}
-    </div>
-<SelectGameMenu showGameSelection={showGameSelection} 
-                    setShowGameSelection={setShowGameSelection} 
-                    currentGame={currentGame}
-                    setCurrentGame={setCurrentGame}
-                    gameList={gameList}/>
-    */

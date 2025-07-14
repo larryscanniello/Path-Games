@@ -45,6 +45,9 @@ export default function Mousegame(){
     const [flashList,setFlashList] = useState([]);
     const [width,height] = useWindowSize();
 
+    //This effect fetches a game from the database once a mode (stationary or moving mouse) has been selected
+    //It also runs when Mouse Game is first loaded, and the api call to mousegame/ will fail, but it will get
+    //data about the number of levels left for each difficulty
     useEffect(() => {
         async function fetchGame(){
             try{
@@ -53,15 +56,15 @@ export default function Mousegame(){
             })
             .catch((e)=>{throw new Error("Error fetching game.")});
             const responsedata = res.data;
-            console.log(responsedata.success)
             if(!responsedata.success){
-                console.log('check-1')
                 setLevelsLeft(responsedata.levels_left);          
             }else if(stoch){
                 setLevelsLeft(responsedata.levels_left);
                 gameID.current = responsedata.game.id
                 winRateRef.current = responsedata.win_rate
                 leaderboard.current = responsedata.leaderboard
+                //bot4evidence is an array with entries of the form [t,type,[i,j]]
+                //For now, all that is needed are the [i,j]'s, which represent the path bot 4 (the adversary) took in this simulation
                 const bot4evidence = JSON.parse(responsedata.bots[3].evidence).slice(1);
                 const bot4path = bot4evidence.map(([t,type,[i,j]])=> [i,j])
                 const grid = JSON.parse(responsedata.game.grid)
@@ -101,7 +104,12 @@ export default function Mousegame(){
                     playerPath: [parseddata.game.botStartingIndex],
                     sensorLog: []
                 })
+                //sensorCounts is a 25x25 array of tuples of the form [x,y], where x is number of beeps at the space, y is total senses at the space
+                //it is initialized with all [0,0]
                 setSensorCounts(Array.from({ length: 25 }, () => Array.from({ length: 25 }, () => [0, 0])))
+                //gridColors is a 25x25 array of colors, that is mapped to from sensorCounts
+                //An entry in gridColors corresponds to a square being redder or greener depending on sense ratio
+                //To start, it is all -1, which makes each tile have only the default background applied to it
                 setGridColors(Array.from({length: 25},()=> Array.from({length: 25},()=>-1)))
             }
 
@@ -112,12 +120,15 @@ export default function Mousegame(){
         fetchGame();
         }, [stoch,stochVersion])
 
+        //This effect is so a new sense automatically brings the scroller on the sensor info box all the way down
         useEffect(()=>{
             if(boxRef&&stoch){
                 boxRef.current.scrollTop = boxRef.current.scrollHeight;
             }
         },[gameState])
 
+        //this effect is so if a player leaves mid-game for any reason,
+        //the API is called and their game is saved (for visualization purposes - they can't resume)
         useEffect(() => {
             const handleBeforeUnload = () => {
                 if(gameState.gameStatus==='in_progress'&&gameState.turn>0){
@@ -129,7 +140,7 @@ export default function Mousegame(){
                         sensorLog: gameState.sensorLog,
                         id: gameID.current
                     };
-                    navigator.sendBeacon('http://localhost:8000/api/handle_game_over_mousegame/', JSON.stringify(obj));
+                    navigator.sendBeacon(import.meta.env.BEACON_URL, JSON.stringify(obj));
                 }   
             };
             window.addEventListener('beforeunload', handleBeforeUnload);
@@ -138,7 +149,7 @@ export default function Mousegame(){
             };
         }, [gameState.playerPath, gameState.sensorLog, gameState.gameStatus,gameID]);
         
-
+        //This effect handles all of the keydowns, attaches an event listener to the window
       useEffect(() => {
         const handleKeyDown = (e) => {
             setGameState(prev => {
@@ -198,8 +209,12 @@ export default function Mousegame(){
                             bot4index = gameData.game.botStartingIndex;
                         }
                     }
+                    //If a player hits the space and chooses to sense, they get a beep with probability e^{-\alpha(d-1)}
+                    //where here, d is the (actual) Manhattan distance from the mouse, and alpha is a sensitivty parameter
+                    //fixed at .1155=-log(.5)/(5-1) (so that when the distance from the mouse is 7, probability of a beep is .5)
                     const manhattanDistance = Math.abs(mouseIndex[0]-playerIndex[0])+Math.abs(mouseIndex[1]-playerIndex[1]);
                     const beep = Math.random()< Math.exp(-.1155*(manhattanDistance-1));
+                    //The sensor log object is made so backend saves player sense results
                     if(beep){
                         sensorLogObj = {position: playerIndex, turn:prev.turn+1, beep: true}
                     }
@@ -231,7 +246,10 @@ export default function Mousegame(){
                         }
                     }
                     const flash = { id: Date.now(),  color, flashPosition };
+                    //Each flash will be used in the grid/tile rendering components to render a flash
+                    //The reason the flashlist is a list is to handle many/fast flashes
                     setFlashList(prev => [...prev, flash]);
+                    //The setTimeout ensures the flash expires after .3 seconds, by deleting the flash from the flash list
                     setTimeout(() => {
                         setFlashList(prev => prev.filter(f => f.id !== flash.id));
                         }, 300);
@@ -258,6 +276,7 @@ export default function Mousegame(){
             if(prev.turn+1===1){
                 handleFirstTurn()
             }
+            //Handle first turn sends an API call so that once user starts game, they can't restart
             async function handleFirstTurn(){
                 const username = localStorage.getItem(USERNAME);
                 const obj = {username,id:gameID.current}
@@ -280,8 +299,9 @@ export default function Mousegame(){
         }
       }, [gameData,width,height]); 
 
-
+      //This effect handles the grid tile background color changes if the user selects the option so they can visualize sensor readings
       useEffect(()=>{
+        //This function assigns a color based on the ratio of beeps/senses
         function getColorFromValue(a,b) {
             if(a===0){
                 return `bg-red-400`
@@ -307,13 +327,16 @@ export default function Mousegame(){
                     const i = gameState.sensorLog[index].position[0]
                     const j = gameState.sensorLog[index].position[1]
                     setSensorCounts(prev => {
+                        //First make a deep copy of newCounts before updating sensor counts
                         const newCounts = [...prev];
                         newCounts[i] = [...newCounts[i]];
                         newCounts[i][j] = [...newCounts[i][j]];
+                        //newCounts is an array of tuples [x,y]; where y is total senses and x is number of beeps
                         newCounts[i][j][1] += 1;
                         if (gameState.sensorLog[index].beep) {
                             newCounts[i][j][0] += 1;
                         }
+                        //make a deep copy of gridColors (a state variable) before using getColorFromValue to set color
                         const newColors = [...gridColors];
                         newColors[i] = [...newColors[i]];
                         newColors[i][j] = getColorFromValue(newCounts[i][j][0], newCounts[i][j][1]);
@@ -348,6 +371,7 @@ export default function Mousegame(){
 
    
     const stochoptions = ['stationary','stochastic']
+    //get bot4index from gameData
     let bot4index;
     if(gameData){
         if(gameState.turn!==0){

@@ -40,7 +40,15 @@ export default function RenderGridMousegame(props){
         return "0"
         }
     
-
+    /*
+    Grid Legend
+    +4 - Player
+    +8 - Bot 4 (Jeff) index
+    +16 - Background color is changed
+    +32 - player mouse hovering over sensor log, corresponding tile is changed color
+    +64 - Mouse
+    So for example, if space (i,j) contains the player and background color is changed, grid[i][j] will equal 4+16=20
+    */
     if(props.seePath){
         for(let i=0;i<playerPath.length;i++){
             grid[playerPath[i][0]][playerPath[i][1]]= 2
@@ -128,7 +136,7 @@ function BotSlot(props){
         if(width<1100||height<900) return "1";
         return "0"
     }
-
+    //Check if bot4 is in tile and place if so. If player is also in tile, then adjust position to fit both and place player
     if(bot4index[0]===props.i && bot4index[1]===props.j){
         if(playerIndex[0]===props.i && playerIndex[1]===props.j){
             const bot4obj = { id: 4, className:"absolute top-1/2 left-2/7 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-orange-600 text-white text-xs flex items-center justify-center border border-black z-30"}
@@ -146,6 +154,7 @@ function BotSlot(props){
     }
 
     let mouseclass = '';
+    //If game is over, show the mouse in its tile
     if(props.gameStatus!=='in_progress'&&props.mouseIndex[0]===props.i && props.mouseIndex[1]===props.j){
         botsInSpace.push({id: 6, className:'open-sq mouse-sprite anim-r'})
     }

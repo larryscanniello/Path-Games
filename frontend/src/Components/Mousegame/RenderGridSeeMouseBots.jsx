@@ -33,6 +33,20 @@ export default function RenderGridSeeBots(props){
     const indices = props.indices
     const plans = props.plans
 
+    /*
+    Here, the full power of encoding is really needed
+    1 closed square
+    +2 Bot 1 planned space
+    +4 Bot 2 planned space
+    +8 Bot 3 planned space
+    +16 Bot 4 planned space
+    +32 Bot 1
+    +64 Bot 2
+    +128 Bot 3
+    +256 Bot 4
+    +512 Player
+    So if bot 3 and bot 4 are planned to be in the space, and bot 3 is currently in the space, grid will have a value of 8+16+128
+    */
 
     for(let i=0;i<6;i++){
         if(indices[i]){
