@@ -38,6 +38,7 @@ export default function Firegame(){
     const [leaderboard,setLeaderboard] = useState(null);
     const [width,height] = useWindowSize();
 
+    //When user selects a difficulty, fetches game board / data needed for new game
     useEffect(() => {
         async function fetchGame(){
             try{
@@ -49,17 +50,20 @@ export default function Firegame(){
             const leaderboardres = await api.post('getfiregameleaderboard/',{})
             .catch((e)=>{throw new Error("Error fetching leaderboard.")});
             setLeaderboard(leaderboardres.data)
-            
+            //When the next line of code runs when the component is initialized, there will be no response data
+            //but the previous API call will still fetch data about number of levels of left for each difficulty, which is used elsewhere
             if(!responsedata){
                 setLevelsLeft(res.data.levels_left);
             }
             else{
             setInitialGameLoaded(true);
-            
             gameID.current = responsedata.id
             const grid = JSON.parse(responsedata.initial_board);
             const firelist = JSON.parse(responsedata.fire_progression);
             const fireGrids = [grid];
+            //firelist[t] is an array of tuples of the form [[a,b],[c,d],...,[e,f]] where each tuple is a space that catches on fire at time t
+            //fireGrids is an array of 25x25 arrays, where fireGrids[t][a][b]===2 if the space (a,b) is on fire at time t, 0 otherwise
+            //In the following code I make fireGrids from firelist, ensuring all of this is processed up front / at the beginning
             for (let t = 1; t <= firelist.length; t++) {
                 const newGrid = fireGrids[t-1].map(row=>[...row]);
                 for (let [x, y] of firelist[t-1] || []) {
@@ -89,6 +93,8 @@ export default function Firegame(){
         fetchGame();
         }, [difficulty,difficultyCount])
 
+    //This useEffect contains the handleKeyDown that handles player movement, and it adds the corresponding event listener to the window
+    //For each arrow key down, checks if space is in bounds and if space is open (if grid[i][j] isnt 1)
       useEffect(() => {
         const handleKeyDown = (e) => {
             setGameState(prev => {
@@ -135,6 +141,7 @@ export default function Firegame(){
             }
             const [k,h] = newPlayerIndex
             let gameStatus = 'in_progress';
+            //Checks firelist if player is in a fire square, and game is over
             for(let i=0;i<prev.turn+1;i++){
                 for(let j=0;j<gameData.firelist[i].length; j++){
                     if(k===gameData.firelist[i][j][0]&&h===gameData.firelist[i][j][1]){
@@ -142,6 +149,7 @@ export default function Firegame(){
                     }
                 }
             }
+            //Checks if player is at extinguisher index
             if(gameData.extIndex[0]===newPlayerIndex[0]&&gameData.extIndex[1]===newPlayerIndex[1]){
                 gameStatus = 'win'
             }
@@ -151,6 +159,7 @@ export default function Firegame(){
                 handleGameOver(gameStatus,playerPath);
             }
             if(prev.turn+1===1){
+                //handleFirstTime pings the backend so the player can't restart a game they've already started
                 handleFirstTurn()
             }
             async function handleFirstTurn(){
@@ -173,6 +182,8 @@ export default function Firegame(){
         }
       }, [gameData]);
 
+      //Adds an event listener for if a player closes the window or leaves in the middle of the game
+      //It saves their progress so they can see the path they took
       useEffect(() => {
         const handleBeforeUnload = () => {
             if(gameState.gameStatus==='in_progress'){
@@ -184,8 +195,7 @@ export default function Firegame(){
                     sensorLog: gameState.sensorLog,
                     id: gameID.current
                 };
-                //const blob = new Blob([JSON.stringify(obj)], JSON.stringify({ foo: 'bar' }));
-                navigator.sendBeacon('http://localhost:8000/api/handle_game_over_firegame/', JSON.stringify(obj));
+                navigator.sendBeacon(import.meta.env.BEACON_URL, JSON.stringify(obj));
             }   
         };
         window.addEventListener('beforeunload', handleBeforeUnload);
@@ -195,7 +205,7 @@ export default function Firegame(){
     }, [gameState.playerPath, gameState.sensorLog, gameState.gameStatus,gameID]);
 
       
-
+    
       async function handleGameOver(result,path){
         setLevelsLeft(prev=>{
             const newll = [...prev];

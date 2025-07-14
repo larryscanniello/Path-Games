@@ -4,11 +4,12 @@ import api from "../../api";
 import { USERNAME } from "../../constants";
 import NavBar from "../NavBar";
 
-
+//This component lists the previously played games to be viewed, so user can enter the Mouse Game Visualizer
 export default function ViewGameList(){
     const [gameList,setGameList] = useState(null);
     const navigate = useNavigate();
     const username = localStorage.getItem(USERNAME);
+
 
     useEffect(()=>{
     async function fetchGameList(){

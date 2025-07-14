@@ -38,6 +38,8 @@ export default function RenderGridFiregame(props){
               row.map((cell, j) => {
                 let bgColor = '';
                 const mod = cell % 10;
+                //get background tile depending on fireGrid value
+                //here, fireGrid is just a 25x25 array that has been passed in from the parent component
                 if(mod===0){
                   bgColor = "bg-[url('/space_tiles_hyptosis/wool_colored_white.png')]"
                 }

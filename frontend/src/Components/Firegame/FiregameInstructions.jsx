@@ -3,6 +3,9 @@ import { Link } from "react-router-dom"
 import FiregameDifficultyMenu from "./FiregameDifficultyMenu"
 import { USERNAME } from "../../constants"
 
+//I wrote the instructions at the start and the instructions mid game as two separate components
+//This is not ideal. I will change it eventually
+
 export default function FiregameInstructions(props){
     const username = localStorage.getItem(USERNAME);
 

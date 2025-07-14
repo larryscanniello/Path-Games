@@ -39,6 +39,16 @@ export default function RenderGridSeeBots(props){
       }
     }
 
+
+    /*
+    +1 - closed cell
+    +2 - fire square
+    +4 - supressor
+    +>=8 - one of the bots or player (the encoding of individual bots doesnt really do anything - which bot is which is determined
+     in the BotSlot component using i,j , not the encoding. No harm in keeping it like this though)
+    Binary representations are used. So 10=2+8 is a fire square with bot 3, etc.
+    */
+
     return(
     <div>
     <div className="grid grid-rows-25 grid-cols-25 shadow-[0_0_12px_rgba(34,211,238,0.2)] border-b-2 border-t-1 border-l-3 border-r-3 border-cyan-400/30">
@@ -60,6 +70,9 @@ export default function RenderGridSeeBots(props){
                           key={i*25+j}
                           className={`${getTileSize()} relative flex items-center justify-center ${bgColor}`}
                           style={{backgroundSize: `${getBackgroundSize()}`}}>
+                          {/*Again, the actual values of g>=8 are meaningless here. 
+                          But BotSlot only gets processed if there's actually a bot there,
+                          which improves performance*/}
                           {!!((g&8)||(g&16)||(g&32)||(g&64)||(g&128)||(g&256)) && <BotSlot
                             indices = {props.indices}
                             difficulty = {props.difficulty}
@@ -93,12 +106,15 @@ export default function RenderGridSeeBots(props){
 function BotSlot(props){
     const [bot1index,bot2index,bot3index,bot4index,successpossibleindex,playerindex] = props.indices
     const botsInSpace = []
+    //This component manually checks each bot index to see if this is the botslot corresponding to that index
+
+    //If result is forfeit then there is no player data, so we only read playerIndex if the result is forfeit
     if(props.result!=='forfeit'){
       if(playerindex[0]==props.i&& playerindex[1]==props.j){
         botsInSpace.push({id: 0, className:"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-purple-500 border border-black z-20"})
     }
     }
-    
+    //There is only success possible bot if difficulty is hard
     if(props.difficulty==='hard'){
         if(successpossibleindex[0]===props.i && successpossibleindex[1]===props.j){
             botsInSpace.push({ id: 5, className:"absolute top-0 left-0 w-3 h-3 rounded-full bg-yellow-600 text-white text-xs flex items-center justify-center border border-black z-10"})

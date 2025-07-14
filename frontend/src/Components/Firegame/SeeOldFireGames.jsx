@@ -32,6 +32,7 @@ function SeeFireBots() {
   const [result,setResult] = useState(null);
   const [width,height] = useWindowSize();
 
+  //This effect gets the list of previously played firegames to be selected from for players to view
   useEffect(()=>{
       async function fetchGameList(){
           const res = await api.post('getfiregamelist/',{
@@ -51,7 +52,8 @@ function SeeFireBots() {
       fetchGameList();
   },[])
   
-
+  //This effect only runs once a game has been selected
+  //Fetches the actual game to be viewed
   useEffect(() => {
     async function fetchGame(){
       try{
@@ -81,9 +83,9 @@ function SeeFireBots() {
       const successpossiblelength = successpossiblepath.length;
       const firelist = JSON.parse(responsedata.fire_progression)
       const simlength = Math.max(bot1length,bot2length,bot3length,bot4length,successpossiblelength,player_path.length);
-
+      //For the next code, I wanted to encoded the fire supressor as a 4 instead of a 5 
+      //and if a bot is encoded as a 10, I wanted to get rid of that completely
       const initial_board = JSON.parse(responsedata.initial_board).map(row=>row.map(cell=> cell===5 ? 4 : cell===10 ? 0 : cell))
-      console.log('ib',initial_board)
       const fireGrids = [initial_board];
 
       for (let t = 1; t <= firelist.length; t++) {
